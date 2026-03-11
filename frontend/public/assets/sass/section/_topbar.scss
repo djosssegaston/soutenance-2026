@@ -1,0 +1,127 @@
+/*==========================================================================
+Top Bar CSS
+==========================================================================*/
+.top__bar {
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+    &-wrapper {
+        background: var(--color-1);
+        padding: 13px 25px;
+    }
+    &-left {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        justify-content: start;
+        a {
+            font-size: 16px;
+            margin-right: 27px;
+            color: var(--white);
+            i {
+                font-size: 14px;
+                margin-right: 5px;
+                color: var(--primary-color-1);
+            }
+        }
+    }
+    &-right {
+        text-align: right;
+        a {
+            font-size: 16px;
+            color: var(--white);
+            margin-right: 17px;
+            transition: .4s;
+            &:last-child {
+                margin-right: 0;
+            }
+            &:hover {
+                color: var(--primary-color-1);
+            }
+        }
+    }
+    &.two {
+        background: var(--color-9);
+        padding: 10px 0;
+        .top__bar-left a i {
+            color: var(--primary-color-3);
+        }
+        .top__bar-right a:hover {
+            color: var(--primary-color-3);
+        }
+    }
+    &.three {
+        .top__bar-wrapper {
+            padding-right: 0;
+            padding-left: 0;
+            background-color: transparent;
+        }
+        .top__bar-left a {
+            color: var(--text-heading-color);
+            i {
+                color: var(--primary-color-4);
+            }
+        }
+        .top__bar-right a {
+            color: var(--black);
+            &:hover {
+                color: var(--primary-color-4);
+            }
+        }
+    }
+}
+
+
+@media (max-width: 991px) {
+    .top__bar {
+        &-left {
+            a {
+                &:last-child {
+                    margin: 0;
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 767px) {
+    .top__bar {
+        &-left {
+            justify-content: center;
+            margin-bottom: 15px;
+            a {
+                font-size: 16px;
+                i {
+                    font-size: 14px;
+                }
+            }
+        }
+        &-right {
+            text-align: center;
+            a {
+                font-size: 16px;
+                text-transform: capitalize;
+                i {
+                    font-size: 14px;
+                }
+            }
+        }
+    }
+    .top__bar.two .top__bar-right {
+        text-align: center;
+    }
+    .top__bar.two .top__bar-left {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .top__bar {
+        &-left {
+            margin-bottom: 5px;
+            a {
+                margin-bottom: 3px;
+            }
+        }
+    }    
+}

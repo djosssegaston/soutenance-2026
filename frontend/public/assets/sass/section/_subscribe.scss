@@ -1,0 +1,154 @@
+/*==========================================================================
+Subscribe One CSS
+==========================================================================*/
+
+.subscribe__one {
+    background-color: var(--primary-color-1);
+    padding: 70px 0;
+    background-size: cover;
+    background-repeat: no-repeat;
+    h2 {
+        color: var(--white);
+        margin-bottom: 30px;
+        font-weight: 500;
+        span {
+            font-weight: 100;
+        }
+    }
+    &-form {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 25px;
+        input {
+            background-color: transparent;
+            width: 453px;
+            height: 62px;
+            border: 2px solid rgb(51 208 158);
+            padding: 0 0 0 25px;
+            color: var(--text-heading-color);
+            border-radius: 50px;
+            transition: .4s;
+            &:focus {
+                border-color: var(--border-color-4);
+            }
+            &::placeholder {
+                color: var(--white);
+            }
+        }
+        .btn-one {
+            background-color: var(--white);
+            text-transform: capitalize;
+            color: var(--text-heading-color);
+            &:hover {
+                color: var(--white);
+            }
+        } 
+    }
+}
+
+@media (max-width: 1199px) {
+    .subscribe__one-form input {
+        width: 100%;
+    }
+}
+
+@media (max-width: 767px) {
+    .subscribe__one-form .email-input {
+        margin-bottom: 20px;
+        input {
+            max-width: 100%;
+        }
+    }
+    .subscribe__one-content {
+        padding: 45px 0 45px 0;
+    }
+}
+
+@media (max-width: 359px) {
+    .subscribe__one-form input {
+        height: 70px;
+    }
+}
+
+
+
+/*==========================================================================
+Subscribe Two CSS
+==========================================================================*/
+
+
+.subscribe__two {
+    margin-bottom: -125px;
+    z-index: 5;
+    position: relative;
+    .subscribe__two-wrapper {
+        background-color: var(--primary-color-4);
+        border-radius: 20px;
+        padding: 68px 58px;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+    h2 {
+        color: var(--white);
+    }
+    &-right {
+        display: flex;
+        align-items: center;
+        gap: 30px;
+        flex-wrap: wrap;
+        .btn-four {
+            background-color: #0D0C24;
+            color: var(--white);
+            &:hover {
+                color: var(--black);
+                i {
+                    color: var(--black);
+                }
+            }
+            &::before {
+                background-color: var(--white);
+            }
+        }
+    }
+    .contact {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        background-color: #F36940;
+        color: var(--white);
+        border-radius: 100px;
+        padding: 10px 25px;
+        span {
+            display: block;
+            font-size: 13px;
+            line-height: 1;
+            text-align: left;
+            margin-bottom: 3px;
+        }
+        a {
+            display: block;
+            font-size: 15px;
+            font-family: var(--heading-font);
+            font-weight: 600;
+        }
+        i {
+            font-size: 30px; 
+        }
+    }
+}
+
+
+@media (max-width: 359px) {
+    .subscribe__two .subscribe__two-wrapper {
+        padding: 30px 30px;
+    }
+    .subscribe__two-right {
+        gap: 15px;
+    }
+    .subscribe__two .contact {
+        padding: 10px 16px;
+    }
+}

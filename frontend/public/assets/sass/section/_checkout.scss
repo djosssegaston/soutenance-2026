@@ -1,0 +1,212 @@
+/*==========================================================================
+Checkout Scss
+==========================================================================*/
+
+.paragrah {
+    margin-bottom: 60px;
+    &:last-child {
+        margin-bottom: 0;
+    }
+    h6 {
+        font-weight: 600;
+        margin-bottom: 18px;
+    }
+    p {
+        font-size: 14px;
+        margin-bottom: 10px;
+        color: var(--black);
+        opacity: .8;
+    }
+    span {
+        font-size: 12px;
+    }
+}
+
+.select-option {
+    border: 1px solid var(--border-color-2);
+    border-radius: 5px;
+    position: relative;
+    .select-icon {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        right: 15px;
+    }
+    .left {
+        width: 100%;
+        label {
+            position: absolute;
+            font-size: 13px;
+            left: 11px;
+            opacity: .8;
+        }
+        select {
+            width: 100%;
+            appearance: none;
+            border: 0;
+            padding: 22px 10px 5px;
+        }
+    }
+}
+
+.checkout-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+    &-wrappper {
+        border-top: 1px solid var(--border-color-2);
+        padding-top: 45px;
+        margin-top: 40px;
+        p {
+            font-size: 16px;
+            margin-bottom: 35px;
+        }
+        a {
+            transition: .4s;
+            i {
+                margin-right: 8px;
+            }
+            &:hover {
+                color: var(--primary-color-1);
+            }
+        }
+        input {
+            width: 390px;
+            border-radius: 5px;
+            border: 0;
+        }
+    }
+}
+
+.checkout-area-form {
+    margin-right: -50px;
+}
+
+/* Checkout sidebar */
+.order-summary-list {
+    h6 {
+        font-size: 16px;
+        margin-bottom: 20px;
+        font-family: var(--body-font);
+        padding: 17px 0 8px 19px;
+    }
+    .single-card {
+        display: flex;
+        padding: 8px 22px;
+        gap: 30px;
+        margin-bottom: 25px;
+        .summary-img {
+            position: relative;
+            .quantity {
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                position: absolute;
+                top: -5px;
+                right: -6px;
+                background: var(--primary-color-1);
+                text-align: center;
+                line-height: 20px;
+                color: var(--white);
+                opacity: 1;
+                outline: 1px solid var(--white);
+            }
+        }
+        .summary-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        span {
+            font-size: 14px;
+            opacity: .7;
+        }
+        .price {
+            font-size: 16px;
+            font-weight: 600;
+            opacity: 1;
+        }
+        p {
+            font-size: 14px;
+            margin-top: 8px;
+        }
+    }
+}
+.cart__area-calculation.checkout-sidebar {
+    border: 1px solid var(--border-color-2);
+}
+
+
+@media (max-width: 992px) {
+    .checkout-area-form {
+        margin-right: 0;
+    }
+}
+
+
+/* Checkbox input styling */
+.stylish-checkBox {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.check-box {
+    position: absolute;
+    visibility: hidden;
+}
+.label-text {
+    transform: translateY(0) scale(1) !important;
+    background-color: transparent !important;
+    width: calc(95% - 15px);
+}
+
+.checkBox-main {
+    display: block;
+    cursor: pointer;
+    width: 15px;
+    height: 15px;
+    border: 2px solid rgba(255, 255, 255, 0);
+    border-radius: 2px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0px 0px 0px 1px black;
+}
+
+.checkBox-main div {
+    width: 60px;
+    height: 60px;
+    background-color: black;
+    top: -52px;
+    left: -52px;
+    position: absolute;
+    transform: rotateZ(45deg);
+    z-index: 100;
+    transition: 300ms ease;
+}
+
+.check-box:checked + .checkBox-main div {
+    left: -10px;
+    top: -10px;
+}
+
+.note-textarea {
+    height: 0;
+    opacity: 0;
+    visibility: hidden;
+    transition: 0.3s ease;
+    resize: none;
+}
+
+.check-box:checked ~ .note-textarea {
+    opacity: 1;
+    visibility: visible;
+    height: 150px;
+}
+
+.checkBox-main {
+    transform: scale(1) translateY(0) !important;
+}

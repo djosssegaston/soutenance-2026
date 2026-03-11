@@ -1,0 +1,42 @@
+﻿<?php
+/*
+ * Composant table de donnees.
+ * Variables attendues: $table_title, $table_id, $table_html, $table_pagination, etc.
+ */
+$table_title = isset($table_title) ? $table_title : "Tableau";
+$table_id = isset($table_id) ? $table_id : "dashboard-table";
+$table_search_placeholder = isset($table_search_placeholder) ? $table_search_placeholder : "Rechercher";
+$table_html = isset($table_html) ? $table_html : "";
+$table_pagination = isset($table_pagination) ? $table_pagination : '<button class="dashboard-page-btn page-btn active">1</button><button class="dashboard-page-btn page-btn">2</button><button class="dashboard-page-btn page-btn">3</button>';
+$table_show_actions = isset($table_show_actions) ? (bool) $table_show_actions : true;
+?>
+
+<div class="dashboard-card content-card dashboard-table-card h-100" data-dashboard-table-card="<?php echo htmlspecialchars($table_id, ENT_QUOTES, 'UTF-8'); ?>">
+  <div class="dashboard-table-card__header card-title">
+    <h6><?php echo htmlspecialchars($table_title, ENT_QUOTES, 'UTF-8'); ?></h6>
+
+    <?php if ($table_show_actions): ?>
+      <div class="dashboard-table-card__actions">
+        <div class="dashboard-search-shell dashboard-search-shell--table">
+          <form id="<?php echo htmlspecialchars($table_id, ENT_QUOTES, 'UTF-8'); ?>Search" class="dashboard-inline-search js-dashboard-search" data-ajax="true" data-search-scope="table" data-search-target="<?php echo htmlspecialchars($table_id, ENT_QUOTES, 'UTF-8'); ?>" action="#" method="get">
+            <i class="bi bi-search"></i>
+            <input type="search" name="table-search" placeholder="<?php echo htmlspecialchars($table_search_placeholder, ENT_QUOTES, 'UTF-8'); ?>" aria-label="<?php echo htmlspecialchars($table_search_placeholder, ENT_QUOTES, 'UTF-8'); ?>" autocomplete="off" />
+          </form>
+          <div class="dashboard-search-suggestions" hidden></div>
+        </div>
+        <button type="button" class="dashboard-filter-btn btn-dashboard outline sm">
+          <i class="bi bi-sliders"></i>
+          <span>Filtres</span>
+        </button>
+      </div>
+    <?php endif; ?>
+  </div>
+
+  <div class="dashboard-table-wrapper table-responsive" id="<?php echo htmlspecialchars($table_id, ENT_QUOTES, 'UTF-8'); ?>">
+    <?php echo $table_html; ?>
+  </div>
+
+  <div class="dashboard-pagination pagination-dashboard">
+    <?php echo $table_pagination; ?>
+  </div>
+</div>

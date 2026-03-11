@@ -1,0 +1,599 @@
+/*==========================================================================
+About Area One CSS
+==========================================================================*/
+
+.about__one {
+    &-image {
+        position: relative;
+        &-shape {
+            position: absolute;
+        }
+        .shape-1 {
+            top: -32px;
+            right: 173px;
+        }
+        .shape-2 {
+            z-index: -1;
+            right: 106px;
+            bottom: 69px;
+        }
+    }
+    &-content {
+        h2 {
+            text-transform: none;
+            margin-bottom: 25px;
+        }
+        p {
+            margin-bottom: 25px;
+        }
+        &-service {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 33px;
+            .service-top {
+                display: flex;
+                align-items: center;
+                flex-wrap: wrap;
+                margin-bottom: 8px;
+                i {
+                    color: var(--primary-color-1);
+                    margin-right: 12px;
+                }
+            }
+            p {
+                margin: 0;
+            }
+        }
+    }
+}
+
+@media (max-width: 1399px) {
+    .about__one-image .shape-1 {
+        right: 80px;
+    }
+}
+
+@media (max-width: 1199px) {
+    .about__one-image .shape-1 {
+        right: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .about__one {
+        &-image {
+            &-shape {
+                display: none;
+            }
+        }
+        &-content {
+            p {
+                font-size: 15px;
+            }
+        }
+    }
+    .about__one-image .image-2 {
+        display: none;
+    }
+    .about__one-image .image-1 {
+        width: 100%;
+    }
+    .about__one-image .experience-bar {
+        right: 0;
+        top: 32px;
+    }
+}
+
+
+/*==========================================================================
+About Area One CSS
+==========================================================================*/
+
+.about__two {
+    &-image {
+        position: relative;
+        &-shape {
+            position: absolute;
+        }
+        .shape-1 {
+            width: 350px;
+            height: 350px;
+            background-color: #ccdbf8;
+            border-radius: 50%;
+            border: 10px solid var(--white);
+            outline: 20px solid #ccdbf8;
+            bottom: -55px;
+            right: 75px;
+            z-index: -1;
+            animation-duration: 13s;
+        }
+    }
+    &-content {
+        h2 {
+            text-transform: none;
+            margin-bottom: 25px;
+        }
+        p {
+            margin-bottom: 25px;
+        }
+        &-service {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 50px;
+            gap: 20px;
+            &-single {
+                border: 1px solid var(--border-color-3);
+                padding: 16px 22px;
+                border-radius: 15px;
+                width: 50%;
+                box-shadow: 0px 0px 40px 0px rgba(0, 0, 0, 0.07);
+                transition: .4s;
+                &:hover {
+                    transform: translateY(-3px);
+                }
+            }
+            .service-top {
+                display: flex;
+                align-items: center;
+                flex-wrap: wrap;
+                margin-bottom: 8px;
+                i {
+                    color: var(--primary-color-2);
+                    margin-right: 12px;
+                    display: inline-flex;
+                    justify-content: center;
+                    align-items: center;
+                    width: 50px;
+                    height: 50px;
+                    border-radius: 50%;
+                    background-color: var(--color-4);
+                    font-size: 25px;
+                }
+            }
+            p {
+                margin: 0;
+            }
+        }
+    }
+    &-bottom {
+        display: flex;
+        align-items: center;
+        gap: 30px;
+        flex-wrap: wrap;
+        &-right {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            img {
+                width: 60px;
+                height: 60px;
+                object-fit: cover;
+                border-radius: 50%;
+            }
+            span {
+                font-size: 14px;
+                color: var(--p-color);
+            }
+        }
+    }
+}
+
+@media (max-width: 1399px) {
+    .about__two-image .shape-1 {
+        right: 80px;
+    }
+}
+
+@media (max-width: 1199px) {
+    .about__two-image .shape-1 {
+        right: 0;
+    }
+}
+
+@media (max-width: 767px) {
+    .about__two-content-service {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .about__two-content-service-single {
+        width: 70%;
+    }
+}
+@media (max-width: 370px) {
+    .about__two-content-service-single {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .about__two {
+        &-image {
+            &-shape {
+                display: none;
+            }
+        }
+        &-content {
+            p {
+                font-size: 15px;
+            }
+        }
+    }
+    .about__two-image .image-2 {
+        display: none;
+    }
+    .about__two-image .image-1 {
+        width: 100%;
+    }
+    .about__two-image .experience-bar {
+        right: 0;
+        top: 32px;
+    }
+}
+
+
+
+
+/*==========================================================================
+About Area Three CSS
+==========================================================================*/
+
+.about__three {
+    &-image {
+        position: relative;
+        > img {
+            z-index: 5;
+            position: absolute;
+            top: 16%;
+            border-radius: 50%;
+            left: 8%;
+            animation-duration: 5s;
+            &:hover {
+                animation-play-state: paused;
+                border-radius: 48%;
+            }
+        }
+    }
+    &-content {
+        h2 {
+            text-transform: none;
+            margin-bottom: 25px;
+        }
+        p {
+            margin-bottom: 25px;
+        }
+        &-service {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 33px;
+            flex-wrap: wrap;
+            row-gap: 5px;
+            &-single {
+                display: flex;
+                align-items: center;
+                margin-bottom: 8px;
+                width: 50%;
+                h6 {
+                    font-size: 16px;
+                    font-weight: 400;
+                    opacity: .8;
+                    font-family: var(--body-font);
+                }
+                i {
+                    color: var(--primary-color-3);
+                    margin-right: 12px;
+                }
+            }
+        }
+        .btn-three {
+            background-color: transparent;
+            border: 1px solid var(--primary-color-3);
+            &::before {
+                background-color: var(--primary-color-3);
+            }
+        }
+    }
+}
+
+@media (max-width: 1399px) {
+    .about__three-content-service-single {
+        width: 100%;
+    }
+}
+@media (max-width: 480px) {
+    .about__three {
+        &-content {
+            p {
+                font-size: 15px;
+            }
+        }
+    }
+    .about__three-image > img {
+        max-width: 90%;
+    }
+}
+
+
+
+/*==========================================================================
+About Area One CSS
+==========================================================================*/
+.about__four {
+    &-image {
+        position: relative;
+        &-wrapper {
+            border-radius: 61% 39% 63% 37% / 35% 23% 77% 65% ;
+            overflow: hidden;
+            max-width: 516px;
+            height: 522px;
+            &:hover {
+                animation-play-state: paused;
+            }
+            img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+        }
+    }
+    &-content {
+        h2 {
+            text-transform: none;
+            margin-bottom: 25px;
+        }
+        p {
+            margin-bottom: 25px;
+        }
+        &-service {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 33px;
+            .service-top {
+                display: flex;
+                align-items: center;
+                flex-wrap: wrap;
+                margin-bottom: 8px;
+                i {
+                    color: var(--primary-color-4);
+                    margin-right: 12px;
+                }
+            }
+            p {
+                margin: 0;
+            }
+        }
+    }
+    &-counter {
+        display: block;
+        text-align: center;
+        background: #FFFFFF;
+        box-shadow: 0px 0px 50px 0px rgba(0, 0, 0, 0.1);
+        border-radius: 15px;
+        padding: 16px 20px;
+        transition: 0.4s;
+        position: absolute;
+        z-index: 4;
+        width: 216px;
+        right: 104px;
+        bottom: 11px;
+        .icon {
+            font-size: 60px;
+            color: var(--primary-color-4);
+            margin-bottom: 10px;
+        }
+        &-main {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0;
+            .counter {
+                margin-bottom: -4px;
+                font-size: 50px;
+            }
+            span {
+                font-size: 50px !important;
+                font-weight: 600;
+            }
+        }
+    }
+}
+
+@media (max-width: 535px) {
+    .about__four-image {
+        position: relative;
+        max-width: 95%;
+    }
+    .about__four-content-service {
+        flex-direction: column;
+        width: 78%;
+        gap: 20px;
+    }
+    .about__four-image-wrapper {
+        height: auto;
+    }
+}
+@media (max-width: 480px) {
+    .about__one {
+        &-image {
+            &-shape {
+                display: none;
+            }
+        }
+        &-content {
+            p {
+                font-size: 15px;
+            }
+        }
+    }
+    .about__one-image .experience-bar {
+        right: 0;
+        top: 32px;
+    }
+}
+
+@media (max-width: 359px) {
+    .about__four-content-service {
+        width: 100%;
+    }
+    .about__four-counter {
+        right: 37px;
+    }
+    .about__four-counter-main {
+        margin-bottom: 16px;
+    }
+}
+
+/*==========================================================================
+Company History CSS
+==========================================================================*/
+
+.company-history {
+    .container {
+        padding: 0 100px;
+    }
+    &-img {
+        height: 268px;
+        overflow: hidden;
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    }    
+    &-content-card {
+        padding: 39px;
+        padding-bottom: 37px;
+        margin-top: 30px;
+        margin-bottom: 50px;
+        position: relative;
+        background: var(--white);
+        box-shadow: 0 0 80px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        transition: 0.4s;
+        &::before {
+            content: "";
+            position: absolute;
+            border: 25px solid transparent;
+            border-left-color: var(--white);
+            left: 100%;
+            top: 50px;
+        }
+        &::after {
+            content: "";
+            width: 10px;
+            height: 10px;
+            position: absolute;
+            background: var(--primary-color-1);
+            border-radius: 50%;
+            top: 70px;
+            left: 113.5%;
+        }
+        .content-top {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            span {
+                font-weight: 700;
+                font-size: 20px;
+                color: var(--white);
+                background: var(--primary-color-1);
+                padding: 4px 20px;
+                padding-right: 28px;
+                -webkit-clip-path: polygon(0 0, 100% 0, 81% 50%, 100% 99%, 0 100%, 0% 50%);
+                clip-path: polygon(0 0, 100% 0, 81% 50%, 100% 99%, 0 100%, 0% 50%);
+                transition: 0.4s;
+            }
+        }
+    }
+    .history-column {
+        padding-right: 70px;
+        border-right: 1px dashed var(--primary-color-1);
+        &.two {
+            border: 0;
+            padding-left: 70px;
+            padding-right: 0;
+            .company-history-content-card {
+                &::before {
+                    right: 100%;
+                    left: unset;
+                    border-color: transparent;
+                    border-right-color: var(--white);
+                }
+                &::after {
+                    left: unset;
+                    right: 113%;
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 1199px) {
+    .company-history .history-column.two {
+        padding-left: 0;
+        padding-right: 70px;
+        border-right: 1px dashed var(--primary-color-1);
+    }
+    .company-history .history-column.two .company-history-content-card::before {
+        right: unset;
+        border-color: transparent;
+        border-left-color: var(--white);
+        left: 100%;
+        top: 50px;
+    }
+    .company-history-content-card::after {
+        left: 109.3%;
+    }
+    .company-history .history-column.two .company-history-content-card::after {
+        right: unset;
+        left: 109.3%;
+    }
+}
+@media (max-width: 992px) {
+    .company-history .container {
+        padding: 0;
+    }
+}
+@media (max-width: 767px) {
+    .company-history-content-card .content-top {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 20px;
+        flex-direction: column;
+    }
+    .company-history-content-card {
+        padding: 20px;
+        padding-bottom: 18px;
+    }
+    .company-history.container {
+        padding: 0 !important;
+        padding-right: 30px !important;
+    }
+    .company-history .history-column {
+        padding-right: 48px;
+    }
+}
+@media (max-width: 480px) {
+    .company-history .history-column {
+        padding-right: 0;
+        border: 0;
+    }
+    .company-history-content-card::before {
+        display: none;
+    }
+    .company-history-content-card::after {
+        display: none;
+    }
+    .company-history .history-column.two {
+        padding: 0;
+        border: 0;
+    }
+    .company-history .container {
+        padding: 0 !important;
+    }
+}

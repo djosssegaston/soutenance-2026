@@ -1,0 +1,1142 @@
+/*------------------------------------------------------------------------
+
+Template Name: Cosion - Business Consulting HTML5 Template
+Author:  ThemeOri
+Author URI: http://themeori.com
+Version: 1.0.2
+Description: This Template is created for web template
+
+--------------------------------------------------------------------------
+TABLE OF CONTENTS
+--------------------------------------------------------------------------
+* Google Fonts
+* Common CSS
+* Form CSS
+* Hedging  CSS
+* Button And Title Styles CSS
+* Text Style CSS
+* Scroll Top CSS
+* Preloader CSS
+* Animation CSS
+* Color CSS
+* Dark CSS
+* Dark Light Switch CSS
+* Space And Container CSS
+* Top Bar CSS
+* Top Bar Three CSS
+* Menu Bar Sticky CSS
+* Menu Bar CSS
+* Menu Sidebar CSS
+* Header Two CSS
+* Header Three CSS
+* Menu Responsive CSS
+* Banner One CSS
+* Banner Two CSS
+* Banner Three CSS
+* About One CSS
+* About Two CSS
+* About Three CSS
+* About Company CSS
+* Company Two CSS
+* About Solution CSS
+* Company History CSS
+* Features CSS
+* Consulting CSS
+* Work CSS
+* Services CSS
+* Services Two CSS
+* Services Three CSS
+* Services Page CSS
+* Services Details CSS
+* Cta CSS
+* Cta Two CSS
+* Get In Touch CSS
+* Get In Touch Three CSS
+* Help CSS
+* Pricing CSS
+* Pricing Two CSS
+* Team CSS
+* Team Two CSS
+* Team Three CSS
+* Team Details CSS
+* Testimonial CSS
+* Testimonial Two CSS
+* Choose Us CSS
+* FAQ CSS
+* FAQ Two CSS
+* Project CSS
+* Portfolio One CSS
+* Portfolio Two CSS
+* Portfolio Three CSS
+* Filter CSS
+* Project Filter CSS
+* Project Details CSS
+* Solution CSS
+* Solution Two CSS
+* Experience CSS
+* Subscribe One CSS
+* Subscribe Two CSS
+* Blog One CSS
+* Blog Two CSS
+* Blog Three CSS
+* News Details CSS
+* News Standard CSS
+* Contact CSS
+* Contact Page CSS
+* Contact Two CSS
+* Contact Three CSS
+* Contact Four CSS
+* Request Quote CSS
+* Footer Top CSS
+* Footer One CSS
+* Footer Two CSS
+* Footer Three CSS
+* All Footer CSS
+* Copyright One CSS
+* Copyright Two CSS
+* Copyright Three CSS
+* All Side Bar CSS
+* Post CSS
+* Theme Pagination CSS
+* Page Banner CSS
+* Error CSS
+* Contact CSS
+/*==========================================================================
+Google Fonts
+==========================================================================*/
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Outfit:wght@100..900&display=swap');
+/*==========================================================================
+Common CSS
+==========================================================================*/
+body {
+	font-family: var(--body-font);
+	color: var(--body-color);
+	font-size: 16px;
+	line-height: 26px;
+  	font-weight: 400;
+}
+img {
+	max-width: 100%;
+	height: auto;
+	transition: 0.4s;
+}
+a {
+	outline: none;
+	color: inherit;
+	text-decoration: none;
+}
+a,
+button,
+i {
+	text-decoration: none;
+	color: inherit;
+}
+a:focus,
+a:hover {
+	text-decoration: none;
+	color: inherit;
+}
+.section-padding {
+	padding: 120px 0px;
+}
+@media (max-width: 991px) {
+	.section-padding {
+		padding: 80px 0px;
+	}
+}
+@media (max-width: 575px) {
+	.section-padding {
+		padding: 60px 0px;
+	}
+}
+.display-none {
+	display: none;
+}
+.display-block {
+	display: block;
+}
+.filter img {
+	filter: grayscale(100%);
+}
+.img__full {
+	width: 100%;
+}
+/*==========================================================================
+Form CSS
+==========================================================================*/
+button,
+input[type="button"],
+input[type="reset"],
+input[type="submit"] {
+	border: 1px solid var(--border-color-2);
+	border-color: transparent;
+	background: var(--primary-color-1);
+	color: var(--white);
+	padding: 17px 40px;
+}
+button:hover,
+input[type="button"]:hover,
+input[type="reset"]:hover,
+input[type="submit"]:hover {
+  	border-color: transparent;
+}
+button:active,
+button:focus,
+input[type="button"]:active,
+input[type="button"]:focus,
+input[type="reset"]:active,
+input[type="reset"]:focus,
+input[type="submit"]:active,
+input[type="submit"]:focus {
+  	border-color: transparent;
+}
+input[type="text"],
+input[type="email"],
+input[type="url"],
+input[type="password"],
+input[type="search"],
+input[type="number"],
+input[type="tel"],
+input[type="range"],
+input[type="date"],
+input[type="month"],
+input[type="week"],
+input[type="time"],
+input[type="datetime"],
+input[type="datetime-local"],
+input[type="color"],
+textarea {
+	color: var(--body-color);
+	border-radius: 5px;
+	width: 100%;
+	height: 60px;
+	border: 1px solid var(--color-4);
+	padding: 0 15px;
+	background: var(--white);
+}
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="url"]:focus,
+input[type="password"]:focus,
+input[type="search"]:focus,
+input[type="number"]:focus,
+input[type="tel"]:focus,
+input[type="range"]:focus,
+input[type="date"]:focus,
+input[type="month"]:focus,
+input[type="week"]:focus,
+input[type="time"]:focus,
+input[type="datetime"]:focus,
+input[type="datetime-local"]:focus,
+input[type="color"]:focus,
+textarea:focus {
+	color: var(--text-heading-color);
+	outline: none;
+	box-shadow: none;
+	border-color: var(--primary-color-1);
+}
+select {
+	border: 1px solid var(--border-color-2);
+}
+textarea {
+	width: 100%;
+	height: 150px;
+	padding-top: 15px;
+}
+button,
+button:hover,
+button:focus {
+	box-shadow: none;
+	border: none;
+	outline: none;
+}
+/*==========================================================================
+Social
+==========================================================================*/
+.social {
+	display: flex;
+	align-items: center;
+	gap: 15px;
+	a {
+		i {
+			font-size: 14px;
+			color: var(--white);
+			transition: 0.4s;
+			border: 1px solid var(--border-color-1);
+			width: 42px;
+			height: 42px;
+			border-radius: 50%;
+			display: inline-flex;
+			justify-content: center;
+			align-items: center;
+			&:hover {
+				border-color: var(--primary-color-1);
+				background-color: var(--primary-color-1);
+			}
+		}
+	}
+}
+
+.mfp-close {
+    background: var(--black) !important;
+    width: 50px !important;
+    height: 50px !important;
+    text-align: center !important;
+    line-height: 50px;
+    padding: 0 !important;
+    border-radius: 50%;
+    margin-top: 15px;
+    margin-right: -15px;
+    outline: 2px solid var(--black) !important;
+    border: 2px solid #ffffff4d !important;
+    opacity: .8;
+}
+/*==========================================================================
+Hedging CSS
+==========================================================================*/
+$list: (h1, 64px, 1.18, 0, 0, var(--text-heading-color), var(--heading-font), 600),
+(h2, 48px, 1.25, 0, 0, var(--text-heading-color), var(--heading-font), 600),
+(h3, 32px, 1.25, 0, 0, var(--text-heading-color), var(--heading-font), 600),
+(h4, 28px, 1.63, 0, 0, var(--text-heading-color), var(--heading-font), 600),
+(h5, 24px, 1.5, 0, 0, var(--text-heading-color), var(--heading-font), 500),
+(h6, 20px, 1.5, 0, 0, var(--text-heading-color), var(--heading-font), 500),
+(p, 16px, 1.75, 0, 0, var(--p-color));
+@each $name, $size, $height, $p, $m, $color, $font, $weight in $list {
+    #{$name}{
+      font-size: $size;
+      line-height: $height;
+      padding: $p;
+      margin: $m;
+      color: $color;
+      font-family: $font;
+      font-weight: $weight;
+    }
+}
+$list: left, center, right;
+@each $i in $list {
+    .t-#{$i} {
+        text-align: $i;
+    }
+}
+@media (max-width: 1399px) {
+	h2 {
+		font-size: 45px;
+		line-height: 55px;
+	}
+}
+@media (max-width: 767px) {
+	h2 {
+		font-size: 38px;
+		line-height: 50px;
+	}
+}
+@media (max-width: 420px) {
+	h2 {
+		font-size: 31px;
+		line-height: 41px;
+	}
+	h3 {
+		font-size: 28px;
+		line-height: 38px;
+	}
+}
+@media (max-width: 359px) {
+	h2 {
+		font-size: 27px;
+		line-height: 37px;
+	}
+	h3 {
+		font-size: 24px;
+		line-height: 34px;
+	}
+	h4 {
+		font-size: 21px;
+		line-height: 31px;
+	}
+	h5 {
+		font-size: 20px;
+		line-height: 30px;
+	}
+	h6 {
+		font-size: 18px;
+		line-height: 28px;
+	}
+}
+
+p {
+	text-transform: none;
+}
+
+span {
+	display: inline-block;
+}
+
+/*==========================================================================
+Button And Title Styles CSS
+==========================================================================*/
+.subtitle-one,
+.subtitle-two,
+.subtitle-three,
+.subtitle-four {
+    position: relative;
+    text-transform: capitalize;
+    color: var(--primary-color-1);
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 1.87;
+    margin-bottom: 14px !important;
+    background: #d5ece5;
+    padding: 0px 17px;
+    border-radius: 50px;
+    display: flex;  
+    align-items: center;
+    width: fit-content;
+	&::before {
+		content: "";
+		width: 7px;
+		height: 7px;
+		background-color: var(--primary-color-1);
+		display: block;
+		border-radius: 50%;
+		margin-right: 8px;
+	}
+}
+.subtitle-two {
+    background: #e6eeff;
+	color: var(--primary-color-2);
+	&::before {
+		background-color: var(--primary-color-2);
+	}
+}
+.subtitle-three {
+	background-color: #FFF4E6;
+	color: var(--primary-color-3);
+	&::before {
+		background-color: var(--primary-color-3);
+	}
+}
+.subtitle-four {
+	background-color: #FFEBE5;
+	color: var(--primary-color-4);
+	&::before {
+		background-color: var(--primary-color-4);
+	}
+}
+.btn-one,
+.btn-two,
+.btn-three,
+.btn-four{
+    background-color: var(--primary-color-1);
+    color: var(--white);
+    display: inline-flex;
+    align-items: center;
+    font-size: 14px;
+    line-height: 26px;
+    padding: 17px 30px;
+    text-align: center;
+    font-weight: 500;
+    z-index: 3;
+    position: relative;
+    transition: 0.4s;
+    text-transform: none;
+    overflow: hidden;
+    border-radius: 50px;
+	text-transform: capitalize;
+	i {
+		position: relative;
+		top: 0px;
+		margin-left: 10px;
+		font-size: 13px;
+		transition: 0.2s;
+	}
+	&::before {
+		content: "";
+		width: 100%;
+		height: 100%;
+		background-color: var(--color-1);
+		position: absolute;
+		left: 0;
+		top: 0;
+		z-index: -1;
+		transition: ease-out 0.3s;
+		border-radius: 50px;
+		left: -100%;
+	}
+    &:hover {
+		color: var(--white);
+		i {
+			transform: translateX(2px);
+			color: var(--white);
+		}
+		&::before {
+			left: 0;
+		}
+    }
+}
+.btn {
+	&-two {
+		background: var(--primary-color-2);
+		&::before {
+			background-color: var(--color-3);
+		}
+	}	
+	&-three {
+		background: var(--primary-color-3);
+		color: var(--color-7);
+		font-weight: 500;
+		&::before {
+			background-color: var(--color-3);
+		}
+		&:hover {
+			border-color: var(--color-3);
+		}
+	}
+	&-four {
+		background: var(--primary-color-4);
+		font-weight: 500;
+		&::before {
+			background-color: var(--color-3);  
+		}
+		&:hover {
+			border-color: var(--color-3);
+		}
+	}
+}
+.simple-btn-1,
+.simple-btn-2,
+.simple-btn-3 {
+	color: var(--primary-color-1);
+	display: inline-block;
+	font-size: 16px;
+	line-height: 26px;
+	font-weight: 700;
+	font-family: var(--heading-font);
+	transition: 0.4s;
+	text-transform: uppercase;
+	i {
+		position: relative;
+		top: 0;
+		margin-left: 15px;
+		font-size: 13px;
+	}
+    &:hover {
+        color: var(--btn-heading-color);
+    }
+	&:focus {
+		color: var(--btn-heading-color);
+	}
+}
+.simple-btn {
+	&-2 {
+		color: var(--text-heading-color);
+		&:hover {
+			color: var(--primary-color-1);
+		}
+	}
+	&-3 {
+		color: var(--white);
+		&:hover {
+			color: var(--primary-color-1);
+		}
+	}
+}
+/*==========================================================================
+Progress Bar Animation
+==========================================================================*/
+@keyframes animateStripe {
+    0% {        
+        transform: translate(0, 0);
+    }
+    
+    100% {        
+        transform: translate(35px, 0);
+    }
+}
+
+
+/*==========================================================================
+Highlighted Text Styles
+==========================================================================*/
+.highlighted {
+    position: relative;
+    z-index: 1;
+    display: inline-block;
+    &::before {
+		content: "";
+		width: 108%;
+		height: 4px;
+		background: var(--primary-color-1);
+		position: absolute;
+		bottom: 6%;
+		left: -7px;
+		border-radius: 50px;
+		animation: highlightAnimation 4s infinite;
+    }
+}
+
+@keyframes highlightAnimation {
+	0% {
+	  width: 0;
+	}
+	15% {
+	  width: 108%;
+	}
+	85% {
+	  opacity: 1;
+	}
+	90% {
+	  width: 108%;
+	  opacity: 0;
+	}
+	to {
+	  width: 0;
+	  opacity: 0;
+	}
+}
+
+.highlighted-two {
+    position: relative;
+    display: inline-block;
+	color: var(--primary-color-1);
+	&::before {
+		content: "";
+		width: 108%;
+		height: 60px;
+		position: absolute;
+		border: 2px solid transparent;
+		border-top: 2px solid var(--primary-color-1);
+		border-radius: 50%;
+		top: 58px;
+		left: -10px;
+		z-index: 1;
+	}
+}
+
+@media (max-width: 480px) {
+	.highlighted-two::before {
+		top: 40px;
+	}
+}
+
+/*==========================================================================
+Scroll Top CSS
+==========================================================================*/
+.scroll-up {
+	cursor: pointer;
+	display: block;
+	border-radius: 50px;
+	box-shadow: inset  0 0 0 2px var(--color-8);
+	z-index: 10000;
+	opacity: 0;
+	visibility: hidden;
+	transform: translateY(15px);
+	position: fixed;
+	right: 20px;
+	bottom: 20px;
+	height: 50px;
+	width: 50px;
+    transition: all 200ms linear;
+	&::after {
+		position: absolute;
+		font-family: 'Font Awesome 5 Pro';
+		content: "\f176";
+		text-align: center;
+		line-height: 50px;
+		font-size: 24px;
+		color: var(--primary-color-1);
+		left: 0;
+		top: 0;
+		font-size: 20px;
+		height: 50px;
+		width: 50px;
+		cursor: pointer;
+		display: block;
+		z-index: 1;
+		transition: all 200ms linear;
+	}
+	&.active-scroll {
+		opacity: 1;
+		visibility: visible;
+		transform: translateY(0);
+	}
+	svg path { 
+		fill: none; 
+	}
+	svg.scroll-circle path {
+		stroke: var(--primary-color-1);
+		stroke-width: 4;
+		box-sizing:border-box;
+		transition: all 200ms linear;
+	}
+}
+.style-two {
+	&::after {
+		color: var(--primary-color-2);
+	}
+	svg.scroll-circle path {
+		stroke: var(--primary-color-2);
+	}
+}
+.style-three {
+	&::after {
+		color: var(--primary-color-3);
+	}
+	svg.scroll-circle path {
+		stroke: var(--primary-color-3);
+	}
+}
+.style-four {
+	&::after {
+		color: var(--primary-color-4);
+	}
+	svg.scroll-circle path {
+		stroke: var(--primary-color-4);
+	}
+}
+/*==========================================================================
+Preloader CSS
+==========================================================================*/
+.loader {
+    z-index: 9999999;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background: var(--color-1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.loader-container, .loader-container:before, .loader-container:after {
+	border-radius: 50%;
+	width: 2.5em;
+	height: 2.5em;
+	animation-fill-mode: both;
+	animation: bblFadInOut 1.8s infinite ease-in-out;
+  }
+  .loader-container {
+	color: var(--primary-color-1);
+	font-size: 7px;
+	position: relative;
+	text-indent: -9999em;
+	transform: translateZ(0);
+	animation-delay: -0.16s;
+  }
+  .loader-container:before,
+  .loader-container:after {
+	content: '';
+	position: absolute;
+	top: 0;
+  }
+  .loader-container:before {
+	left: -4.5em;
+	animation-delay: -0.32s;
+  }
+  .loader-container:after {
+	left: 4.5em;
+  }
+  
+  @keyframes bblFadInOut {
+	0%, 80%, 100% { box-shadow: 0 2.5em 0 -1.3em }
+	40% { box-shadow: 0 2.5em 0 0 }
+  }
+	  
+		
+/*==========================================================================
+Animation CSS
+==========================================================================*/
+.video {
+	position: relative;
+	text-align: center;
+	display: inline-block;
+	z-index: 4;
+	a {
+		position: relative;
+		color: var(--primary-color-2);
+		font-size: 20px;
+		z-index: 1;
+		background: var(--white);
+		width: 90px;
+		height: 90px;
+		line-height: 90px;
+		border-radius: 50%;
+		display: block;                
+	}          
+}
+.video-pulse::after, .video-pulse::before {
+	position: absolute;
+	content: "";
+	width: 100%;
+	height: 100%;
+	border: 1px solid var(--white);
+	opacity: 0.3;
+	left: 0;
+	top: 0;
+	border-radius: 50%;
+	animation-duration: 2.5s;
+	animation-timing-function: linear;
+	animation-name: video-animation;
+	animation-iteration-count: infinite;
+}
+.video-pulse::before {
+	animation-delay: 1s;
+}
+@keyframes video-animation {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.5);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(2);
+    }
+}
+
+/*============** Custom Animation **============*/
+
+.animate-y-axis {
+    -webkit-animation-name: y-axis;
+    animation-name: y-axis;
+    -webkit-animation-duration: 11s;
+    animation-duration: 11s;
+    -webkit-animation-iteration-count: infinite;
+    animation-iteration-count: infinite;
+    -webkit-animation-timing-function: linear;
+    animation-timing-function: linear;
+}
+
+@-webkit-keyframes y-axis {
+    0% {
+        -webkit-transform: translateY(-30px);
+        transform: translateY(-30px);
+    }
+
+    50% {
+        -webkit-transform: translateY(-10px);
+        transform: translateY(-10px);
+    }
+
+    100% {
+        -webkit-transform: translateY(-30px);
+        transform: translateY(-30px);
+    }
+}
+
+@keyframes y-axis {
+    0% {
+        -webkit-transform: translateY(-30px);
+        transform: translateY(-30px);
+    }
+
+    50% {
+        -webkit-transform: translateY(-10px);
+        transform: translateY(-10px);
+    }
+
+    100% {
+        -webkit-transform: translateY(-30px);
+        transform: translateY(-30px);
+    }
+}
+
+.animate-y-axis-slider {
+    -webkit-animation-name: y-axis-slider;
+    animation-name: y-axis-slider;
+    -webkit-animation-duration: 3s;
+    animation-duration: 3s;
+    -webkit-animation-iteration-count: infinite;
+    animation-iteration-count: infinite;
+    -webkit-animation-timing-function: linear;
+    animation-timing-function: linear;
+}
+
+@-webkit-keyframes y-axis-slider {
+    0% {
+        -webkit-transform: translateY(-40px);
+        transform: translateY(-40px);
+    }
+
+    50% {
+        -webkit-transform: translateY(-20px);
+        transform: translateY(-20px);
+    }
+
+    100% {
+        -webkit-transform: translateY(-40px);
+        transform: translateY(-40px);
+    }
+}
+
+@keyframes y-axis-slider {
+    0% {
+        -webkit-transform: translateY(-40px);
+        transform: translateY(-40px);
+    }
+
+    50% {
+        -webkit-transform: translateY(-20px);
+        transform: translateY(-20px);
+    }
+
+    100% {
+        -webkit-transform: translateY(-40px);
+        transform: translateY(-40px);
+    }
+}
+/*==== Animation x-axis ==== */
+.animate-x-axis {
+    -webkit-animation-name: x-axis;
+    animation-name: x-axis;
+    -webkit-animation-duration: 2s;
+    animation-duration: 2s;
+    -webkit-animation-iteration-count: infinite;
+    animation-iteration-count: infinite;
+    -webkit-animation-timing-function: linear;
+    animation-timing-function: linear;
+}
+
+@-webkit-keyframes x-axis {
+    0% {
+        -webkit-transform: translateX(-20px);
+        transform: translateX(-20px);
+    }
+
+    50% {
+        -webkit-transform: translateX(-10px);
+        transform: translateX(-10px);
+    }
+
+    100% {
+        -webkit-transform: translateX(-20px);
+        transform: translateX(-20px);
+    }
+}
+
+@keyframes x-axis {
+    0% {
+        -webkit-transform: translateX(-20px);
+        transform: translateX(-20px);
+    }
+
+    50% {
+        -webkit-transform: translateX(-10px);
+        transform: translateX(-10px);
+    }
+
+    100% {
+        -webkit-transform: translateX(-20px);
+        transform: translateX(-20px);
+    }
+}
+/*==== Animation Rotate ==== */
+.animate-rotate {
+    animation-name: rotate;
+    animation-duration: 24s;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+    -webkit-animation-name: rotate;
+    -webkit-animation-duration: 24s;
+    -webkit-animation-iteration-count: infinite;
+    -webkit-animation-timing-function: linear;
+    -moz-animation-name: rotate;
+    -moz-animation-duration: 24s;
+    -moz-animation-iteration-count: infinite;
+    -moz-animation-timing-function: linear;
+    -ms-animation-name: rotate;
+    -ms-animation-duration: 24s;
+    -ms-animation-iteration-count: infinite;
+    -ms-animation-timing-function: linear;
+    -o-animation-name: rotate;
+    -o-animation-duration: 24s;
+    -o-animation-iteration-count: infinite;
+    -o-animation-timing-function: linear;
+}
+
+@-webkit-keyframes rotate {
+    from {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+
+    to {
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes rotate {
+    from {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+
+    to {
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
+}
+
+/*==== Animate zoom-in-out-rotate  ====*/
+.animate-zoom-in-out-rotate {
+    animation-name: zoomInOut-rotate;
+    animation-duration: 3s;
+    animation-iteration-count: infinite;
+    animation-timing-function: ease-in-out;
+    -webkit-animation-name: zoomInOut-rotate;
+    -webkit-animation-duration: 3s;
+    -webkit-animation-iteration-count: infinite;
+    -webkit-animation-timing-function: ease-in-out;
+    -moz-animation-name: zoomInOut-rotate;
+    -moz-animation-duration: 3s;
+    -moz-animation-iteration-count: infinite;
+    -moz-animation-timing-function: ease-in-out;
+    -ms-animation-name: zoomInOut-rotate;
+    -ms-animation-duration: 3s;
+    -ms-animation-iteration-count: infinite;
+    -ms-animation-timing-function: ease-in-out;
+    -o-animation-name: zoomInOut-rotate;
+    -o-animation-duration: 3s;
+    -o-animation-iteration-count: infinite;
+    -o-animation-timing-function: ease-in-out;
+}
+
+@-webkit-keyframes zoomInOut-rotate {
+    0% {
+        -webkit-transform: rotate(0deg) scale(0.7);
+        transform: rotate(0deg) scale(0.7);
+    }
+
+    50% {
+        -webkit-transform: rotate(180deg) scale(1);
+        transform: rotate(180deg) scale(1);
+    }
+
+    100% {
+        -webkit-transform: rotate(360deg) scale(0.7);
+        transform: rotate(360deg) scale(0.7);
+    }
+}
+
+@keyframes zoomInOut-rotate {
+    0% {
+        -webkit-transform: rotate(0deg) scale(0.7);
+        transform: rotate(0deg) scale(0.7);
+    }
+
+    50% {
+        -webkit-transform: rotate(180deg) scale(1);
+        transform: rotate(180deg) scale(1);
+    }
+
+    100% {
+        -webkit-transform: rotate(360deg) scale(0.7);
+        transform: rotate(360deg) scale(0.7);
+    }
+}
+
+
+/*==== Animate zoom-in-out  ====*/
+.animate-zoom-in-out {
+    animation-name: zoomInOut;
+    animation-duration: 3s;
+    animation-iteration-count: infinite;
+    animation-timing-function: ease-in-out;
+    -webkit-animation-name: zoomInOut;
+    -webkit-animation-duration: 3s;
+    -webkit-animation-iteration-count: infinite;
+    -webkit-animation-timing-function: ease-in-out;
+    -moz-animation-name: zoomInOut;
+    -moz-animation-duration: 3s;
+    -moz-animation-iteration-count: infinite;
+    -moz-animation-timing-function: ease-in-out;
+    -ms-animation-name: zoomInOut;
+    -ms-animation-duration: 3s;
+    -ms-animation-iteration-count: infinite;
+    -ms-animation-timing-function: ease-in-out;
+    -o-animation-name: zoomInOut;
+    -o-animation-duration: 3s;
+    -o-animation-iteration-count: infinite;
+    -o-animation-timing-function: ease-in-out;
+}
+
+@-webkit-keyframes zoomInOut {
+    0% {
+        -webkit-transform: scale(0.9);
+        transform: scale(0.9);
+    }
+
+    50% {
+        -webkit-transform: scale(1);
+        transform: scale(1);
+    }
+
+    100% {
+        -webkit-transform: scale(0.9);
+        transform: scale(0.9);
+    }
+}
+
+@keyframes zoomInOut {
+    0% {
+        -webkit-transform: scale(0.9);
+        transform: scale(0.9);
+    }
+
+    50% {
+        -webkit-transform: scale(1);
+        transform: scale(1);
+    }
+
+    100% {
+        -webkit-transform: scale(0.9);
+        transform: scale(0.9);
+    }
+}
+
+.halfRotationAnimation {
+	animation: halfRotationAnimation 5s infinite ease-in-out;
+}
+
+@keyframes halfRotationAnimation {
+	0% {
+		transform: rotate(-10deg);
+	}
+	50% {
+		transform: rotate(-15deg);
+	}
+	100% {
+		transform: rotate(-10deg);
+	}  
+}
+
+.swiper-button-prev::after {
+	display: none;
+}
+.swiper-button-next::after {
+	display: none;
+}
+
+
+.blob-animation {
+	animation: blob-animation 15s linear infinite;
+}
+
+@keyframes blob-animation{
+	0%, 100% {
+	border-radius: 40% 60% 70% 30% / 40% 40% 60% 50%;
+	}
+	34% {
+	  border-radius: 70% 30% 50% 50% / 30% 30% 70% 70%;
+	}
+	67% {
+	  border-radius: 100% 60% 60% 100% / 100% 100% 60% 60%;
+	}
+  }
+
+@media (min-width: 1024px) {
+	.slide_box {
+		margin-right: -420px;
+	}
+}

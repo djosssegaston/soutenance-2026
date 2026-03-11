@@ -1,0 +1,309 @@
+/*==========================================================================
+Team One Style
+==========================================================================*/
+
+.team__one {
+    position: relative;
+    &-single-slider {   
+        &:hover {
+            .team__one-image img {
+                transform: scale(1.1);
+            }
+            .team__one-content {
+                transform: translateY(-55%);
+            }
+        }
+    }   
+    &-image {
+        height: 420px;
+        overflow: hidden;
+        border-radius: 20px 20px 0 0;
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: 1.5s;
+        }
+    }
+    &-content {
+        border-radius: 20px;
+        background: var(--white);
+        width: 85%;
+        text-align: center;
+        margin: auto;
+        border: 1px solid var(--border-color-2);
+        box-shadow: 0px 0px 40px 0px rgba(0, 0, 0, 0.07);
+        transform: translateY(-50%);
+        padding: 28px 20px;
+        transition: 0.4s;
+        margin-bottom: -14%;
+        span {
+            margin-bottom: 10px;
+        }
+        .social {
+            justify-content: center;
+            gap: 10px;
+            a i {
+                color: var(--text-heading-color);
+                border-color: var(--color-4);
+                width: 40px;
+                height: 40px;
+                &:hover {
+                    background-color: var(--primary-color-4);
+                    color: var(--white);
+                }
+            }
+        }
+    }
+
+    // Style Two
+    &.style-two {
+        .social a i:hover {
+            background-color: var(--primary-color-1);
+        }
+    }
+
+    // Style Three
+    &.style-three {
+        .team__one-single-slider {
+            position: relative;
+            overflow: hidden;
+            &:hover {
+                .team__one-content {
+                    top: 55%;
+                    transform: translateX(-50%) scale(1);
+                    opacity: 1;
+                }
+            }
+        }
+        .team__one-image {
+            border-radius: 20px;
+        }
+        .team__one-content {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%) scale(.8);
+            transition: .5s;
+            opacity: 0;
+        }
+        .social a i:hover {
+            background-color: var(--primary-color-1);
+        }
+    }
+
+    // Style Four
+    &.style-four {
+        .team__one-single-slider {
+            position: relative;
+            overflow: hidden;
+            &:hover {
+                .social {
+                    right: 20px;
+                    opacity: 1;
+                    visibility: visible;
+                }
+                span {
+                    left: 28px;
+                    opacity: 1;
+                    visibility: visible;
+                }
+                h5 {
+                    left: 28px;
+                    opacity: 1;
+                    visibility: visible;
+                }
+                .team__one-image img {
+                    transform: scale(1);
+                }
+            }
+        }
+        .team__one-image {
+            border-radius: 20px;
+        }
+        .team__one-content {
+            border-radius: 0;
+            background: none;
+            width: auto;
+            text-align: left;
+            margin: 0;
+            border: 0;
+            box-shadow: none;
+            transform: none;
+            padding: 0;
+            span {
+                margin-bottom: 0;
+                position: absolute;
+                bottom: 65px;
+                left: 0;
+                background: var(--primary-color-1);
+                color: var(--white);
+                padding: 4px 20px;
+                opacity: 0;
+                visibility: hidden;
+                transition: .5s;
+            }
+            h5 {
+                position: absolute;
+                bottom: 19px;
+                left: 68px;
+                color: var(--white);
+                background-color: var(--color-1);
+                padding: 5px 20px;
+                opacity: 0;
+                visibility: hidden;
+                transition: .5s;
+            }
+            .social {
+                position: absolute;
+                top: 30px;
+                right: 0;
+                flex-direction: column;
+                gap: 8px;
+                opacity: 0;
+                visibility: hidden;
+                transition: .4s;
+                i {
+                    width: 45px;
+                    height: 45px;
+                    border: 0;
+                    background: var(--color-1);
+                    color: var(--white);
+                    transition: .3s;
+                    &:hover {
+                        background-color: var(--primary-color-1);
+                    }
+                }
+            }
+        }
+    }
+    .swiper-button-prev, .swiper-button-next {
+        width: 55px;
+        height: 55px;
+        color: var(--black);
+        background-color: var(--color-8);
+        border-radius: 50%;
+        font-size: 24px;
+        transition: .4s;
+        &:hover {
+            background-color: var(--primary-color-4);
+            color: var(--white);
+        }
+    }
+    .swiper-button-prev{
+        left: 185px;
+    }
+    .swiper-button-next {
+        right: 185px;
+    }
+}
+
+@media (max-width: 1570px) {
+    .team__one .swiper-button-next {
+        right: 65px;
+    } 
+    .team__one .swiper-button-prev {
+        left: 65px;
+    } 
+}  
+@media (max-width: 1240px) {
+    .team__one .swiper-button-next {
+        right: 10px;
+    } 
+    .team__one .swiper-button-prev {
+        left: 10px;
+    } 
+}  
+@media (max-width: 570px) {
+    .team__one .swiper-button-next, .team__one .swiper-button-prev {
+        display: none;
+    } 
+}  
+
+
+
+/*==========================================================================
+Team Two Style
+==========================================================================*/
+
+.team__two {
+    &-single {
+        display: flex;
+        align-items: center;
+        gap: 30px;
+        box-shadow: 0px 0px 50px 0px rgba(0, 0, 0, 0.06);
+        border: 1px solid var(--border-color-2);
+        border-radius: 20px;
+        padding: 40px 50px;
+        transition: .4s;
+        .team-person {
+            text-align: center;
+            border-right: 1px solid var(--border-color-2);
+            padding-right: 20px;
+            .team-img {
+                width: 180px;
+                height: 180px;
+                overflow: hidden;
+                border-radius: 50%;
+                margin-bottom: 10px;
+                img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                }
+            }
+            span {
+                color: #4d4d4d;
+            }
+        }
+        .team-content {
+            p {
+                margin-bottom: 30px;
+                color: var(--black);
+                opacity: .7;
+            }
+            .social a i {
+                border-color: var(--border-color-2);
+                color: var(--black);
+                background-color: var(--white);
+                &:hover {
+                    border: var(--primary-color-2);
+                    background-color: var(--primary-color-2);
+                    color: var(--white);
+                }
+            }
+        }
+        &:hover {
+            transform: translateY(-5px) scale(1.01);
+            box-shadow: 0px 0px 50px 0px rgb(0 0 0 / 10%);
+        }
+    }
+    &.style-two {
+        .social a i {
+            border-color: var(--border-color-2);
+            color: var(--black);
+            background-color: var(--white);
+            &:hover {
+                border: var(--primary-color-1);
+                background-color: var(--primary-color-1);
+                color: var(--white);
+            }
+        }
+    }
+}
+
+@media (max-width: 575px) {
+    .team__two-single {
+        gap: 20px;
+        padding: 30px 20px;
+        flex-direction: column;
+        text-align: center;
+    }
+    .team-person {
+        padding: 0 !important;
+        border: 0 !important;
+    }
+    .team__two .social {
+        justify-content: center;
+    }
+}

@@ -1,0 +1,34 @@
+/*==========================================================================
+* Horizontal Scroll Animation
+==========================================================================*/
+
+.horizontal-scroll {
+    padding: 21px 0;
+    background: var(--primary-color-1);
+    margin-bottom: -1px;
+    &.style-two {
+        background: var(--primary-color-4);
+        .horizontal-scroll-icon {
+            color: #f9a890;
+        }
+    }
+    &-active {
+        padding: 0;
+    }
+    &-icon {
+        margin: 0 45px;
+        font-size: 28px;
+        color: #037756;
+    }
+    &-single-item {
+        display: flex !important;
+        justify-content: space-between;
+        align-items: center;
+        list-style: none;
+        h3 {
+            font-size: 30px;
+            color: var(--white);
+            font-weight: 400;
+        }
+    }
+}

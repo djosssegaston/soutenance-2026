@@ -1,0 +1,111 @@
+/*==========================================================================
+Work Process One Style
+==========================================================================*/
+
+.work-process__one {
+    .work-process-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 45px;
+        .single-item {
+            text-align: center;
+            position: relative;
+            &__icon {
+                position: relative;
+                width: 90px;
+                height: 90px;
+                border-radius: 50%;
+                background-color: var(--color-8);
+                display: inline-flex;
+                justify-content: center;
+                align-items: center;
+                font-size: 43px;
+                color: var(--primary-color-3);
+                margin-bottom: 15px;
+                transition: .4s;
+            }
+            &__number {
+                position: absolute;
+                top: 0;
+                left: 0;
+                background-color: var(--primary-color-3);
+                width: 30px;
+                height: 30px;
+                border-radius: 50%;
+                color: var(--white);
+                font-size: 18px;
+                display: inline-flex;
+                justify-content: center;
+                align-items: center;
+                font-family: var(--heading-font);
+                outline: 3px solid var(--white);
+                transition: .9s;
+            }
+            h5 {
+                margin-bottom: 10px;
+            }
+            &:nth-child(even) {
+                margin-top: 100px;
+                .next-arrow {
+                    transform: scaleY(-1) !important;
+                    rotate: -8deg;
+                    top: 18%;
+                }
+                &:hover .next-arrow  {
+                    transform: scaleY(-1) translate(12px) rotate(7deg) !important;
+                }
+            }
+            &:hover {
+                .single-item__icon {
+                    background-color: var(--primary-color-3);
+                    color: var(--color-1);
+                }
+                .single-item__number{
+                    transform: rotateY(380deg);
+                }
+                .next-arrow {
+                    transform: translate(12px) rotate(7deg);
+                }
+            }
+        }
+    }
+    .next-arrow {
+        position: absolute;
+        right: -45px;
+        top: 25%;
+        rotate: 8deg;
+        transition: .4s;
+    }
+}
+
+
+@media (max-width: 992px) {
+    .work-process__one .work-process-wrapper {
+        flex-wrap: wrap;
+    }
+    .work-process__one .work-process-wrapper .single-item {
+        width: 35%;
+    }
+    .work-process__one .work-process-wrapper .single-item:nth-child(even) .next-arrow {
+        display: none;
+    }
+}
+
+@media (max-width: 767px) {
+    .work-process__one .work-process-wrapper .single-item {
+        width: 45%;
+    }
+}
+@media (max-width: 480px) {
+    .work-process__one .work-process-wrapper .single-item {
+        width: 75%;
+        margin: 0 !important;
+        &:first-child {
+            margin-top: 70px !important;
+        }
+        .next-arrow {
+            display: none;
+        }
+    }
+}

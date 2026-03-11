@@ -1,0 +1,191 @@
+/*==========================================================================
+Counter One Style
+==========================================================================*/
+
+.counter-up__one {
+    display: flex;
+    align-items: center;
+    margin-top: -30px;
+    .counter-single {
+        display: flex;
+        align-items: center;
+        gap: 30px;
+        border-right: 1px solid var(--border-color-2);
+        padding: 0 100px;
+        margin-top: -115px;
+        &:first-child {
+            padding-left: 0;
+        }
+        &:last-child {
+            padding-right: 0;
+            border: 0;
+        }
+        .icon {
+            font-size: 55px;
+            color: var(--primary-color-1);
+        }
+        .top {
+            display: flex;
+            align-items: center;
+        }
+    }
+}
+
+@media (max-width: 1399px) {  
+    .counter-up__one .counter-single {
+        gap: 25px;
+        padding: 0 60px;
+        margin-top: -205px;  
+    }
+}
+
+@media (max-width: 1199px) {
+    .counter-up__one .counter-single {
+        padding: 0 42px;  
+    }
+}
+
+@media (max-width: 991px) {
+    .counter-up__one {
+        justify-content: center;
+        margin-top: 5px;
+    }
+    .counter-up__one .counter-single {
+        margin: 0 ;
+    }
+}
+
+@media (max-width: 480px) {
+    .counter-up__one .counter-single {
+        padding: 0 30px;
+    }
+    .counter-up__one .counter-single .top h2 {
+        font-size: 32px;
+    }
+    .counter-up__one .counter-single .icon {
+        font-size: 48px;
+    }
+}
+
+
+/*==========================================================================
+Counter Two Style
+==========================================================================*/
+
+
+.counter-up__two {
+    background: var(--primary-color-2);
+    padding: 75px 0;
+    position: relative;
+    &::before {
+        content: "";
+        width: 62%;
+        height: 100%;
+        position: absolute;
+        background-color: var(--color-5);
+        right: 0;
+        top: 0;
+    }
+    &::after {
+        content: "";
+        position: absolute;
+        right: 62%;
+        top: 0;
+        background-color: var(--color-5);
+        height: 100%;
+        width: 100px;
+        clip-path: polygon(40% 50%, 100% 100%, 100% 0);
+    }
+    &-content {
+        width: 28%;
+        h3 {
+            font-size: 38px;
+            text-transform: none;
+            color: var(--white);
+        }
+    }
+    .counter-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    &-counter-wrapper {
+        display: flex;
+        align-items: center;
+        z-index: 2;
+        .single-counter {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 0 75px;
+            border-right: 1px solid var(--border-color-1);
+            &:first-child {
+                padding-left: 0;
+            }
+            &:last-child {
+                border-right: 0;
+                padding-right: 0;
+            }
+            &-icon {
+                font-size: 52px;
+                color: var(--white);
+            }
+            &-right {
+                .counter-only {
+                    display: flex;
+                    align-items: center;
+                    h3 {
+                        font-size: 44px;
+                        color: var(--white);
+                    }
+                }
+                span {
+                    font-size: 16px;
+                    color: var(--white);
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 1399px) {
+    .counter-up__two-counter-wrapper .single-counter {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 0 40px;
+        border-right: 1px solid var(--border-color-1);
+    }
+}
+@media (max-width: 1199px) {
+    .counter-up__two-counter-wrapper .single-counter {
+        padding: 0 22px;
+    }
+}
+@media (max-width: 992px) {
+    .counter-up__two .counter-wrapper {
+        flex-direction: column;
+    }
+    .counter-up__two-content {
+        z-index: 2;
+        margin-bottom: 24px;
+        width: 100%;
+        text-align: center;
+    }
+}
+@media (max-width: 767px) {
+    .counter-up__two {
+        padding: 45px 0;
+    }
+    .counter-up__two-counter-wrapper .single-counter {
+        padding: 0;
+        border: 0;
+    }
+    .counter-up__two-counter-wrapper {
+        flex-direction: column;
+        gap: 20px;
+    }
+}
+
+
+
