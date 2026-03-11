@@ -22,7 +22,7 @@ $threadMap = [
       'status' => '',
     ],
     [
-      'type' => 'attachment',
+      'type' => 'pdf',
       'outgoing' => true,
       'time' => '09:16',
       'title' => 'Facture_fournisseur.pdf',
@@ -42,6 +42,14 @@ $threadMap = [
       'time' => '09:24',
       'duration' => '0:18',
       'status' => 'Lu',
+    ],
+    [
+      'type' => 'file',
+      'outgoing' => false,
+      'time' => '09:30',
+      'title' => 'Bon_commande_signe.docx',
+      'meta' => 'Word - 380 Ko',
+      'status' => '',
     ],
   ],
   'Administrateur ALOGOTO' => [
@@ -75,6 +83,13 @@ $threadMap = [
       'text' => 'Le calendrier a ete ajuste et sera envoye dans le tableau de suivi aujourd hui.',
       'status' => 'Lu',
     ],
+    [
+      'type' => 'audio',
+      'outgoing' => false,
+      'time' => '08:55',
+      'duration' => '01:12',
+      'status' => '',
+    ],
   ],
   'Ecobank CI' => [
     [
@@ -98,7 +113,7 @@ $threadMap = [
 $messagesView = dashboard_messages_prepare($conversations, $presenceMap, $threadMap);
 
 $page_title = 'Messages';
-$page_subtitle = 'Messagerie interne compacte, inspiree de WhatsApp Web et WhatsApp mobile.';
+$page_subtitle = 'Messagerie interne inspiree de WhatsApp Web, dans la charte ALOGOTO.';
 $page_active_nav = 'messages';
 $page_document_title = 'Messages - ALOGOTO';
 $page_inline_styles = dashboard_messages_styles();
@@ -107,8 +122,8 @@ $page_inline_scripts = dashboard_messages_scripts($messagesView['payload']);
 include __DIR__ . '/components/porteur_page_start.php';
 
 dashboard_render_messages_shell($messagesView['cards'], $messagesView['default_id'], 'porteur_escape', [
-  'sidebar_title' => 'Conversations',
-  'sidebar_subtitle' => 'Messagerie interne ALOGOTO',
+  'sidebar_title' => 'Centre de conversation',
+  'sidebar_subtitle' => 'Synchronise avec vos partenaires',
   'sidebar_badge' => $messagesView['unread_total'] . ' non lus',
   'compose_placeholder' => 'Tapez un message',
 ]);
