@@ -1,0 +1,625 @@
+/* Logo dans le header horizontal */
+.logo-horizontal .header-brand-img {
+    max-width: 100%;
+    height: auto;
+    transition: all 0.3s ease;
+}
+
+/* Logo dans la sidebar */
+.side-header .header-brand1 .header-brand-img {
+    max-width: 100%;
+    height: auto;
+    transition: all 0.3s ease;
+}
+
+/* Écrans très larges (>= 1400px) */
+@media (min-width: 1400px) {
+    .logo-horizontal .header-brand-img,
+    .side-header .header-brand1 .header-brand-img {
+        max-width: 180px;
+    }
+}
+
+/* Écrans larges (1200px - 1399px) */
+@media (min-width: 1200px) and (max-width: 1399px) {
+    .logo-horizontal .header-brand-img,
+    .side-header .header-brand1 .header-brand-img {
+        max-width: 160px;
+    }
+}
+
+/* Écrans moyens (992px - 1199px) */
+@media (min-width: 992px) and (max-width: 1199px) {
+    .logo-horizontal .header-brand-img,
+    .side-header .header-brand1 .header-brand-img {
+        max-width: 140px;
+    }
+}
+
+/* Tablettes paysage (768px - 991px) */
+@media (min-width: 768px) and (max-width: 991px) {
+    .logo-horizontal .header-brand-img,
+    .side-header .header-brand1 .header-brand-img {
+        max-width: 120px;
+    }
+}
+
+/* Tablettes portrait (576px - 767px) */
+@media (min-width: 576px) and (max-width: 767px) {
+    .logo-horizontal .header-brand-img,
+    .side-header .header-brand1 .header-brand-img {
+        max-width: 100px;
+    }
+}
+
+/* Mobiles (<= 575px) */
+@media (max-width: 575px) {
+    .logo-horizontal .header-brand-img,
+    .side-header .header-brand1 .header-brand-img {
+        max-width: 80px;
+    }
+}
+
+/* Mobiles très petits (<= 375px) */
+@media (max-width: 375px) {
+    .logo-horizontal .header-brand-img,
+    .side-header .header-brand1 .header-brand-img {
+        max-width: 70px;
+    }
+}
+
+/* Mobiles ultra petits (<= 320px) */
+@media (max-width: 320px) {
+    .logo-horizontal .header-brand-img,
+    .side-header .header-brand1 .header-brand-img {
+        max-width: 60px;
+    }
+}
+
+/* Sidebar réduite */
+.sidebar-mini.sidenav-toggled .side-header .header-brand1 .header-brand-img {
+    max-width: 40px !important;
+}
+
+/* Amélioration de la qualité d'image */
+.header-brand-img {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+}
+
+/* Centrage du logo sur mobile */
+@media (max-width: 767px) {
+    .side-header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 0;
+    }
+
+    .logo-horizontal {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+/* RESPONSIVITE DES DROPDOWNS NOTIFICATIONS ET MESSAGES */
+
+/* Container des dropdowns */
+.notifications,
+.message {
+    position: relative;
+}
+
+/* Menu dropdown de base - CACHÉ PAR DÉFAUT */
+.notifications .dropdown-menu,
+.message .dropdown-menu {
+    width: 320px;
+    max-width: 90vw;
+    max-height: 70vh;
+    overflow: hidden;
+    display: none;
+    flex-direction: column;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+/* Afficher le dropdown quand il a la classe .show */
+.notifications .dropdown-menu.show,
+.message .dropdown-menu.show {
+    display: flex;
+}
+
+/* Header du dropdown */
+.drop-heading {
+    padding: 12px 16px;
+    flex-shrink: 0;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.drop-heading h6 {
+    font-size: 14px;
+    line-height: 1.4;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Contenu scrollable */
+.notifications-menu,
+.message-menu {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: calc(70vh - 100px);
+    padding: 8px 0;
+}
+
+/* scrollbar personnalisée */
+.notifications-menu::-webkit-scrollbar,
+.message-menu::-webkit-scrollbar {
+    width: 6px;
+}
+
+.notifications-menu::-webkit-scrollbar-track,
+.message-menu::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.notifications-menu::-webkit-scrollbar-thumb,
+.message-menu::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+}
+
+.notifications-menu::-webkit-scrollbar-thumb:hover,
+.message-menu::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Items de notification */
+.notifications-menu .dropdown-item {
+    padding: 12px 16px;
+    display: block;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background 0.2s ease;
+}
+
+.notifications-menu .dropdown-item:last-child {
+    border-bottom: none;
+}
+
+.notifications-menu .dropdown-item:hover {
+    background: #f8f9fa;
+}
+
+.notifications-menu h5 {
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.4;
+    margin-bottom: 4px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.notifications-menu p {
+    font-size: 12px;
+    line-height: 1.5;
+    margin: 0;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.notifications-menu .text-sm {
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+/* Items de message */
+.message-menu .dropdown-item {
+    padding: 12px 16px;
+    display: flex;
+    align-items: flex-start;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background 0.2s ease;
+}
+
+.message-menu .dropdown-item:last-child {
+    border-bottom: none;
+}
+
+.message-menu .dropdown-item:hover {
+    background: #f8f9fa;
+}
+
+.message-menu .avatar {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+}
+
+.message-menu .avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.message-menu .wd-90p {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.message-menu h5 {
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.4;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.message-menu small {
+    font-size: 11px;
+    flex-shrink: 0;
+    margin-left: 8px;
+}
+
+.message-menu span {
+    font-size: 12px;
+    line-height: 1.5;
+    display: block;
+    margin-top: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Footer du dropdown */
+.dropdown-menu .dropdown-item.text-center {
+    padding: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    border-top: 2px solid #e9ecef;
+    flex-shrink: 0;
+}
+
+/* Positionnement du dropdown */
+.dropdown-menu-end {
+    right: 0 !important;
+    left: auto !important;
+}
+
+/* Mobiles - ajustements */
+@media (max-width: 767px) {
+    .notifications .dropdown-menu,
+    .message .dropdown-menu {
+        position: fixed !important;
+        top: 60px !important;
+        right: 10px !important;
+        left: 10px !important;
+        width: auto !important;
+        max-width: calc(100vw - 20px);
+        max-height: 60vh;
+        z-index: 9999;
+    }
+
+    .notifications-menu,
+    .message-menu {
+        max-height: calc(60vh - 100px);
+    }
+}
+
+/* Tablettes */
+@media (min-width: 768px) and (max-width: 991px) {
+    .notifications .dropdown-menu,
+    .message .dropdown-menu {
+        width: 300px;
+    }
+}
+
+/* Empêcher le débordement sur petits écrans */
+@media (max-width: 575px) {
+    .nav-link.icon {
+        padding: 8px;
+        margin: 0 2px;
+    }
+
+    .pulse,
+    .pulse-danger {
+        width: 8px;
+        height: 8px;
+        font-size: 8px;
+    }
+}
+
+/* Correction du positionnement des icônes */
+.d-flex.order-lg-2 {
+    flex-wrap: nowrap;
+    align-items: center;
+}
+
+.dropdown.d-flex {
+    display: flex !important;
+    align-items: center;
+}
+
+/* Animation d'ouverture fluide */
+.dropdown-menu.show {
+    animation: dropdownSlideIn 0.2s ease-out;
+}
+
+@keyframes dropdownSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* BARRE DE NAVIGATION MOBILE/TABLETTE FIXE EN BAS */
+.mobile-bottom-nav {
+    display: none;
+    position: fixed;
+    inset: auto 0 0 0;
+    background: #ffffff;
+    box-shadow: 0 -6px 24px rgba(0, 0, 0, 0.12);
+    z-index: 10000;
+    padding: 10px 12px 12px;
+    border-top: 1px solid #e9ecef;
+}
+
+.mobile-bottom-nav__container {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    align-items: end;
+    gap: 6px;
+    max-width: 640px;
+    margin: 0 auto;
+}
+
+.mobile-bottom-nav__slot,
+.mobile-bottom-nav__container > .dropdown {
+    min-width: 0;
+    display: flex;
+    justify-content: center;
+    position: relative;
+}
+
+.mobile-bottom-nav__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 76px;
+    min-height: 56px;
+    padding: 6px 4px;
+    margin: 0 auto;
+    text-decoration: none;
+    color: #6c757d;
+    transition: color 0.25s ease, transform 0.25s ease, background-color 0.25s ease, box-shadow 0.25s ease;
+    position: relative;
+    border-radius: 18px;
+}
+
+.mobile-bottom-nav__item:hover,
+.mobile-bottom-nav__item:active {
+    color: var(--porteur-accent);
+    transform: translateY(-1px);
+}
+
+.mobile-bottom-nav__item.active {
+    color: var(--porteur-accent);
+    background: var(--porteur-accent-soft);
+}
+
+.mobile-bottom-nav__item--menu {
+    width: clamp(54px, 13vw, 60px);
+    max-width: clamp(54px, 13vw, 60px);
+    min-width: clamp(54px, 13vw, 60px);
+    min-height: clamp(54px, 13vw, 60px);
+    margin-top: clamp(-24px, -4vw, -18px);
+    padding: 8px 5px;
+    border-radius: clamp(18px, 4vw, 20px);
+    background: var(--porteur-accent);
+    color: #ffffff;
+    box-shadow: 0 10px 20px rgba(var(--porteur-accent-rgb), 0.24);
+    z-index: 2;
+}
+
+.mobile-bottom-nav__item--menu:hover,
+.mobile-bottom-nav__item--menu:active,
+.mobile-bottom-nav__item--menu.active {
+    color: #ffffff;
+    background: var(--porteur-accent);
+    transform: translateY(-2px);
+}
+
+.mobile-bottom-nav__icon {
+    font-size: 22px;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.mobile-bottom-nav__item--menu .mobile-bottom-nav__icon {
+    font-size: clamp(19px, 4.6vw, 21px);
+    margin-bottom: 2px;
+}
+
+.mobile-bottom-nav__label {
+    font-size: 10px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 64px;
+}
+
+.mobile-bottom-nav__item--menu .mobile-bottom-nav__label {
+    color: #ffffff;
+    max-width: none;
+}
+
+.mobile-bottom-nav__badge {
+    position: absolute;
+    top: -4px;
+    right: -8px;
+    background: #F35120;
+    color: #ffffff;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 600;
+    border: 2px solid #ffffff;
+}
+
+.mobile-bottom-nav__divider {
+    display: none;
+}
+
+/* Afficher la barre sur mobile et tablette */
+@media (max-width: 991px) {
+    .mobile-bottom-nav {
+        display: block;
+    }
+
+    body {
+        padding-bottom: 98px;
+    }
+
+    .main-content {
+        padding-bottom: 108px !important;
+    }
+}
+
+/* Cacher tous les icones du haut sur mobile/tablette et centrer le logo */
+@media (max-width: 991px) {
+    .header-right-icons,
+    .main-header-center,
+    .app-header .app-sidebar__toggle {
+        display: none !important;
+    }
+
+    .app-header .main-container > .d-flex {
+        justify-content: center;
+        align-items: center;
+        min-height: 50px;
+    }
+
+    .app-header .logo-horizontal {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        margin: 0 auto;
+    }
+
+    .app-header .logo-horizontal .header-brand-img {
+        margin: 0 auto;
+    }
+
+    .app .app-sidebar {
+        inset-block-start: 64px;
+    }
+}
+
+/* Tablettes : header un peu plus compact pour libérer le haut de la sidebar */
+@media (min-width: 768px) and (max-width: 991px) {
+    .app-header .main-container > .d-flex {
+        min-height: 60px;
+    }
+
+    .app .app-sidebar {
+        inset-block-start: 60px;
+    }
+
+    body .app-sidebar:not(.horizontal-main) .main-sidemenu {
+        padding-top: 15px;
+    }
+}
+
+/* Optimisation pour très petits écrans */
+@media (max-width: 375px) {
+    .mobile-bottom-nav {
+        padding-inline: 8px;
+    }
+
+    .mobile-bottom-nav__container {
+        gap: 4px;
+    }
+
+    .mobile-bottom-nav__icon {
+        font-size: 20px;
+    }
+
+    .mobile-bottom-nav__item {
+        max-width: 68px;
+        min-height: 52px;
+        padding: 4px 2px;
+    }
+
+    .mobile-bottom-nav__item--menu {
+        width: 52px;
+        max-width: 52px;
+        min-width: 52px;
+        min-height: 52px;
+        margin-top: -18px;
+        border-radius: 16px;
+    }
+
+    .mobile-bottom-nav__label {
+        font-size: 9px;
+    }
+}
+
+/* Dropdowns pour mobile */
+.mobile-search-dropdown,
+.mobile-notifications-dropdown,
+.mobile-messages-dropdown,
+.mobile-profile-dropdown {
+    position: fixed !important;
+    bottom: 96px !important;
+    top: auto !important;
+    left: 10px !important;
+    right: 10px !important;
+    width: auto !important;
+    max-width: calc(100vw - 20px) !important;
+    max-height: 60vh;
+    z-index: 10001;
+    margin: 0;
+    display: none;
+    transform: none !important;
+}
+
+.mobile-search-dropdown.show,
+.mobile-notifications-dropdown.show,
+.mobile-messages-dropdown.show,
+.mobile-profile-dropdown.show {
+    display: flex !important;
+    flex-direction: column;
+}
+
+.mobile-search-dropdown {
+    max-height: 200px;
+}
+
+/* Empêcher le comportement par défaut de Bootstrap */
+.dropdown-menu[data-bs-popper] {
+    transform: none !important;
+}
