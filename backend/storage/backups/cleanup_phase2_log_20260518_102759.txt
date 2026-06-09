@@ -1,0 +1,12 @@
+[2026-05-18 10:27:59] === DÉBUT PHASE 2: RÉPARATION WORKFLOW ===
+[2026-05-18 10:27:59] Conversation 1 réparée: liée à institution 1, projet 2
+[2026-05-18 10:27:59] Financement ajouté pour projet 20 (Boutique en Ligne): 2 000 000 FCFA
+[2026-05-18 10:27:59] Projet 2 a 14 documents
+[2026-05-18 10:27:59] Notifications admin marquées comme lues
+[2026-05-18 10:27:59] 4 notifications utiles ajoutées
+[2026-05-18 10:27:59] Échéance ajoutée pour projet 20: 250 000 FCFA au 15/06/2026
+[2026-05-18 10:27:59] Projet 2 statut actuel: under_institution_review - OK (under_institution_review)
+[2026-05-18 10:27:59] Financements actuels: 2
+[2026-05-18 10:27:59]   Financement #5: projet #2, decaisse, 5000000.00 FCFA
+[2026-05-18 10:27:59]   Financement #6: projet #20, valide, 2000000.00 FCFA
+[2026-05-18 10:27:59] === PHASE 2 TERMINÉE AVEC SUCCÈS ===

@@ -1,5 +1,9 @@
 <?php
 
+if (isset($porteurData) && is_array($porteurData)) {
+    return $porteurData;
+}
+
 return [
   'projects' => [
     [
@@ -330,3 +334,4 @@ return [
     ],
   ],
 ];
+

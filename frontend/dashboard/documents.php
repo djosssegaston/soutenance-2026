@@ -61,6 +61,7 @@ include __DIR__ . '/components/porteur_page_start.php';
             $stat_trend_icon = 'bi-check2-circle';
             $stat_icon_bg = 'rgba(0, 196, 134, 0.15)';
             $stat_icon_color = 'var(--primary-color-1)';
+            $stat_compact_header = true;
             include __DIR__ . '/components/stat_card.html';
             ?>
           </div>
@@ -74,6 +75,7 @@ include __DIR__ . '/components/porteur_page_start.php';
             $stat_trend_icon = 'bi-clock-history';
             $stat_icon_bg = 'rgba(252, 160, 40, 0.18)';
             $stat_icon_color = 'var(--primary-color-3)';
+            $stat_compact_header = true;
             include __DIR__ . '/components/stat_card.html';
             ?>
           </div>
@@ -87,6 +89,7 @@ include __DIR__ . '/components/porteur_page_start.php';
             $stat_trend_icon = 'bi-exclamation-triangle';
             $stat_icon_bg = 'rgba(243, 81, 32, 0.12)';
             $stat_icon_color = 'var(--primary-color-4)';
+            $stat_compact_header = true;
             include __DIR__ . '/components/stat_card.html';
             ?>
           </div>
@@ -94,7 +97,7 @@ include __DIR__ . '/components/porteur_page_start.php';
 
         <div class="row dashboard-gap-20 porteur-documents-main">
           <div class="col-12">
-            <section class="dashboard-card content-card dashboard-table-card">
+            <section class="dashboard-card content-card dashboard-table-card" data-auto-paginate="true">
               <div class="dashboard-table-card__header card-title">
                 <h6>Gestion documentaire</h6>
 
@@ -111,7 +114,7 @@ include __DIR__ . '/components/porteur_page_start.php';
               </div>
 
               <div class="dashboard-table-wrapper table-responsive">
-                <table class="table dashboard-table data-table align-middle">
+                <table class="table dashboard-table data-table align-middle" data-items-per-page="10">
                   <thead>
                     <tr>
                       <th>Nom du document</th>
@@ -148,11 +151,7 @@ include __DIR__ . '/components/porteur_page_start.php';
                 </table>
               </div>
 
-              <div class="dashboard-pagination pagination-dashboard">
-                <button class="dashboard-page-btn page-btn active">1</button>
-                <button class="dashboard-page-btn page-btn">2</button>
-                <button class="dashboard-page-btn page-btn">3</button>
-              </div>
+              <div class="dashboard-pagination pagination-dashboard"></div>
             </section>
           </div>
 

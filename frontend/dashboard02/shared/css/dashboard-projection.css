@@ -1,0 +1,256 @@
+/* 
+ * Dashboard Projection Overrides — Soutenance
+ * Chargé EN DERNIER dans header_meta.php pour override propre.
+ * Optimise la lisibilité en projection grand écran :
+ *  - Cards stables (pas de translateY au hover)
+ *  - Bordures renforcées pour lisibilité lointaine
+ *  - Tableaux structurés
+ *  - Icônes sans transformation
+ *  - Contrastes renforcés
+ */
+
+
+/* ─────────── CARD STABILITY ─────────── */
+.card {
+    transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.card::before {
+    display: none !important;
+}
+
+.card:hover,
+.card-clickable:hover,
+.cockpit-card:hover {
+    transform: none !important;
+    border-color: #cbd5e1 !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04) !important;
+}
+
+.card-clickable:active {
+    transform: none !important;
+}
+
+/* Card Hover KPI Icon — soft color only, no background/box-shadow shift */
+.card:hover .card-icon,
+.card:hover .avatar:not(.avatar-list .avatar),
+.card:hover .chart-circle-value i,
+.card:hover .counter-icon {
+    background-color: transparent !important;
+    color: var(--brand-orange) !important;
+    box-shadow: none !important;
+}
+
+
+/* ─────────── BORDER REINFORCEMENT ─────────── */
+
+/* Cards — visible border for projection */
+.card {
+    border: 4px solid #cbd5e1 !important;
+}
+
+/* Card header separation */
+.card-header {
+    border-bottom: 4px solid #d1d5db !important;
+}
+
+/* Card footer separation (when present) */
+.card-footer {
+    border-top: 4px solid #d1d5db !important;
+}
+
+/* Tables — header clearly separated from body */
+.table thead th {
+    border-bottom: 4px solid #cbd5e1 !important;
+}
+
+/* Tables — row separator visible */
+.table td,
+.table th {
+    border-top: 4px solid #d1d5db !important;
+}
+
+/* Table row hover — keep subtle but visible */
+.table tbody tr:hover,
+.table tbody tr:active {
+    background-color: rgba(252, 160, 40, 0.06) !important;
+}
+
+/* Page header — section separator (no layout shift) */
+.page-header {
+    border-bottom: 4px solid #e2e8f0 !important;
+}
+
+/* List group — visible separators */
+.list-group-item {
+    border-color: #d1d5db !important;
+    border-width: 4px !important;
+}
+
+/* Modals — add visible border */
+.modal-content {
+    border: 4px solid #cbd5e1 !important;
+}
+
+/* Form controls — sharper outline */
+.form-control,
+.form-select {
+    border: 4px solid #cbd5e1 !important;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--brand-orange) !important;
+    box-shadow: 0 0 0 3px rgba(252, 160, 40, 0.1) !important;
+}
+
+/* Progress bar wrapper */
+.progress {
+    border: 4px solid #e2e8f0 !important;
+}
+
+
+/* ─────────── INPUT TEXT COLOR — BLACK FOR READABILITY ─────────── */
+.form-control,
+.form-select,
+textarea,
+select,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="tel"],
+input[type="date"],
+input[type="search"],
+input[type="url"] {
+    color: #000 !important;
+}
+
+/* Force black also on focus (overrides porteur-theme orange) */
+.form-control:focus,
+.form-select:focus,
+.form-control:focus-visible,
+.form-select:focus-visible {
+    color: #000 !important;
+}
+
+/* Keep placeholder light */
+.form-control::placeholder,
+textarea::placeholder,
+input::placeholder {
+    color: #9ca3af !important;
+    opacity: 1 !important;
+}
+
+
+/* ─────────── TABLE STABILITY ─────────── */
+.table tbody tr {
+    transition: none !important;
+}
+
+
+/* ─────────── SIDEBAR / NAV STABILITY ─────────── */
+.sidenav-menu-item:hover .side-menu__icon,
+.sidenav-menu-item:active .side-menu__icon {
+    transform: none !important;
+}
+
+
+/* ─────────── LIST GROUP STABILITY ─────────── */
+.list-group-item {
+    transition: background-color 0.2s ease !important;
+}
+
+.list-group-item:hover,
+.list-group-item:active {
+    border-left: 4px solid #d1d5db !important;
+    background: #f5f5f7;
+}
+
+
+/* ─────────── FORM / BUTTON STABILITY ─────────── */
+.form-control,
+.form-select {
+    transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.btn {
+    transition: background-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.btn-primary:hover,
+.btn-primary:active,
+.btn-primary:focus {
+    transform: none !important;
+}
+
+.pagination .page-link {
+    transition: background-color 0.2s ease !important;
+}
+
+
+/* ─────────── TASK LIST ─────────── */
+.task-list-item {
+    transition: background-color 0.2s ease !important;
+}
+
+
+/* ─────────── BETTER READABILITY ON PROJECTION ─────────── */
+
+/* Table text — slightly larger & higher contrast */
+.table {
+    font-size: 0.875rem;
+}
+
+.table thead th {
+    font-size: 12px;
+    color: #475569;
+}
+
+/* KPI numbers — larger for long-distance reading */
+.number-font {
+    font-size: 1.5rem !important;
+}
+
+/* Page header title — bigger */
+.page-header .page-title {
+    font-size: 1.1rem;
+}
+
+/* card-title stronger */
+.card-title {
+    color: #1e293b !important;
+}
+
+
+/* ─────────── DROPDOWN ANIMATIONS ─────────── */
+.dropdown-menu.show {
+    animation: none !important;
+}
+
+
+/* ─────────── MOBILE BOTTOM NAV ─────────── */
+.mobile-bottom-nav__item {
+    transition: color 0.2s ease !important;
+}
+
+.mobile-bottom-nav__item:hover,
+.mobile-bottom-nav__item:active {
+    transform: none !important;
+}
+
+.mobile-bottom-nav__item--menu:hover,
+.mobile-bottom-nav__item--menu:active,
+.mobile-bottom-nav__item--menu.active {
+    transform: none !important;
+}
+
+
+/* ─────────── MISCELLANEOUS ─────────── */
+.side-menu__icon {
+    transition: color 0.2s ease !important;
+}
+
+.progress-bar {
+    transition: width 0.4s ease !important;
+}

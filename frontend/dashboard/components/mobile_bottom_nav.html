@@ -9,7 +9,7 @@ $mobileNavConfig = [
     'secondary_label' => 'Projets',
     'secondary_href' => dashboard_url('mes_projets.php'),
     'secondary_icon' => 'bi-folder2',
-    'secondary_active' => ['my-projects', 'create-project', 'funding', 'repayments', 'stats'],
+    'secondary_active' => ['my-projects', 'create-project', 'funding', 'repayments', 'repayment-schedule'],
     'messages_href' => dashboard_url('messages.php'),
     'notifications_href' => dashboard_url('notifications.php'),
     'profile_href' => dashboard_url('profil.php'),
@@ -19,7 +19,7 @@ $mobileNavConfig = [
     'secondary_label' => 'Projets',
     'secondary_href' => dashboard_url('parcourir_projets.php'),
     'secondary_icon' => 'bi-briefcase',
-    'secondary_active' => ['browse', 'risk-analysis', 'validation', 'portfolio', 'investments', 'reports', 'repayments'],
+    'secondary_active' => ['available-projects', 'analyzed-projects', 'interviews', 'financed-portfolio', 'repayments'],
     'messages_href' => dashboard_url('messages_institution.php'),
     'notifications_href' => dashboard_url('notifications_institution.php'),
     'profile_href' => dashboard_url('profil_institution.php'),
@@ -40,11 +40,12 @@ $mobileNavConfig = [
 $mobileNavRole = isset($mobileNavConfig[$mobile_nav_context]) ? $mobileNavConfig[$mobile_nav_context] : $mobileNavConfig['porteur'];
 $mobileNavItems = [
   [
-    'label' => 'Accueil',
-    'href' => dashboard_url('dashboard_' . ($mobile_nav_context === 'porteur' ? 'porteur' : ($mobile_nav_context === 'institution' ? 'institution' : 'admin')) . '.php'),
-    'icon' => 'bi-house-door',
-    'active' => $page_active_nav === 'dashboard',
+    'label' => 'Menu',
+    'href' => '#',
+    'icon' => 'bi-list',
+    'active' => false,
     'badge' => 0,
+    'toggle' => true,
   ],
   [
     'label' => $mobileNavRole['secondary_label'],
@@ -59,6 +60,7 @@ $mobileNavItems = [
     'icon' => 'bi-chat-dots',
     'active' => $page_active_nav === 'messages',
     'badge' => $mobile_nav_messages_badge,
+    'badge_class' => 'mobile-nav__badge--messages',
   ],
   [
     'label' => 'Notif.',
@@ -66,6 +68,7 @@ $mobileNavItems = [
     'icon' => 'bi-bell',
     'active' => $page_active_nav === 'notifications',
     'badge' => $mobile_nav_notifications_badge,
+    'badge_class' => 'mobile-nav__badge--notifications',
   ],
   [
     'label' => 'Profil',
@@ -78,14 +81,122 @@ $mobileNavItems = [
 ?>
 <nav class="dashboard-mobile-nav d-md-none" aria-label="Navigation mobile rapide">
 <?php foreach ($mobileNavItems as $item): ?>
-  <a href="<?php echo htmlspecialchars($item['href'], ENT_QUOTES, 'UTF-8'); ?>" class="dashboard-mobile-nav__item<?php echo $item['active'] ? ' is-active' : ''; ?>" aria-label="<?php echo htmlspecialchars($item['label'], ENT_QUOTES, 'UTF-8'); ?>">
+  <a href="<?php echo htmlspecialchars($item['href'], ENT_QUOTES, 'UTF-8'); ?>" class="dashboard-mobile-nav__item<?php echo $item['active'] ? ' is-active' : ''; ?>" aria-label="<?php echo htmlspecialchars($item['label'], ENT_QUOTES, 'UTF-8'); ?>"<?php echo !empty($item['toggle']) ? ' data-mobile-menu-toggle' : ''; ?>>
     <span class="dashboard-mobile-nav__icon-wrap<?php echo $item['badge'] > 0 ? ' has-badge' : ''; ?>">
       <i class="bi <?php echo htmlspecialchars($item['icon'], ENT_QUOTES, 'UTF-8'); ?>"></i>
 <?php if ($item['badge'] > 0): ?>
-      <span class="dashboard-mobile-nav__badge"><?php echo htmlspecialchars((string) min($item['badge'], 99), ENT_QUOTES, 'UTF-8'); ?></span>
+      <span class="dashboard-mobile-nav__badge <?php echo htmlspecialchars($item['badge_class'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><?php echo htmlspecialchars((string) min($item['badge'], 99), ENT_QUOTES, 'UTF-8'); ?></span>
 <?php endif; ?>
     </span>
     <span class="dashboard-mobile-nav__label"><?php echo htmlspecialchars($item['label'], ENT_QUOTES, 'UTF-8'); ?></span>
   </a>
 <?php endforeach; ?>
 </nav>
+
+<?php if ($mobile_nav_context === 'porteur'): ?>
+  <?php
+    $mobileDrawerItems = [
+      ['label' => 'Dashboard', 'href' => dashboard_url('dashboard_porteur.php')],
+      ['label' => 'Mes projets', 'href' => dashboard_url('mes_projets.php')],
+      ['label' => 'Créer un projet', 'href' => dashboard_url('creer_projet.php')],
+      ['label' => 'Documents', 'href' => dashboard_url('documents.php')],
+      ['label' => 'Financement', 'href' => dashboard_url('financement.php')],
+      ['label' => 'Remboursements', 'href' => dashboard_url('remboursements.php')],
+      ['label' => 'Messages', 'href' => dashboard_url('messages.php')],
+      ['label' => 'Notifications', 'href' => dashboard_url('notifications.php')],
+      ['label' => 'Profil', 'href' => dashboard_url('profil.php')],
+      ['label' => 'Sécurité', 'href' => dashboard_url('securite.php')],
+    ];
+  ?>
+  <div class="mobile-menu-backdrop" id="mobileMenuBackdrop"></div>
+  <div class="mobile-menu-drawer" id="mobileMenuDrawer">
+    <div class="mobile-menu-drawer__handle"></div>
+    <div class="mobile-menu-drawer__list">
+      <?php foreach ($mobileDrawerItems as $link): ?>
+        <a class="mobile-menu-drawer__item" href="<?php echo htmlspecialchars($link['href'], ENT_QUOTES, 'UTF-8'); ?>"><?php echo htmlspecialchars($link['label'], ENT_QUOTES, 'UTF-8'); ?></a>
+      <?php endforeach; ?>
+    </div>
+  </div>
+  <style>
+    .mobile-menu-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 180ms ease;
+      z-index: 1040;
+    }
+    .mobile-menu-drawer {
+      position: fixed;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      background: #fff;
+      box-shadow: 0 -12px 24px rgba(0,0,0,0.12);
+      border-top-left-radius: 16px;
+      border-top-right-radius: 16px;
+      transform: translateY(100%);
+      transition: transform 200ms ease;
+      z-index: 1050;
+      padding: 14px 16px 24px;
+    }
+    .mobile-menu-drawer__handle {
+      width: 50px;
+      height: 5px;
+      border-radius: 999px;
+      background: #d9d9d9;
+      margin: 0 auto 12px;
+    }
+    .mobile-menu-drawer__list {
+      display: grid;
+      gap: 10px;
+    }
+    .mobile-menu-drawer__item {
+      display: block;
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: #f6f7fb;
+      color: #111;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .mobile-menu-drawer__item:hover {
+      background: #eef0f7;
+    }
+    .mobile-menu-drawer.is-open {
+      transform: translateY(0);
+    }
+    .mobile-menu-backdrop.is-open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  </style>
+  <script>
+    (function () {
+      var toggleButtons = document.querySelectorAll('[data-mobile-menu-toggle]');
+      var drawer = document.getElementById('mobileMenuDrawer');
+      var backdrop = document.getElementById('mobileMenuBackdrop');
+      if (!drawer || !backdrop || !toggleButtons.length) { return; }
+      function openDrawer() {
+        drawer.classList.add('is-open');
+        backdrop.classList.add('is-open');
+      }
+      function closeDrawer() {
+        drawer.classList.remove('is-open');
+        backdrop.classList.remove('is-open');
+      }
+      toggleButtons.forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+          e.preventDefault();
+          if (drawer.classList.contains('is-open')) {
+            closeDrawer();
+          } else {
+            openDrawer();
+          }
+        });
+      });
+      backdrop.addEventListener('click', closeDrawer);
+    })();
+  </script>
+<?php endif; ?>

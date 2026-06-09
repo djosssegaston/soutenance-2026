@@ -1,14 +1,40 @@
 ﻿<?php
 require_once __DIR__ . '/../includes/path_helpers.php';
 
+$totalProjects = \App\Models\Project::count();
+$totalFunding = (float) \App\Models\Funding::sum('montant');
+$totalRepayments = (float) \App\Models\Repayment::sum('montant');
+$paidRepayments = (float) \App\Models\Repayment::where('statut', 'paye')->sum('montant');
+$repaymentRate = $totalRepayments > 0 ? round(($paidRepayments / $totalRepayments) * 100, 1) : 0;
+$activeDisputes = \App\Models\Dispute::whereIn('statut', ['ouvert', 'en_mediation'])->count();
+$projectsThisMonth = \App\Models\Project::whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])->count();
+$projectsLastMonth = \App\Models\Project::whereBetween('created_at', [now()->copy()->subMonth()->startOfMonth(), now()->copy()->subMonth()->endOfMonth()])->count();
+$projectTrend = $projectsLastMonth > 0 ? round((($projectsThisMonth - $projectsLastMonth) / $projectsLastMonth) * 100, 1) : 0;
+$totalUsers = \App\Models\User::count();
+
+$recentProjects = \App\Models\Project::with('owner')->latest()->take(5)->get();
+
+$sectorData = \App\Models\Project::select('secteur', \Illuminate\Support\Facades\DB::raw('COUNT(*) as count'))
+    ->whereNotNull('secteur')
+    ->groupBy('secteur')
+    ->orderByDesc('count')
+    ->get();
+$totalSectorProjects = $sectorData->sum('count');
+
+$institutionRanking = \App\Models\Institution::withSum('financements', 'montant')
+    ->withCount('financements as projets_count')
+    ->orderByDesc('financements_sum_montant')
+    ->take(3)
+    ->get();
+
 $page_title = "Tableau de bord";
 $page_subtitle = "Administration générale";
 $page_active_nav = "dashboard";
 $mobile_nav_context = "admin";
-$mobile_nav_messages_badge = 3;
-$mobile_nav_notifications_badge = 3;
-$dashboard_user_name = "Admin principal";
-$dashboard_user_id = "ADM-2026-001";
+$mobile_nav_messages_badge = 0;
+$mobile_nav_notifications_badge = 0;
+$dashboard_user_name = "Administrateur";
+$dashboard_user_id = "ADM-000";
 $dashboard_user_role = "Administrateur plateforme";
 ?>
 <!DOCTYPE html>
@@ -155,16 +181,16 @@ $dashboard_user_role = "Administrateur plateforme";
 
     <main class="dashboard-content main-content">
       <div class="container-fluid px-0">
-        <!-- Ligne 1: Cartes stats -->
-        <div class="row dashboard-gap-16 mt-2 mb-4 admin-kpi-row">
+        <!-- Ligne 1: Cartes stats - DONNÉES DYNAMIQUES -->
+        <div class="row dashboard-gap-16 mt-2 mb-4 admin-kpi-row" id="admin-kpi-container">
           <div class="col-12 col-md-6 col-xl-3">
             <?php
             $stat_icon = "bi-folder2";
             $stat_title = "Projets Totaux";
-            $stat_value = "156";
-            $stat_trend = "+12";
-            $stat_trend_class = "is-up";
-            $stat_trend_icon = "bi-arrow-up-right";
+            $stat_value = (string) $totalProjects;
+            $stat_trend = ($projectTrend >= 0 ? '+' : '') . $projectTrend . '% vs mois dernier';
+            $stat_trend_class = $projectTrend >= 0 ? 'is-up' : 'is-down';
+            $stat_trend_icon = $projectTrend >= 0 ? 'bi-arrow-up-right' : 'bi-arrow-down-right';
             $stat_icon_bg = "rgba(0, 196, 134, 0.15)";
             $stat_icon_color = "var(--primary-color-1)";
             include 'components/stat_card.html';
@@ -175,10 +201,10 @@ $dashboard_user_role = "Administrateur plateforme";
             <?php
             $stat_icon = "bi-cash-coin";
             $stat_title = "Volume Financé";
-            $stat_value = "2.4Mrd FCFA";
-            $stat_trend = "+18%";
+            $stat_value = number_format($totalFunding, 0, ',', ' ') . ' FCFA';
+            $stat_trend = $totalUsers . ' utilisateurs';
             $stat_trend_class = "is-up";
-            $stat_trend_icon = "bi-arrow-up-right";
+            $stat_trend_icon = "bi-people";
             $stat_icon_bg = "rgba(252, 160, 40, 0.18)";
             $stat_icon_color = "var(--primary-color-3)";
             include 'components/stat_card.html';
@@ -189,10 +215,10 @@ $dashboard_user_role = "Administrateur plateforme";
             <?php
             $stat_icon = "bi-graph-up-arrow";
             $stat_title = "Taux Remboursement";
-            $stat_value = "94.2%";
-            $stat_trend = "+2.1%";
+            $stat_value = $repaymentRate . '%';
+            $stat_trend = number_format($paidRepayments, 0, ',', ' ') . ' FCFA remboursés';
             $stat_trend_class = "is-up";
-            $stat_trend_icon = "bi-arrow-up-right";
+            $stat_trend_icon = "bi-check2-circle";
             $stat_icon_bg = "rgba(0, 72, 220, 0.12)";
             $stat_icon_color = "var(--primary-color-2)";
             include 'components/stat_card.html';
@@ -202,11 +228,11 @@ $dashboard_user_role = "Administrateur plateforme";
           <div class="col-12 col-md-6 col-xl-3">
             <?php
             $stat_icon = "bi-exclamation-triangle";
-            $stat_title = "Taux Défaut";
-            $stat_value = "3.1%";
-            $stat_trend = "-0.5%";
-            $stat_trend_class = "is-down";
-            $stat_trend_icon = "bi-arrow-down-right";
+            $stat_title = "Litiges Actifs";
+            $stat_value = (string) $activeDisputes;
+            $stat_trend = 'En cours de résolution';
+            $stat_trend_class = $activeDisputes > 0 ? "is-down" : "is-up";
+            $stat_trend_icon = $activeDisputes > 0 ? "bi-exclamation-circle" : "bi-check-circle";
             $stat_icon_bg = "rgba(243, 81, 32, 0.12)";
             $stat_icon_color = "var(--primary-color-4)";
             include 'components/stat_card.html';
@@ -232,11 +258,9 @@ $dashboard_user_role = "Administrateur plateforme";
         <div class="row dashboard-gap-20 mt-4 mb-4">
           <div class="col-12">
             <?php
-            $table_title = "Projets récents";
-            $table_id = "adminRecentProjects";
-            $table_search_placeholder = "Rechercher un projet";
-            $table_html = <<<'HTML'
-<table class="table dashboard-table align-middle">
+            ob_start();
+            ?>
+<table class="table dashboard-table data-table align-middle" data-items-per-page="10">
   <thead>
     <tr>
       <th>ID</th>
@@ -247,45 +271,30 @@ $dashboard_user_role = "Administrateur plateforme";
     </tr>
   </thead>
   <tbody>
+<?php if ($recentProjects->count() > 0): ?>
+<?php foreach ($recentProjects as $p): ?>
+<?php $statusEnum = $p->statusEnum(); ?>
     <tr>
-      <td>PRJ-001</td>
-      <td>Coopérative Cacao Abidjan</td>
-      <td>Kouame A.</td>
-      <td>15M FCFA</td>
-      <td><span class="status-badge status-approved">Approuvé</span></td>
+      <td>PRJ-<?php echo str_pad($p->id, 3, '0', STR_PAD_LEFT); ?></td>
+      <td><?php echo htmlspecialchars($p->titre); ?></td>
+      <td><?php echo htmlspecialchars($p->owner->name ?? 'N/A'); ?></td>
+      <td><?php echo number_format($p->montant_demande, 0, ',', ' '); ?> FCFA</td>
+      <td><span class="status-badge <?php echo $statusEnum->badgeClass(); ?>"><?php echo $statusEnum->label(); ?></span></td>
     </tr>
+<?php endforeach; ?>
+<?php else: ?>
     <tr>
-      <td>PRJ-002</td>
-      <td>Clinique Mobile Bamako</td>
-      <td>Diallo M.</td>
-      <td>25M FCFA</td>
-      <td><span class="status-badge status-funding">En financement</span></td>
+      <td colspan="5" class="text-center text-muted">Aucun projet pour le moment</td>
     </tr>
-    <tr>
-      <td>PRJ-003</td>
-      <td>EdTech Plateforme Dakar</td>
-      <td>Ndiaye S.</td>
-      <td>8M FCFA</td>
-      <td><span class="status-badge status-submitted">Soumis</span></td>
-    </tr>
-    <tr>
-      <td>PRJ-004</td>
-      <td>Ferme Solaire Lomé</td>
-      <td>Agbeko K.</td>
-      <td>45M FCFA</td>
-      <td><span class="status-badge status-rejected">Rejeté</span></td>
-    </tr>
-    <tr>
-      <td>PRJ-005</td>
-      <td>Transport Électrique</td>
-      <td>Mensah P.</td>
-      <td>30M FCFA</td>
-      <td><span class="status-badge status-late">En retard</span></td>
-    </tr>
+<?php endif; ?>
   </tbody>
 </table>
-HTML;
-            $table_pagination = '<button class="dashboard-page-btn active">1</button><button class="dashboard-page-btn">2</button><button class="dashboard-page-btn">3</button>';
+<?php
+            $table_html = ob_get_clean();
+            $table_title = "Projets récents";
+            $table_id = "adminRecentProjects";
+            $table_search_placeholder = "Rechercher un projet";
+            $table_auto_paginate = true;
             include 'components/data_table.html';
             ?>
           </div>
@@ -303,12 +312,17 @@ HTML;
                   </div>
                 </div>
 
-                <ul class="dashboard-legend">
-                  <li><span><i class="bg-success-token"></i>Agriculture</span><strong>35%</strong></li>
-                  <li><span><i class="bg-info-token"></i>Technologie</span><strong>25%</strong></li>
-                  <li><span><i class="bg-warning-token"></i>Santé</span><strong>20%</strong></li>
-                  <li><span><i class="bg-danger-token"></i>Transport</span><strong>15%</strong></li>
-                  <li><span><i style="background:#6A726F;"></i>Autre</span><strong>5%</strong></li>
+                <ul class="dashboard-legend" id="adminSectorLegend">
+<?php foreach ($sectorData as $sector): ?>
+<?php $pct = $totalSectorProjects > 0 ? round(($sector->count / $totalSectorProjects) * 100) : 0; ?>
+                  <li data-sector="<?php echo htmlspecialchars($sector->secteur); ?>" data-pct="<?php echo $pct; ?>">
+                    <span><i style="background:<?php echo 'hsl(' . (crc32($sector->secteur) % 360) . ', 60%, 50%)'; ?>;"></i><?php echo htmlspecialchars($sector->secteur); ?></span>
+                    <strong><?php echo $pct; ?>%</strong>
+                  </li>
+<?php endforeach; ?>
+<?php if ($sectorData->count() === 0): ?>
+                  <li><span class="text-muted">Aucune donnée sectorielle</span></li>
+<?php endif; ?>
                 </ul>
               </div>
             </section>
@@ -317,41 +331,34 @@ HTML;
 
         <!-- Ligne 4: Classement institutions -->
         <div class="row dashboard-gap-20">
+<?php if ($institutionRanking->count() > 0): ?>
+<?php
+$maxFinance = $institutionRanking->first()->financements_sum_montant ?? 1;
+$barColors = ['bg-success-token', 'bg-warning-token', 'bg-danger-token'];
+$i = 0;
+?>
+<?php foreach ($institutionRanking as $inst): ?>
+<?php $pct = $maxFinance > 0 ? round(($inst->financements_sum_montant / $maxFinance) * 100) : 0; ?>
           <div class="col-12 col-md-6 col-lg-4">
             <section class="dashboard-card institution-card hover-lift">
-              <p class="institution-card__meta mb-2">Banque Atlantique</p>
-              <h4 class="mb-2">450M FCFA</h4>
-              <p class="institution-card__meta mb-3">23 projets</p>
+              <p class="institution-card__meta mb-2"><?php echo htmlspecialchars($inst->nom ?? $inst->name ?? 'Institution'); ?></p>
+              <h4 class="mb-2"><?php echo number_format($inst->financements_sum_montant ?? 0, 0, ',', ' '); ?> FCFA</h4>
+              <p class="institution-card__meta mb-3"><?php echo (int) $inst->projets_count; ?> projets</p>
               <div class="dashboard-progress">
-                <div class="dashboard-progress__bar bg-success-token" style="width: 92%;"></div>
+                <div class="dashboard-progress__bar <?php echo $barColors[$i % 3]; ?>" style="width: <?php echo $pct; ?>%;"></div>
               </div>
-              <p class="institution-card__meta mt-2">92%</p>
+              <p class="institution-card__meta mt-2"><?php echo $pct; ?>%</p>
             </section>
           </div>
-
-          <div class="col-12 col-md-6 col-lg-4">
-            <section class="dashboard-card institution-card hover-lift">
-              <p class="institution-card__meta mb-2">Ecobank</p>
-              <h4 class="mb-2">380M FCFA</h4>
-              <p class="institution-card__meta mb-3">18 projets</p>
-              <div class="dashboard-progress">
-                <div class="dashboard-progress__bar bg-warning-token" style="width: 87%;"></div>
-              </div>
-              <p class="institution-card__meta mt-2">87%</p>
+<?php $i++; ?>
+<?php endforeach; ?>
+<?php else: ?>
+          <div class="col-12">
+            <section class="dashboard-card institution-card">
+              <p class="text-center text-muted mb-0">Aucune institution avec financement pour le moment</p>
             </section>
           </div>
-
-          <div class="col-12 col-md-6 col-lg-4">
-            <section class="dashboard-card institution-card hover-lift">
-              <p class="institution-card__meta mb-2">BOAD</p>
-              <h4 class="mb-2">290M FCFA</h4>
-              <p class="institution-card__meta mb-3">12 projets</p>
-              <div class="dashboard-progress">
-                <div class="dashboard-progress__bar bg-danger-token" style="width: 78%;"></div>
-              </div>
-              <p class="institution-card__meta mt-2">78%</p>
-            </section>
-          </div>
+<?php endif; ?>
         </div>
       </div>
     </main>
@@ -369,7 +376,52 @@ HTML;
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
   <!-- Scripts dashboard -->
-  <script src="<?php echo htmlspecialchars(dashboard_asset('js/dashboard.js'), ENT_QUOTES, 'UTF-8'); ?>"></script>
-  <script src="<?php echo htmlspecialchars(dashboard_asset('js/dashboard-enhancements.js'), ENT_QUOTES, 'UTF-8'); ?>"></script>
+  <script src="<?php echo htmlspecialchars(dashboard_asset('js/api-client.js'), ENT_QUOTES, 'UTF-8'); ?>"></script>
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    initAdminSectorChart();
+  });
+
+  function initAdminSectorChart() {
+    const canvas = document.getElementById('adminSectorChart');
+    if (!canvas) return;
+
+    const legend = document.getElementById('adminSectorLegend');
+    if (!legend) return;
+
+    const items = legend.querySelectorAll('li[data-sector]');
+    if (items.length === 0) return;
+
+    const labels = [];
+    const data = [];
+    const colors = [];
+
+    items.forEach(function(item) {
+      labels.push(item.getAttribute('data-sector'));
+      data.push(parseFloat(item.getAttribute('data-pct')));
+      const color = item.querySelector('i')?.style?.background || '#6A726F';
+      colors.push(color);
+    });
+
+    new Chart(canvas, {
+      type: 'doughnut',
+      data: {
+        labels: labels,
+        datasets: [{
+          data: data,
+          backgroundColor: colors,
+          borderWidth: 1,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false }
+        }
+      }
+    });
+  }
+  </script>
 </body>
 </html>

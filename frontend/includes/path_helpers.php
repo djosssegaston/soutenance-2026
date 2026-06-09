@@ -66,17 +66,76 @@ if (!function_exists('alogoto_project_base_url')) {
 
     function dashboard_url(string $path = ''): string
     {
-        return alogoto_url('frontend/dashboard/' . ltrim($path, '/'));
+        $cleanPath = ltrim(str_replace('\\', '/', $path), '/');
+        if (function_exists('route')) {
+            $routeMap = [
+                'dashboard_admin.php' => 'dashboard.admin',
+                'dashboard_porteur.php' => 'dashboard.porteur',
+                'dashboard_institution.php' => 'dashboard.institution',
+                'projets_admin.php' => 'admin.projects',
+                'utilisateurs.php' => 'admin.users',
+                'finance.php' => 'admin.finance',
+                'litiges.php' => 'admin.disputes',
+                'audit_logs.php' => 'admin.audit',
+                'messages_admin.php' => 'admin.messages',
+                'notifications_admin.php' => 'admin.notifications',
+                'profil_admin.php' => 'admin.profile',
+                'securite_admin.php' => 'admin.security',
+                'parametres.php' => 'admin.settings',
+                'mes_projets.php' => 'porteur.projects',
+                'remboursements.php' => 'porteur.repayments',
+                'notifications.php' => 'porteur.notifications',
+                'messages.php' => 'porteur.messages',
+                'profil.php' => 'porteur.profile',
+                'securite.php' => 'porteur.security',
+                'documents.php' => 'porteur.documents',
+                'financement.php' => 'porteur.funding',
+                'echeancier_remboursement.php' => 'porteur.schedule',
+                'creer_projet.php' => 'porteur.projects.create',
+                'parcourir_projets.php' => 'institution.projects',
+                'remboursements_institution.php' => 'institution.repayments',
+                'notifications_institution.php' => 'institution.notifications',
+                'messages_institution.php' => 'institution.messages',
+                'profil_institution.php' => 'institution.profile',
+                'securite_institution.php' => 'institution.security',
+                'portfolio.php' => 'institution.portfolio',
+                'analyse_risque.php' => 'institution.risk',
+                'entretiens_planifies.php' => 'institution.interviews',
+                'investissements.php' => 'institution.investments',
+                'validation.php' => 'institution.validation',
+            ];
+            if (isset($routeMap[$cleanPath])) {
+                return route($routeMap[$cleanPath]);
+            }
+        }
+
+        if ($cleanPath === '') {
+            return function_exists('route')
+                ? route('dashboard.redirect')
+                : alogoto_url('backend/public/dashboard');
+        }
+
+        if (str_starts_with($cleanPath, 'assets/')) {
+            return alogoto_url('frontend/dashboard/' . $cleanPath);
+        }
+
+        return function_exists('route')
+            ? route('dashboard.redirect')
+            : alogoto_url('backend/public/dashboard');
     }
 
     function dashboard_asset(string $path = ''): string
     {
-        return dashboard_url('assets/' . ltrim($path, '/'));
+        return alogoto_url('frontend/dashboard/assets/' . ltrim($path, '/'));
     }
 
     function backend_url(string $path = ''): string
     {
-        return alogoto_url('backend/public/' . ltrim($path, '/'));
+        $cleanPath = ltrim(str_replace('\\', '/', $path), '/');
+        $scheme = (! empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+        $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+        return $scheme . '://' . $host . '/' . $cleanPath;
     }
 }
+
 

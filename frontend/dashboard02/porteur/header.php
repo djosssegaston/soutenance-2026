@@ -8,7 +8,7 @@ require_once __DIR__ . "/../path_helpers.php";
 
 </head>
 
-<body class="app sidebar-mini ltr light-mode">
+<body class="app sidebar-mini ltr light-mode" data-user-id="<?php echo auth()->id(); ?>" data-user-name="<?php echo auth()->user()?->name ?? ''; ?>">
 
     <!--{ Pre-loder start }-->
     <div id="global-loader">
@@ -84,7 +84,7 @@ require_once __DIR__ . "/../path_helpers.php";
                                         <!-- NOTIFICATIONS -->
                                         <div class="dropdown  d-flex notifications">
                                             <a class="nav-link icon" data-bs-toggle="dropdown"><i
-                                                    class="fe fe-bell"></i><span class="pulse" id="header-notifications-pulse"></span>
+                                                    class="fe fe-bell"></i><span class="header-count" id="header-notifications-pulse">0</span>
                                             </a>
                                             <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                                                 <div class="drop-heading border-bottom">
@@ -106,7 +106,7 @@ require_once __DIR__ . "/../path_helpers.php";
                                         <!-- NOTIFICATIONS -->
                                         <div class="dropdown  d-flex message">
                                             <a class="nav-link icon text-center" data-bs-toggle="dropdown">
-                                                <i class="fe fe-message-square"></i><span class="pulse-danger" id="header-messages-pulse"></span>
+                                                <i class="fe fe-message-square"></i><span class="header-count" id="header-messages-pulse">0</span>
                                             </a>
                                             <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                                                 <div class="drop-heading border-bottom">
@@ -136,7 +136,8 @@ require_once __DIR__ . "/../path_helpers.php";
                                         <!-- FULL-SCREEN -->
                                         <div class="dropdown d-flex profile-1">
                                             <a href="javascript:void(0)" data-bs-toggle="dropdown" class="nav-link user-dropdown">
-                                                <img src="../../asset/images/profiles/5.jpg" alt="profile-user" class="profile-user avatar cover-image" id="header-user-avatar">
+                                                <?php $__av = $user->avatar_url ?? ''; $__avSrc = !empty($__av) ? (str_starts_with($__av,'http')||str_starts_with($__av,'/')?$__av:'/storage/'.$__av) : '../../asset/images/profiles/1.jpg'; ?>
+                                                <img src="<?php echo htmlspecialchars($__avSrc, ENT_QUOTES, 'UTF-8'); ?>" alt="profile-user" class="profile-user avatar cover-image" id="header-user-avatar">
                                             </a>
                                             <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                                                 <div class="drop-heading">
@@ -152,7 +153,7 @@ require_once __DIR__ . "/../path_helpers.php";
                                                 <a class="dropdown-item" href="securite.php">
                                                     <i class="dropdown-icon fe fe-shield"></i> Sécurité
                                                 </a>
-                                                <a class="dropdown-item" href="/logout" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                                <a class="dropdown-item" href="/logout" onclick="event.preventDefault();ALOGOTO.logout();">
                                                     <i class="dropdown-icon fe fe-alert-circle"></i> Déconnexion
                                                 </a>
                                                 <form id="logout-form" action="/logout" method="POST" class="d-none">
@@ -381,7 +382,7 @@ require_once __DIR__ . "/../path_helpers.php";
                     </form>
                     <a class="sidebar-logout__link"
                             href="<?php echo htmlspecialchars($logout_url ?? '/logout', ENT_QUOTES, 'UTF-8'); ?>"
-                            onclick="event.preventDefault(); document.getElementById('dashboard02-logout-form').submit();">
+                            onclick="event.preventDefault();ALOGOTO.logout();">
                         <i class="side-menu__icon fa fa-sign-out"></i>
                         <span class="side-menu__label">Déconnexion</span>
                     </a>

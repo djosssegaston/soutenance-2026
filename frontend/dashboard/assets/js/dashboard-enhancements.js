@@ -14,6 +14,7 @@
     initSkeletonLoading();
     initTooltips();
     initLogoutConfirmation();
+    // initAjaxActions(); // Removed - replaced with POST forms
   });
 
   function initResponsiveTables() {
@@ -521,11 +522,85 @@
 
     if (confirmButton) {
       confirmButton.addEventListener("click", function () {
-        var logoutUrl = confirmButton.getAttribute("data-logout-url") || "logout.php";
+        var logoutFormId = confirmButton.getAttribute("data-logout-form") || "";
+        var logoutForm = logoutFormId ? document.getElementById(logoutFormId) : null;
+        var logoutUrl = confirmButton.getAttribute("data-logout-url") || "";
         logoutModal.hide();
-        window.location.href = logoutUrl;
+        if (logoutForm) {
+          logoutForm.submit();
+          return;
+        }
+        if (logoutUrl) {
+          window.location.href = logoutUrl;
+        }
       });
     }
+  }
+
+  function initAjaxActions() {
+    $(document).on("click", "[data-ajax-action]", function (event) {
+      event.preventDefault();
+      var $trigger = $(this);
+      var url = String($trigger.data("ajaxUrl") || "");
+      var targetSelector = String($trigger.data("ajaxTarget") || "");
+      var statusLabel = String($trigger.data("ajaxStatusLabel") || "");
+      var statusClass = String($trigger.data("ajaxStatusClass") || "");
+      var feedbackSelector = String($trigger.data("ajaxFeedback") || "");
+
+      $trigger.prop("disabled", true).addClass("is-loading");
+
+      $.ajax({
+        url: url || "#",
+        method: "POST",
+        dataType: "json",
+        data: {
+          action: $trigger.data("ajaxAction") || "update",
+          payload: $trigger.data("ajaxPayload") || ""
+        }
+      }).always(function () {
+        if (targetSelector && statusLabel) {
+          var $target = $(targetSelector);
+          if ($target.length) {
+            $target.text(statusLabel);
+            if (statusClass) {
+              $target.attr("class", "status-badge " + statusClass);
+            }
+          }
+        }
+
+        if (feedbackSelector) {
+          var $feedback = $(feedbackSelector);
+          if ($feedback.length) {
+            $feedback.text("Mise Ã  jour effectuÃ©e.");
+            $feedback.removeAttr("hidden");
+          }
+        }
+
+        $trigger.prop("disabled", false).removeClass("is-loading");
+      });
+    });
+
+    $(document).on("submit", "form[data-ajax-form]", function (event) {
+      event.preventDefault();
+      var $form = $(this);
+      var url = String($form.data("ajaxUrl") || "");
+      var feedbackSelector = String($form.data("ajaxFeedback") || "");
+
+      $.ajax({
+        url: url || "#",
+        method: "POST",
+        dataType: "json",
+        data: $form.serialize()
+      }).always(function () {
+        if (feedbackSelector) {
+          var $feedback = $(feedbackSelector);
+          if ($feedback.length) {
+            $feedback.text("Message envoyÃ©.");
+            $feedback.removeAttr("hidden");
+          }
+        }
+      });
+    });
   }
 
   function inferActionLabel($action) {

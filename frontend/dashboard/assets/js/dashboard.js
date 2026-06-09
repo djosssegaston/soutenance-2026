@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
   "use strict";
 
   document.addEventListener("DOMContentLoaded", function () {
@@ -7,6 +7,9 @@
     initDropdowns();
     initActiveSidebarLink();
     initCharts();
+    initAjaxActions();
+    initFakeDeleteActions();
+    initAutoPagination();
   });
 
   function syncTopbarSpacing() {
@@ -184,6 +187,157 @@
     }
   }
 
+
+
+  function getCookieValue(name) {
+    var matches = document.cookie.match(new RegExp('(?:^|; )' + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\$1') + '=([^;]*)'));
+    return matches ? decodeURIComponent(matches[1]) : '';
+  }
+
+  function initFakeDeleteActions() {
+    document.addEventListener('click', function (event) {
+      var target = event.target;
+      if (!target) {
+        return;
+      }
+      var button = target.closest('button, a');
+      if (!button) {
+        return;
+      }
+      var label = (button.textContent || '').toLowerCase();
+      if (label.indexOf('supprimer') === -1) {
+        return;
+      }
+      event.preventDefault();
+      var confirmed = window.confirm('Confirmer la suppression ?');
+      if (!confirmed) {
+        return;
+      }
+
+      var removable = button.closest('tr')
+        || button.closest('.dashboard-card')
+        || button.closest('.list-group-item')
+        || button.closest('.project-card')
+        || button.closest('.timeline-item')
+        || button.closest('.card')
+        || button.closest('.col-12')
+        || button.closest('li');
+
+      if (removable) {
+        removable.remove();
+      }
+
+      showActionToast('Suppression reussie.');
+    });
+  }
+
+  function initAjaxActions() {
+    document.addEventListener('click', function (event) {
+      var target = event.target;
+      if (!target) {
+        return;
+      }
+      var button = target.closest('[data-ajax-url]');
+      if (!button) {
+        return;
+      }
+      event.preventDefault();
+
+      var url = button.getAttribute('data-ajax-url');
+      button.classList.add('is-loading');
+      button.disabled = true;
+      if (!url) {
+        return;
+      }
+
+      var csrfToken = window.csrfToken || (document.querySelector('meta[name="csrf-token"]') || {}).content || '';
+      fetch(url, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+          ...(csrfToken ? { 'X-CSRF-TOKEN': csrfToken } : {}),
+          ...(!csrfToken ? { 'X-CSRF-TOKEN': getCookieValue('XSRF-TOKEN') } : {})
+        }
+      }).then(function (response) {
+        return response.json().then(function (data) {
+          return { ok: response.ok, data: data };
+        }).catch(function () {
+          return { ok: response.ok, data: {} };
+        });
+      }).then(function (result) {
+        var data = result.data || {};
+        var targetSelector = button.getAttribute('data-ajax-target');
+        if (targetSelector) {
+          var el = document.querySelector(targetSelector);
+          if (el) {
+            if (data.status_label) {
+              el.textContent = data.status_label;
+            }
+            if (data.status_class) {
+              el.className = 'status-badge ' + data.status_class;
+            }
+          }
+        }
+
+        var feedbackSelector = button.getAttribute('data-ajax-feedback');
+        if (feedbackSelector) {
+          var feedback = document.querySelector(feedbackSelector);
+          if (feedback) {
+            feedback.hidden = false;
+            feedback.textContent = data.message || (result.ok ? 'Action enregistree.' : 'Action impossible.');
+          }
+        }
+
+        if (!result.ok) {
+          showActionToast(data.message || 'Action impossible.');
+          button.classList.remove('is-loading');
+          button.disabled = false;
+          return;
+        }
+
+        showActionToast(data.message || 'Action enregistree.');
+        button.classList.remove('is-loading');
+        button.disabled = false;
+      }).catch(function () {
+        showActionToast('Erreur reseau.');
+        button.classList.remove('is-loading');
+        button.disabled = false;
+      });
+    });
+  }
+
+  function showActionToast(message) {
+    var toast = document.createElement('div');
+    toast.textContent = message;
+    toast.style.position = 'fixed';
+    toast.style.right = '20px';
+    toast.style.bottom = '20px';
+    toast.style.background = '#1f915f';
+    toast.style.color = '#fff';
+    toast.style.padding = '10px 14px';
+    toast.style.borderRadius = '10px';
+    toast.style.fontSize = '13px';
+    toast.style.fontWeight = '600';
+    toast.style.boxShadow = '0 10px 30px rgba(6, 42, 38, 0.2)';
+    toast.style.zIndex = '9999';
+    toast.style.opacity = '0';
+    toast.style.transition = 'opacity 0.2s ease';
+    document.body.appendChild(toast);
+
+    requestAnimationFrame(function () {
+      toast.style.opacity = '1';
+    });
+
+    setTimeout(function () {
+      toast.style.opacity = '0';
+      setTimeout(function () {
+        toast.remove();
+      }, 250);
+    }, 2000);
+  }
+
   function initCharts() {
     if (typeof Chart === "undefined") {
       return;
@@ -195,9 +349,15 @@
     var green = readCssVar("--primary-color-1", "#00C486");
     var blue = readCssVar("--primary-color-2", "#0048DC");
     var orange = readCssVar("--primary-color-3", "#FCA028");
-    var red = readCssVar("--primary-color-4", "#F35120");
+        var chartPayloads = window.dashboardCharts || {};
 
-    Chart.defaults.font.family = "'Inter', sans-serif";
+    function getChartPayload(key, fallback) {
+      if (chartPayloads && chartPayloads[key]) {
+        return chartPayloads[key];
+      }
+      return fallback;
+    }
+Chart.defaults.font.family = "'Inter', sans-serif";
     Chart.defaults.font.size = 11;
     Chart.defaults.color = "#6A726F";
     Chart.defaults.plugins.legend.labels.usePointStyle = true;
@@ -221,16 +381,21 @@
       displayColors: true
     };
 
-    var adminFundingCanvas = document.getElementById("adminFundingChart");
+        var adminFundingCanvas = document.getElementById("adminFundingChart");
     if (adminFundingCanvas) {
+      var adminFundingPayload = getChartPayload("adminFunding", {
+        labels: ["Jan", "F�v", "Mar", "Avr", "Mai", "Jun"],
+        financements: [320, 410, 520, 610, 720, 840],
+        remboursements: [230, 295, 360, 430, 500, 610]
+      });
       new Chart(adminFundingCanvas, {
         type: "line",
         data: {
-            labels: ["Jan", "Fév", "Mar", "Avr", "Mai", "Jun"],
+          labels: adminFundingPayload.labels,
           datasets: [
             {
               label: "Financements",
-              data: [320, 410, 520, 610, 720, 840],
+              data: adminFundingPayload.financements,
               borderColor: green,
               borderWidth: 2,
               fill: true,
@@ -248,7 +413,7 @@
             },
             {
               label: "Remboursements",
-              data: [230, 295, 360, 430, 500, 610],
+              data: adminFundingPayload.remboursements,
               borderColor: blue,
               borderWidth: 2,
               fill: false,
@@ -299,15 +464,19 @@
       });
     }
 
-    var adminSectorCanvas = document.getElementById("adminSectorChart");
+        var adminSectorCanvas = document.getElementById("adminSectorChart");
     if (adminSectorCanvas) {
+      var adminSectorPayload = getChartPayload("adminSector", {
+        labels: ["Agriculture", "Technologie", "Sant�", "Transport", "Autre"],
+        values: [35, 25, 20, 15, 5]
+      });
       new Chart(adminSectorCanvas, {
         type: "doughnut",
         data: {
-          labels: ["Agriculture", "Technologie", "Santé", "Transport", "Autre"],
+          labels: adminSectorPayload.labels,
           datasets: [
             {
-              data: [35, 25, 20, 15, 5],
+              data: adminSectorPayload.values,
               backgroundColor: [green, blue, orange, red, bodyColor],
               borderWidth: 0,
               hoverOffset: 6
@@ -327,16 +496,20 @@
       });
     }
 
-    var porteurRepaymentCanvas = document.getElementById("porteurRepaymentChart");
+        var porteurRepaymentCanvas = document.getElementById("porteurRepaymentChart");
     if (porteurRepaymentCanvas) {
-      new Chart(porteurRepaymentCanvas, {
+      var porteurRepaymentPayload = getChartPayload("porteurRepayment", {
+        labels: ["Jan", "F�v", "Mar", "Avr", "Mai", "Jun"],
+        values: [850, 850, 850, 850, 850, 0]
+      });
+      window.porteurRepaymentChart = new Chart(porteurRepaymentCanvas, {
         type: "bar",
         data: {
-          labels: ["Jan", "Fév", "Mar", "Avr", "Mai", "Jun"],
+          labels: porteurRepaymentPayload.labels,
           datasets: [
             {
               label: "Remboursements",
-              data: [850, 850, 850, 850, 850, 0],
+              data: porteurRepaymentPayload.values,
               borderRadius: 10,
               maxBarThickness: 44,
               backgroundColor: green
@@ -384,16 +557,21 @@
       });
     }
 
-    var institutionPerformanceCanvas = document.getElementById("institutionPerformanceChart");
+        var institutionPerformanceCanvas = document.getElementById("institutionPerformanceChart");
     if (institutionPerformanceCanvas) {
+      var institutionPerformancePayload = getChartPayload("institutionPerformance", {
+        labels: ["Jan", "F�v", "Mar", "Avr", "Mai", "Jun"],
+        roi: [8.2, 9.1, 8.7, 10.2, 11.5, 10.8],
+        risk: [3.1, 2.8, 3.4, 2.9, 2.5, 2.7]
+      });
       new Chart(institutionPerformanceCanvas, {
         type: "line",
         data: {
-          labels: ["Jan", "Fév", "Mar", "Avr", "Mai", "Jun"],
+          labels: institutionPerformancePayload.labels,
           datasets: [
             {
               label: "ROI %",
-              data: [8.2, 9.1, 8.7, 10.2, 11.5, 10.8],
+              data: institutionPerformancePayload.roi,
               borderColor: green,
               borderWidth: 2,
               fill: true,
@@ -411,7 +589,7 @@
             },
             {
               label: "Risque %",
-              data: [3.1, 2.8, 3.4, 2.9, 2.5, 2.7],
+              data: institutionPerformancePayload.risk,
               borderColor: red,
               borderWidth: 2,
               fill: false,
@@ -460,7 +638,7 @@
       });
     }
 
-    var institutionRiskReturnCanvas = document.getElementById("institutionRiskReturnChart");
+    var institutionRiskReturnCanvas = document.getElementById("institutionRiskReturnChart"); = document.getElementById("institutionRiskReturnChart");
     if (institutionRiskReturnCanvas) {
       new Chart(institutionRiskReturnCanvas, {
         type: "scatter",
@@ -505,7 +683,7 @@
             y: {
               title: {
                 display: true,
-                text: "Rentabilité estimée %"
+                text: "Rentabilit� estim�e %"
               },
               beginAtZero: true,
               grid: {
@@ -524,7 +702,7 @@
       new Chart(institutionInvestmentsCanvas, {
         type: "bar",
         data: {
-          labels: ["Jan", "Fév", "Mar", "Avr", "Mai", "Jun"],
+          labels: ["Jan", "F�v", "Mar", "Avr", "Mai", "Jun"],
           datasets: [
             {
               label: "Investissements",
@@ -573,7 +751,7 @@
       new Chart(institutionRoiCanvas, {
         type: "line",
         data: {
-          labels: ["Jan", "Fév", "Mar", "Avr", "Mai", "Jun"],
+          labels: ["Jan", "F�v", "Mar", "Avr", "Mai", "Jun"],
           datasets: [
             {
               label: "ROI",
@@ -633,17 +811,17 @@
       new Chart(institutionProjectPerformanceCanvas, {
         type: "line",
         data: {
-          labels: ["Jan", "Fév", "Mar", "Avr", "Mai", "Jun"],
+          labels: ["Jan", "F�v", "Mar", "Avr", "Mai", "Jun"],
           datasets: [
             {
-              label: "Qualité dossiers",
+              label: "Qualit� dossiers",
               data: [72, 76, 81, 84, 88, 91],
               borderColor: blue,
               borderWidth: 2,
               fill: false
             },
             {
-              label: "Rentabilité projetée",
+              label: "Rentabilit� projet�e",
               data: [9, 10, 11, 12, 13, 14],
               borderColor: orange,
               borderWidth: 2,
@@ -685,7 +863,7 @@
       new Chart(repaymentsEvolutionCanvas, {
         type: "line",
         data: {
-          labels: ["Jan", "Fév", "Mar", "Avr", "Mai", "Jun"],
+          labels: ["Jan", "F�v", "Mar", "Avr", "Mai", "Jun"],
           datasets: [
             {
               label: "Paiements encaisses",
@@ -706,7 +884,7 @@
               }
             },
             {
-              label: "Échéances sensibles",
+              label: "�ch�ances sensibles",
               data: [0, 0, 650, 320, 180, 90],
               borderColor: orange,
               borderWidth: 2,
@@ -753,7 +931,7 @@
       new Chart(statsFundingCanvas, {
         type: "bar",
         data: {
-          labels: ["Jan", "Fév", "Mar", "Avr", "Mai", "Jun"],
+          labels: ["Jan", "F�v", "Mar", "Avr", "Mai", "Jun"],
           datasets: [
             {
               label: "Financement",
@@ -802,7 +980,7 @@
       new Chart(statsRepaymentsCanvas, {
         type: "bar",
         data: {
-          labels: ["Jan", "Fév", "Mar", "Avr", "Mai", "Jun"],
+          labels: ["Jan", "F�v", "Mar", "Avr", "Mai", "Jun"],
           datasets: [
             {
               label: "Remboursements",
@@ -851,7 +1029,7 @@
       new Chart(statsProjectEvolutionCanvas, {
         type: "line",
         data: {
-          labels: ["Jan", "Fév", "Mar", "Avr", "Mai", "Jun"],
+          labels: ["Jan", "F�v", "Mar", "Avr", "Mai", "Jun"],
           datasets: [
             {
               label: "Progression operationnelle",
@@ -861,7 +1039,7 @@
               fill: false
             },
             {
-              label: "Maturité financement",
+              label: "Maturit� financement",
               data: [10, 20, 33, 47, 58, 70],
               borderColor: green,
               borderWidth: 2,
@@ -908,4 +1086,79 @@
     var value = getComputedStyle(document.documentElement).getPropertyValue(name);
     return value ? value.trim() : fallback;
   }
+
+  function initAutoPagination() {
+    var cards = document.querySelectorAll('.dashboard-table-card[data-auto-paginate="true"]');
+    if (!cards.length) return;
+
+    cards.forEach(function (card) {
+      var table = card.querySelector('.dashboard-table');
+      if (!table) return;
+      var tbody = table.querySelector('tbody');
+      if (!tbody) return;
+
+      var perPage = parseInt(table.getAttribute('data-items-per-page') || '10', 10);
+      if (perPage < 1) perPage = 10;
+      var rows = Array.from(tbody.querySelectorAll('tr'));
+      if (!rows.length) return;
+      var totalPages = Math.ceil(rows.length / perPage);
+      if (totalPages < 1) totalPages = 1;
+      var paginationEl = card.querySelector('.dashboard-pagination');
+      if (!paginationEl) return;
+
+      var currentPage = 1;
+
+      function renderPage(page) {
+        if (page < 1) page = 1;
+        if (page > totalPages) page = totalPages;
+        if (page === currentPage) return;
+        currentPage = page;
+
+        rows.forEach(function (row, idx) {
+          row.style.display = Math.floor(idx / perPage) + 1 === page ? '' : 'none';
+        });
+
+        var btns = paginationEl.querySelectorAll('.page-btn');
+        btns.forEach(function (btn) {
+          var p = btn.getAttribute('data-page');
+          if (p === 'prev' || p === 'next') return;
+          btn.classList.toggle('active', parseInt(p, 10) === page);
+        });
+      }
+
+      if (totalPages > 1) {
+        var h = '<button type="button" class="dashboard-page-btn page-btn page-prev" data-page="prev"><i class="bi bi-chevron-left"></i></button>';
+        for (var i = 1; i <= totalPages; i++) {
+          h += '<button type="button" class="dashboard-page-btn page-btn' + (i === 1 ? ' active' : '') + '" data-page="' + i + '">' + i + '</button>';
+        }
+        h += '<button type="button" class="dashboard-page-btn page-btn page-next" data-page="next"><i class="bi bi-chevron-right"></i></button>';
+        paginationEl.innerHTML = h;
+
+        paginationEl.addEventListener('click', function (e) {
+          var btn = e.target.closest('.page-btn');
+          if (!btn) return;
+          e.preventDefault();
+          var target = btn.getAttribute('data-page');
+          if (target === 'prev') {
+            renderPage(currentPage - 1);
+          } else if (target === 'next') {
+            renderPage(currentPage + 1);
+          } else {
+            renderPage(parseInt(target, 10));
+          }
+        });
+      } else {
+        paginationEl.innerHTML = '<button type="button" class="dashboard-page-btn page-btn active" data-page="1">1</button>';
+      }
+
+      rows.forEach(function (row, idx) {
+        row.style.display = idx < perPage ? '' : 'none';
+      });
+    });
+  }
 })();
+
+
+
+
+

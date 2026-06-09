@@ -6,3 +6,6 @@
 require_once __DIR__ . '/includes/path_helpers.php';
 header('Location: ' . frontend_public_url('index.php'));
 exit;
+
+
+

@@ -983,7 +983,8 @@
   }
 
   .dashboard-table-wrapper.table-responsive {
-    overflow: visible;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .dashboard-mobile-nav {
@@ -1134,6 +1135,42 @@
 
   .dashboard-logout-cancel,
   .dashboard-logout-confirm {
+    width: 100%;
+  }
+}
+
+/* Inline form styles for POST submissions (replacing AJAX) */
+.inline-form {
+  display: inline !important;
+  margin: 0;
+  padding: 0;
+}
+
+.inline-form button[type="submit"] {
+  margin: 0;
+}
+
+.institution-action-group .inline-form + .inline-form {
+  margin-left: 0.5rem;
+}
+
+/* Ensure buttons in forms look identical to standalone buttons */
+.inline-form .btn-dashboard {
+  vertical-align: middle;
+}
+
+/* Mobile responsiveness for inline forms */
+@media (max-width: 768px) {
+  .institution-action-group .inline-form {
+    display: block !important;
+    margin-bottom: 0.5rem;
+  }
+  
+  .institution-action-group .inline-form + .inline-form {
+    margin-left: 0;
+  }
+  
+  .institution-action-group .inline-form .btn-dashboard {
     width: 100%;
   }
 }

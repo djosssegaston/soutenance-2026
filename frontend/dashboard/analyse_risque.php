@@ -22,7 +22,7 @@ $averageRoi = count($projects) > 0 ? round($averageRoi / count($projects), 1) : 
 
 $page_title = 'Analyse de risque';
 $page_subtitle = 'Comparez les scores de risque, la qualité des dossiers et le rendement attendu.';
-$page_active_nav = 'risk';
+$page_active_nav = 'analyzed-projects';
 $page_document_title = 'Analyse de risque - ALOGOTO';
 
 include __DIR__ . '/components/institution_page_start.php';
@@ -100,7 +100,7 @@ include __DIR__ . '/components/institution_page_start.php';
             <?php
             ob_start();
             ?>
-<table class="table dashboard-table data-table align-middle">
+<table class="table dashboard-table data-table align-middle" data-items-per-page="10">
   <thead>
     <tr>
       <th>Projet</th>
@@ -137,9 +137,63 @@ include __DIR__ . '/components/institution_page_start.php';
             $table_title = 'Tableau d’analyse';
             $table_id = 'institutionRiskTable';
             $table_search_placeholder = 'Rechercher une analyse';
-            $table_pagination = '<button class="dashboard-page-btn page-btn active">1</button><button class="dashboard-page-btn page-btn">2</button><button class="dashboard-page-btn page-btn">3</button>';
+            $table_auto_paginate = true;
             include __DIR__ . '/components/data_table.html';
             ?>
+          </div>
+        </div>
+
+        <div class="row dashboard-gap-20 mb-5">
+          <div class="col-12">
+            <section class="dashboard-card">
+              <div class="dashboard-card__head">
+                <h6>Dossier projet</h6>
+              </div>
+              <div class="row g-3">
+                <div class="col-12 col-lg-6">
+                  <div class="institution-soft-card h-100">
+                    <h6 class="mb-2">Documents du projet</h6>
+                    <ul class="mb-0">
+                      <li>Business plan</li>
+                      <li>Etats financiers</li>
+                      <li>Justificatifs juridiques</li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="col-12 col-lg-6">
+                  <div class="institution-soft-card h-100">
+                    <h6 class="mb-2">Historique des validations</h6>
+                    <ul class="mb-0">
+                      <li>Soumis</li>
+                      <li>En verification admin</li>
+                      <li>Valide</li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="col-12 col-lg-6">
+                  <div class="institution-soft-card h-100">
+                    <h6 class="mb-2">Commentaires admin</h6>
+                    <p class="mb-0">Dossier conforme, poursuivre l analyse institutionnelle.</p>
+                  </div>
+                </div>
+                <div class="col-12 col-lg-6">
+                  <div class="institution-soft-card h-100">
+                    <h6 class="mb-2">Commentaires institution</h6>
+                    <p class="mb-0">Besoin de verifier les garanties et le plan d execution.</p>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="institution-soft-card h-100">
+                    <h6 class="mb-2">Historique des actions</h6>
+                    <ul class="mb-0">
+                      <li>Analyse lancee</li>
+                      <li>Entretien planifie</li>
+                      <li>Acceptation institution</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </section>
           </div>
         </div>
 <?php include __DIR__ . '/components/institution_page_end.php'; ?>

@@ -35,4 +35,29 @@ return [
         ],
     ],
 
+    'fedapay' => [
+        'secret_key' => env('FEDAPAY_SECRET_KEY'),
+        'public_key' => env('FEDAPAY_PUBLIC_KEY'),
+        'environment' => env('FEDAPAY_ENV', 'sandbox'),
+        'webhook_secret' => env('FEDAPAY_WEBHOOK_SECRET'),
+    ],
+
+    'google' => [
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => env('GOOGLE_REDIRECT_URI'),
+    ],
+
+    'facebook' => [
+        'client_id' => env('FACEBOOK_CLIENT_ID'),
+        'client_secret' => env('FACEBOOK_CLIENT_SECRET'),
+        'redirect' => env('FACEBOOK_REDIRECT_URI'),
+    ],
+
+    'twitter-oauth-2' => [
+        'client_id' => env('TWITTER_CLIENT_ID'),
+        'client_secret' => env('TWITTER_CLIENT_SECRET'),
+        'redirect' => env('TWITTER_REDIRECT_URI'),
+    ],
+
 ];

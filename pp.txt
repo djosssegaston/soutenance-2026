@@ -1,0 +1,159 @@
+Tu es un développeur Laravel senior.
+
+Je possède déjà un projet frontend avec :
+
+dashboard admin
+dashboard porteur
+dashboard institution
+
+Ta mission est de transformer ce projet en application Laravel dynamique.
+
+Contraintes :
+
+ne pas modifier le design
+ne pas modifier les classes bootstrap
+ne pas modifier le HTML existant
+
+Utiliser Laravel pour :
+
+authentification
+API
+CRUD
+notifications
+messagerie
+gestion projets
+remboursements
+
+Créer :
+
+Models
+Controllers
+Migrations
+Policies
+Middleware
+API routes
+
+Fonctionnalités backend :
+
+gestion utilisateurs
+admin
+porteur
+institution
+gestion projets
+création
+validation admin
+analyse institution
+financement
+remboursement
+messagerie
+conversation porteur ↔ institution
+notifications
+remboursement
+
+l’institution enregistre paiement.
+
+le système met à jour :
+
+admin
+porteur
+historique
+
+Utiliser :
+
+Laravel notifications
+queues
+events
+
+pour envoyer :
+
+emails
+notifications in-app
+
+Pour Laravel tu auras environ 18 tables principales.
+
+users
+id
+nom
+email
+password
+role
+telephone
+statut
+created_at
+institutions
+id
+nom
+email
+telephone
+adresse
+statut
+created_at
+projects
+id
+user_id
+titre
+description
+secteur
+montant_demande
+duree
+localisation
+statut
+created_at
+project_documents
+id
+project_id
+type
+fichier
+statut_validation
+uploaded_at
+financements
+id
+project_id
+institution_id
+montant
+date_financement
+statut
+remboursements
+id
+project_id
+montant
+date_echeance
+date_paiement
+statut
+remboursement_confirmations
+id
+remboursement_id
+institution_id
+date_confirmation
+messages
+id
+sender_id
+receiver_id
+message
+date
+notifications
+id
+user_id
+type
+contenu
+lu
+created_at
+audit_logs
+id
+user_id
+action
+ip
+date
+disputes
+id
+project_id
+user_id
+type
+statut
+description
+date
+settings
+id
+commission
+min_financement
+max_financement

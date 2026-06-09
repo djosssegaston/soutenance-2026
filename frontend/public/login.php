@@ -1,20 +1,33 @@
 <?php
-include 'header.php';
+require_once __DIR__ . '/../includes/path_helpers.php';
+
+// Rediriger vers le login Laravel si accès direct (standalone)
+// Le login Laravel utilise l'authentification par session (web guard)
+// compatible avec les dashboards dashboard02
+if (!isset($isLaravel) || !$isLaravel) {
+    header('Location: ' . backend_url('login'));
+    exit;
+}
+
+include __DIR__ . '/header.php';
 ?>
 <style>
+    * {
+        box-sizing: border-box;
+    }
     .alogoto-login {
         background: linear-gradient(180deg, #edf4f2 0%, #ffffff 100%);
     }
     .alogoto-login.section-padding {
-        padding: 78px 0;
+        padding: 30px 0;
     }
     .alogoto-login__panel {
         background-color: var(--white);
         border: 1px solid var(--border-color-2);
-        border-radius: 20px;
+        border-radius: 16px;
         overflow: hidden;
-        box-shadow: 0 18px 46px rgba(6, 42, 38, 0.11);
-        max-width: 1080px;
+        box-shadow: 0 12px 32px rgba(6, 42, 38, 0.10);
+        max-width: 1000px;
         margin: 0 auto;
     }
     .alogoto-login__media {
@@ -25,23 +38,8 @@ include 'header.php';
     .alogoto-login__media img {
         width: 100%;
         height: 100%;
-        min-height: 530px;
+        min-height: 400px;
         object-fit: cover;
-    }
-    .alogoto-login__media-overlay {
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(180deg, rgba(6, 42, 38, 0.18) 0%, rgba(6, 42, 38, 0.82) 100%);
-        color: var(--white);
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-end;
-        padding: 26px;
-        gap: 10px;
-    }
-    .alogoto-login__media-overlay h3 {
-        color: var(--white);
-        margin-bottom: 6px;
     }
     .alogoto-login__image-size {
         display: inline-flex;
@@ -57,44 +55,45 @@ include 'header.php';
         color: #ffd9a6;
     }
     .alogoto-login__form-wrap {
-        padding: 30px 28px;
-        height: 100%;
+        padding: 18px 20px;
     }
     .alogoto-login__form {
-        max-width: 460px;
+        max-width: 400px;
         margin: 0 auto;
     }
     .alogoto-login__form-wrap h2 {
-        margin-bottom: 6px;
-        font-size: 34px;
+        margin-bottom: 3px;
+        font-size: 26px;
     }
     .alogoto-login__form-wrap > p {
-        margin-bottom: 16px;
-        font-size: 14px;
+        margin-bottom: 10px;
+        font-size: 12px;
     }
     .alogoto-login__group {
-        margin-bottom: 14px;
+        margin-bottom: 8px;
     }
     .alogoto-login__group label {
         display: block;
-        margin-bottom: 6px;
+        margin-bottom: 3px;
         font-weight: 600;
         color: var(--color-1);
-        font-size: 14px;
+        font-size: 12px;
     }
     .alogoto-login__group input {
         width: 100%;
-        height: 50px;
+        height: 40px;
         border: 1px solid var(--border-color-3);
-        border-radius: 12px;
-        padding: 0 16px;
-        transition: 0.25s ease;
+        border-radius: 8px;
+        padding: 0 10px;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         background-color: #fff;
+        font-size: 13px;
     }
     .alogoto-login__group input:focus {
         outline: none;
         border-color: var(--primary-color-3);
         box-shadow: 0 0 0 4px rgba(252, 160, 40, 0.16);
+        transform: translateY(-1px);
     }
     .alogoto-login__group input.is-valid {
         border-color: #30a46c;
@@ -106,10 +105,10 @@ include 'header.php';
     }
     .alogoto-login__feedback {
         display: block;
-        margin-top: 6px;
-        min-height: 18px;
-        font-size: 12.5px;
-        line-height: 1.45;
+        margin-top: 3px;
+        min-height: 14px;
+        font-size: 11px;
+        line-height: 1.4;
         color: #6a726f;
     }
     .alogoto-login__feedback.is-valid {
@@ -124,13 +123,13 @@ include 'header.php';
     .alogoto-login__toggle-pass {
         position: absolute;
         top: 50%;
-        right: 12px;
+        right: 10px;
         transform: translateY(-50%);
         border: 0;
         background: transparent;
         color: var(--p-color);
-        width: 32px;
-        height: 32px;
+        width: 28px;
+        height: 28px;
         border-radius: 50%;
         transition: 0.2s;
     }
@@ -139,24 +138,24 @@ include 'header.php';
         color: var(--color-1);
     }
     .alogoto-login__rules {
-        margin: 8px 0 8px;
+        margin: 4px 0 4px;
         padding: 0;
         list-style: none;
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 6px 12px;
+        gap: 3px 8px;
     }
     .alogoto-login__rules li {
-        font-size: 12px;
+        font-size: 10px;
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 5px;
         color: #7c8482;
     }
     .alogoto-login__rules li i {
-        font-size: 12px;
+        font-size: 10px;
         color: #d64545;
-        min-width: 12px;
+        min-width: 10px;
     }
     .alogoto-login__rules li span {
         line-height: 1.35;
@@ -170,9 +169,9 @@ include 'header.php';
     .alogoto-login__strength {
         background-color: #e9eeec;
         border-radius: 999px;
-        height: 8px;
+        height: 5px;
         overflow: hidden;
-        margin-bottom: 6px;
+        margin-bottom: 3px;
     }
     .alogoto-login__strength > span {
         display: block;
@@ -185,34 +184,47 @@ include 'header.php';
         display: flex;
         justify-content: space-between;
         align-items: center;
-        gap: 12px;
-        margin: 8px 0 14px;
+        gap: 8px;
+        margin: 4px 0 8px;
         flex-wrap: wrap;
     }
     .alogoto-login__extra label {
         margin: 0;
         display: inline-flex;
-        gap: 8px;
+        gap: 5px;
         align-items: center;
-        font-size: 14px;
+        font-size: 12px;
     }
     .alogoto-login__submit {
         width: 100%;
         border: 0;
-        height: 50px;
-        border-radius: 12px;
+        height: 40px;
+        border-radius: 8px;
         color: var(--white);
         font-weight: 700;
+        font-size: 13px;
         background-color: var(--primary-color-3);
-        transition: 0.3s ease;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
     }
-    .alogoto-login__submit:hover {
+    .alogoto-login__submit:hover:not(:disabled) {
         background-color: #f08e08;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(252, 160, 40, 0.35);
+    }
+    .alogoto-login__submit:active:not(:disabled) {
+        transform: translateY(0);
+    }
+    .alogoto-login__submit:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
     }
     .alogoto-login__register {
-        margin-top: 10px;
+        margin-top: 6px;
         margin-bottom: 0;
-        font-size: 14px;
+        font-size: 12px;
         color: var(--p-color);
         text-align: center;
     }
@@ -224,9 +236,9 @@ include 'header.php';
         color: #f08e08;
     }
     .alogoto-login__form-status {
-        margin-top: 8px;
-        min-height: 22px;
-        font-size: 13px;
+        margin-top: 4px;
+        min-height: 16px;
+        font-size: 11px;
         font-weight: 500;
     }
     .alogoto-login__form-status.ok {
@@ -235,15 +247,323 @@ include 'header.php';
     .alogoto-login__form-status.err {
         color: #d64545;
     }
-    @media (max-width: 991px) {
-        .alogoto-login__media img {
-            min-height: 360px;
+    @media (min-width: 1800px) {
+        .alogoto-login__panel {
+            max-width: 1100px;
         }
         .alogoto-login__form-wrap {
-            padding: 26px 20px;
+            padding: 28px 36px;
+        }
+        .alogoto-login__form-wrap h2 {
+            font-size: 30px;
+        }
+        .alogoto-login__form {
+            max-width: 440px;
+        }
+        .alogoto-login__group input {
+            height: 44px;
+            font-size: 14px;
+        }
+        .alogoto-login__submit {
+            height: 44px;
+            font-size: 14px;
+        }
+        .alogoto-login__media img {
+            min-height: 500px;
+        }
+    }
+    @media (max-width: 1400px) {
+        .alogoto-login__panel {
+            max-width: 960px;
+        }
+        .alogoto-login__form {
+            max-width: 380px;
+        }
+    }
+    @media (max-width: 1200px) {
+        .alogoto-login__panel {
+            max-width: 900px;
+        }
+        .alogoto-login__form-wrap {
+            padding: 16px 18px;
+        }
+        .alogoto-login__form {
+            max-width: 360px;
+        }
+    }
+    @media (max-width: 991px) {
+        .alogoto-login__panel {
+            max-width: 100%;
+            margin: 0 10px;
+        }
+        .alogoto-login__media img {
+            min-height: 220px;
+        }
+        .alogoto-login__form-wrap {
+            padding: 20px 18px;
+        }
+        .alogoto-login__form-wrap h2 {
+            font-size: 24px;
+        }
+        .alogoto-login__form {
+            max-width: 100%;
         }
         .alogoto-login__rules {
             grid-template-columns: 1fr;
+        }
+        .alogoto-login__group input {
+            font-size: 14px;
+        }
+    }
+    @media (max-width: 768px) {
+        .alogoto-login.section-padding {
+            padding: 20px 0;
+        }
+        .alogoto-login__panel {
+            border-radius: 14px;
+            margin: 0 8px;
+        }
+        .alogoto-login__media img {
+            min-height: 180px;
+        }
+        .alogoto-login__form-wrap {
+            padding: 18px 16px;
+        }
+        .alogoto-login__form-wrap h2 {
+            font-size: 22px;
+        }
+        .alogoto-login__form-wrap > p {
+            font-size: 13px;
+        }
+    }
+    @media (max-width: 576px) {
+        .alogoto-login.section-padding {
+            padding: 12px 0;
+        }
+        .alogoto-login__panel {
+            border-radius: 12px;
+            margin: 0 6px;
+        }
+        .alogoto-login__form-wrap {
+            padding: 16px 14px;
+        }
+        .alogoto-login__form-wrap h2 {
+            font-size: 20px;
+        }
+        .alogoto-login__media img {
+            min-height: 160px;
+        }
+        .alogoto-login__group input {
+            height: 40px;
+            font-size: 14px;
+            padding: 0 10px;
+        }
+        .alogoto-login__submit {
+            height: 42px;
+            font-size: 13px;
+        }
+        .alogoto-login__extra {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 6px;
+        }
+        .alogoto-login__rules {
+            gap: 2px 6px;
+        }
+        .alogoto-login__rules li {
+            font-size: 11px;
+        }
+    }
+    @media (max-width: 480px) {
+        .alogoto-login.section-padding {
+            padding: 8px 0;
+        }
+        .alogoto-login__panel {
+            border-radius: 10px;
+            margin: 0 4px;
+        }
+        .alogoto-login__form-wrap {
+            padding: 14px 12px;
+        }
+        .alogoto-login__form-wrap h2 {
+            font-size: 18px;
+        }
+        .alogoto-login__media img {
+            min-height: 140px;
+        }
+        .alogoto-login__group {
+            margin-bottom: 6px;
+        }
+        .alogoto-login__group label {
+            font-size: 11px;
+        }
+        .alogoto-login__group input {
+            height: 38px;
+            font-size: 13px;
+            padding: 0 8px;
+        }
+        .alogoto-login__submit {
+            height: 38px;
+            font-size: 12px;
+        }
+        .alogoto-login__extra label {
+            font-size: 11px;
+        }
+        .alogoto-login__register {
+            font-size: 11px;
+        }
+        .alogoto-login__register a {
+            font-size: 11px;
+        }
+    }
+    @media (max-width: 400px) {
+        .alogoto-login__form-wrap {
+            padding: 12px 10px;
+        }
+        .alogoto-login__form-wrap h2 {
+            font-size: 17px;
+        }
+        .alogoto-login__media img {
+            min-height: 120px;
+        }
+        .alogoto-login__group input {
+            height: 36px;
+            font-size: 12px;
+            padding: 0 8px;
+        }
+        .alogoto-login__submit {
+            height: 36px;
+            font-size: 11px;
+        }
+        .alogoto-login__toggle-pass {
+            width: 24px;
+            height: 24px;
+            right: 6px;
+            font-size: 12px;
+        }
+        .alogoto-login__extra {
+            gap: 4px;
+        }
+        .alogoto-login__extra label {
+            font-size: 10px;
+        }
+        .alogoto-login__extra a {
+            font-size: 11px;
+        }
+        .alogoto-login__rules li {
+            font-size: 10px;
+        }
+        .alogoto-login__register {
+            font-size: 10px;
+        }
+    }
+    @media (max-width: 375px) {
+        .alogoto-login__form-wrap {
+            padding: 10px 8px;
+        }
+        .alogoto-login__form-wrap h2 {
+            font-size: 16px;
+        }
+        .alogoto-login__media img {
+            min-height: 100px;
+        }
+        .alogoto-login__group label {
+            font-size: 10px;
+        }
+        .alogoto-login__group input {
+            height: 34px;
+            font-size: 11px;
+            border-radius: 6px;
+        }
+        .alogoto-login__submit {
+            height: 34px;
+            font-size: 11px;
+            border-radius: 6px;
+        }
+        .alogoto-login__password-wrap input {
+            padding-right: 30px !important;
+        }
+    }
+    @media (max-width: 360px) {
+        .alogoto-login.section-padding {
+            padding: 4px 0;
+        }
+        .alogoto-login__form-wrap {
+            padding: 8px 6px;
+        }
+        .alogoto-login__form-wrap h2 {
+            font-size: 15px;
+        }
+        .alogoto-login__form-wrap > p {
+            font-size: 10px;
+        }
+        .alogoto-login__group input {
+            height: 32px;
+            font-size: 11px;
+        }
+        .alogoto-login__submit {
+            height: 32px;
+            font-size: 10px;
+        }
+        .alogoto-login__group label {
+            font-size: 9px;
+        }
+        .alogoto-login__register {
+            font-size: 9px;
+        }
+    }
+    @media (max-width: 320px) {
+        .alogoto-login__form-wrap {
+            padding: 6px 4px;
+        }
+        .alogoto-login__form-wrap h2 {
+            font-size: 14px;
+        }
+        .alogoto-login__media img {
+            min-height: 80px;
+        }
+        .alogoto-login__group {
+            margin-bottom: 4px;
+        }
+        .alogoto-login__group label {
+            font-size: 9px;
+            margin-bottom: 2px;
+        }
+        .alogoto-login__group input {
+            height: 30px;
+            font-size: 10px;
+            padding: 0 6px;
+            border-radius: 5px;
+        }
+        .alogoto-login__submit {
+            height: 30px;
+            font-size: 10px;
+            border-radius: 5px;
+        }
+        .alogoto-login__toggle-pass {
+            width: 20px;
+            height: 20px;
+            right: 4px;
+            font-size: 10px;
+        }
+        .alogoto-login__extra label {
+            font-size: 9px;
+        }
+        .alogoto-login__extra a {
+            font-size: 9px;
+        }
+        .alogoto-login__register {
+            font-size: 8px;
+        }
+        .alogoto-login__register a {
+            font-size: 8px;
+        }
+        .alogoto-login__rules li {
+            font-size: 9px;
+        }
+        .alogoto-login__feedback {
+            font-size: 9px;
+            min-height: 12px;
         }
     }
 </style>
@@ -255,21 +575,18 @@ include 'header.php';
                 <div class="row g-0">
                     <div class="col-lg-6">
                         <div class="alogoto-login__media">
-                            <img src="assets/img/team/team-2.jpg" alt="Visuel connexion (680 x 820 px)">
-                            <div class="alogoto-login__media-overlay">
-                                <h3>Connexion Securisee</h3>
-                                <p>Accedez a votre espace pour suivre vos dossiers et vos investissements en temps reel.</p>
-                                <!-- <span class="alogoto-login__image-size">
-                                    Taille image conseillee : 680 x 820 px
-                                </span> -->
-                            </div>
+                            <img src="" alt="Visuel connexion (680 x 820 px)">
+
                         </div>
                     </div>
                     <div class="col-lg-6">
                         <div class="alogoto-login__form-wrap">
                             <h2 style="text-align: center; color: var(--primary-color-3);">Connexion</h2>
                             <!-- <p>Renseignez vos acces. Les controles se valident en direct sous chaque champ.</p> -->
-                            <form id="alogotoLoginForm" class="alogoto-login__form" novalidate>
+                            <form id="alogotoLoginForm" class="alogoto-login__form" novalidate method="POST" action="<?php echo htmlspecialchars($apiLoginUrl, ENT_QUOTES, 'UTF-8'); ?>">
+                                <?php if (!empty($csrfToken)) { ?>
+                                <input type="hidden" name="_token" value="<?php echo htmlspecialchars($csrfToken, ENT_QUOTES, 'UTF-8'); ?>">
+                                <?php } ?>
                                 <div class="alogoto-login__group">
                                     <label for="loginIdentifier">Email ou telephone</label>
                                     <input
@@ -303,16 +620,6 @@ include 'header.php';
                                     <small id="passwordFeedback" class="alogoto-login__feedback">
                                         Le mot de passe doit respecter les criteres ci-dessous.
                                     </small>
-                                    <ul class="alogoto-login__rules">
-                                        <li id="ruleLength"><i class="fas fa-times-circle" aria-hidden="true"></i><span>8+ caracteres</span></li>
-                                        <li id="ruleUpper"><i class="fas fa-times-circle" aria-hidden="true"></i><span>1 lettre majuscule</span></li>
-                                        <li id="ruleLower"><i class="fas fa-times-circle" aria-hidden="true"></i><span>1 lettre minuscule</span></li>
-                                        <li id="ruleNumber"><i class="fas fa-times-circle" aria-hidden="true"></i><span>1 chiffre</span></li>
-                                    </ul>
-                                    <div class="alogoto-login__strength">
-                                        <span id="passwordStrengthFill"></span>
-                                    </div>
-                                    <small id="passwordStrengthText" class="alogoto-login__feedback"></small>
                                 </div>
                                 <div class="alogoto-login__extra">
                                     <label for="rememberMe">
@@ -322,12 +629,13 @@ include 'header.php';
                                     <a href="reset-password.php">Mot de passe oublie ?</a>
                                 </div>
                                 <button type="submit" class="alogoto-login__submit">
-                                    Se connecter <i class="fas fa-plus"></i>
+                                    <i class="fas fa-sign-in-alt"></i> Se connecter
                                 </button>
+                                <p id="verifiedBanner" class="alogoto-login__form-status ok" style="display:none;"></p>
                                 <p id="formStatus" class="alogoto-login__form-status"></p>
                                 <p class="alogoto-login__register">
                                     Nouveau sur Alogoto ?
-                                    <a href="signup.php">Creer un compte</a>
+                                    <a href="<?php echo htmlspecialchars(frontend_public_url('signup.php'), ENT_QUOTES, 'UTF-8'); ?>">Creer un compte</a>
                                 </p>
                             </form>
                         </div>
@@ -339,21 +647,25 @@ include 'header.php';
 
     <script>
         (function () {
+            // Ne pas intercepter le formulaire si Laravel gère l'authentification
+            const isLaravelContext = <?php echo isset($isLaravel) && $isLaravel ? 'true' : 'false'; ?>;
+            if (isLaravelContext) {
+                // Laisser Laravel gérer la soumission du formulaire avec les sessions
+                return;
+            }
+
+            const apiLoginUrl = <?php echo json_encode($apiLoginUrl); ?>;
+            const apiResendUrl = <?php echo json_encode($apiResendUrl); ?>;
             const form = document.getElementById("alogotoLoginForm");
+            const csrfToken = "<?php echo htmlspecialchars($csrfToken ?? '', ENT_QUOTES, 'UTF-8'); ?>";
             const identifier = document.getElementById("loginIdentifier");
             const password = document.getElementById("loginPassword");
             const togglePassword = document.getElementById("togglePassword");
             const identifierFeedback = document.getElementById("identifierFeedback");
             const passwordFeedback = document.getElementById("passwordFeedback");
-            const strengthFill = document.getElementById("passwordStrengthFill");
-            const strengthText = document.getElementById("passwordStrengthText");
             const formStatus = document.getElementById("formStatus");
-
-            const ruleLength = document.getElementById("ruleLength");
-            const ruleUpper = document.getElementById("ruleUpper");
-            const ruleLower = document.getElementById("ruleLower");
-            const ruleNumber = document.getElementById("ruleNumber");
-
+            const verifiedBanner = document.getElementById("verifiedBanner");
+            const submitButton = form ? form.querySelector(".alogoto-login__submit") : null;
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
             const phoneRegex = /^\+?[0-9]{8,15}$/;
 
@@ -370,6 +682,16 @@ include 'header.php';
                 feedbackEl.textContent = message;
             }
 
+            function normalizePhone(value) {
+                const trimmed = value.trim();
+                if (trimmed.includes("@")) {
+                    return trimmed;
+                }
+                const hasPlus = trimmed.startsWith("+");
+                const digits = trimmed.replace(/[^\d]/g, "");
+                return hasPlus ? "+" + digits : digits;
+            }
+
             function validateIdentifier() {
                 const value = identifier.value.trim();
                 if (!value) {
@@ -380,8 +702,9 @@ include 'header.php';
                     setState(identifier, identifierFeedback, "Email valide.", true);
                     return true;
                 }
-                const compactValue = value.replace(/[\s().-]/g, "");
+                const compactValue = normalizePhone(value);
                 if (phoneRegex.test(compactValue)) {
+                    identifier.value = compactValue;
                     setState(identifier, identifierFeedback, "Numero de telephone valide.", true);
                     return true;
                 }
@@ -389,67 +712,13 @@ include 'header.php';
                 return false;
             }
 
-            function evaluatePassword(value) {
-                const checks = {
-                    length: value.length >= 8,
-                    upper: /[A-Z]/.test(value),
-                    lower: /[a-z]/.test(value),
-                    number: /[0-9]/.test(value)
-                };
-                const score = Object.values(checks).filter(Boolean).length;
-                return { checks, score };
-            }
-
-            function paintRule(ruleEl, ok) {
-                ruleEl.classList.toggle("ok", ok);
-                const icon = ruleEl.querySelector("i");
-                if (!icon) {
-                    return;
-                }
-                icon.classList.remove("fa-check-circle", "fa-times-circle");
-                icon.classList.add(ok ? "fa-check-circle" : "fa-times-circle");
-            }
-
             function updatePassword() {
                 const value = password.value;
-                const { checks, score } = evaluatePassword(value);
-
-                paintRule(ruleLength, checks.length);
-                paintRule(ruleUpper, checks.upper);
-                paintRule(ruleLower, checks.lower);
-                paintRule(ruleNumber, checks.number);
-
-                let width = "0%";
-                let color = "#d64545";
-                let label = "Niveau: faible";
-
-                if (score === 2) {
-                    width = "45%";
-                    color = "#f59f00";
-                    label = "Niveau: moyen";
-                } else if (score === 3) {
-                    width = "72%";
-                    color = "#f08e08";
-                    label = "Niveau: bon";
-                } else if (score === 4) {
-                    width = "100%";
-                    color = "#1f915f";
-                    label = "Niveau: fort";
-                }
-
-                strengthFill.style.width = value ? width : "0%";
-                strengthFill.style.backgroundColor = value ? color : "#d64545";
-                strengthText.textContent = value ? label : "";
-
                 if (!value) {
-                    setState(password, passwordFeedback, "Le mot de passe est requis.", null);
+                    setState(password, passwordFeedback, 'Le mot de passe est requis.', null);
                     return false;
                 }
-                if (score < 4) {
-                    setState(password, passwordFeedback, "Mot de passe incomplet: respectez les 4 criteres.", false);
-                    return false;
-                }
-                setState(password, passwordFeedback, "Mot de passe valide.", true);
+                setState(password, passwordFeedback, 'Mot de passe valide.', true);
                 return true;
             }
 
@@ -462,26 +731,125 @@ include 'header.php';
                 this.innerHTML = isPassword ? '<i class="fas fa-eye-slash"></i>' : '<i class="fas fa-eye"></i>';
             });
 
-            form.addEventListener("submit", function (e) {
+            function setLoading(state) {
+                if (!submitButton) {
+                    return;
+                }
+                submitButton.disabled = state;
+                const originalHTML = '<i class="fas fa-sign-in-alt"></i> Se connecter';
+                submitButton.innerHTML = state ? '<i class="fas fa-spinner fa-spin"></i> Connexion...' : originalHTML;
+            }
+
+            form.addEventListener("submit", async function (e) {
                 e.preventDefault();
                 const idOk = validateIdentifier();
                 const passOk = updatePassword();
 
                 formStatus.classList.remove("ok", "err");
                 if (idOk && passOk) {
-                    formStatus.classList.add("ok");
-                    formStatus.textContent = "Coordonnees valides. Le formulaire est pret a etre connecte au backend.";
+                    setLoading(true);
+                    
+                    try {
+                        const response = await fetch(apiLoginUrl, {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "Accept": "application/json",
+                                ...(csrfToken ? { "X-CSRF-TOKEN": csrfToken } : {})
+                            },
+                            body: JSON.stringify({
+                                identifier: identifier.value.trim(),
+                                password: password.value
+                            })
+                        });
+
+                        const data = await response.json().catch(() => ({}));
+                        if (!response.ok) {
+                            formStatus.classList.add("err");
+                            formStatus.textContent = data.message || "Connexion impossible. Verifiez vos identifiants.";
+                            return;
+                        }
+
+                        if (data.token) {
+                            localStorage.setItem("alogoto_api_token", data.token);
+                        }
+                        
+                        // Redirect based on user role
+                        if (data.user && data.user.role) {
+                            const role = data.user.role;
+                            const userName = data.user.name || 'Utilisateur';
+                            const roleLabels = { admin: 'Administrateur', institution: 'Institution Financière', porteur: 'Porteur de Projet' };
+                            const roleLabel = roleLabels[role] || role;
+                            const loadingTexts = { admin: 'Chargement du centre de contrôle...', institution: 'Synchronisation du portefeuille...', porteur: 'Chargement de vos financements...' };
+                            const icons = { admin: '🛡️', institution: '🏦', porteur: '📋' };
+                            
+                            let dashboardUrl;
+                            switch(role) {
+                                case 'admin': dashboardUrl = backend_url('dashboard/admin'); break;
+                                case 'institution': dashboardUrl = backend_url('dashboard/institution'); break;
+                                default: dashboardUrl = backend_url('dashboard/porteur'); break;
+                            }
+                            
+                            await Swal.fire({
+                                title: `Bienvenue ${userName.split(' ')[0]} ${icons[role] || '👋'}`,
+                                html: `<div style="font-size:1.1rem;color:#64748b;margin-bottom:0.5rem;">Connexion sécurisée réussie</div>
+                                       <div style="display:inline-block;padding:0.3rem 1rem;border-radius:20px;background:#fca02820;color:#fca028;font-weight:600;font-size:0.9rem;">${roleLabel}</div>
+                                       <div style="margin-top:1.2rem;font-size:0.95rem;color:#94a3b8;">${loadingTexts[role] || 'Chargement de votre espace...'}</div>`,
+                                icon: 'success',
+                                showConfirmButton: false,
+                                allowOutsideClick: false,
+                                allowEscapeKey: false,
+                                timer: 2800,
+                                timerProgressBar: true,
+                                background: '#ffffff',
+                                customClass: {
+                                    popup: 'animated fadeInDown faster',
+                                    title: 'fs-24 fw-bold',
+                                },
+                                didOpen: () => {
+                                    const popup = Swal.getPopup();
+                                    popup.style.borderRadius = '20px';
+                                    popup.style.boxShadow = '0 20px 60px rgba(0,0,0,0.12)';
+                                    popup.style.padding = '2rem';
+                                }
+                            });
+                            
+                            window.location.href = dashboardUrl;
+                            return;
+                        }
+                        
+                        if (data.redirect) {
+                            window.location.href = data.redirect;
+                            return;
+                        }
+                        
+                        formStatus.classList.add("ok");
+                        formStatus.textContent = "Connexion reussie. Bienvenue !";
+                    } catch (err) {
+                        formStatus.classList.add("err");
+                        formStatus.textContent = "Erreur reseau. Reessayez.";
+                    } finally {
+                        setLoading(false);
+                    }
                     return;
                 }
 
                 formStatus.classList.add("err");
                 formStatus.textContent = "Veuillez corriger les champs signales avant de continuer.";
             });
+
+            const params = new URLSearchParams(window.location.search);
+            if (params.get("verified") === "1" || params.get("verified") === "true") {
+                verifiedBanner.style.display = "block";
+                verifiedBanner.textContent = "Votre email a ete confirme. Vous pouvez vous connecter.";
+            }
         })();
     </script>
 
 
 </body>
 <?php
-include 'footer.php';
+include __DIR__ . '/footer.php';
 ?>
+
+

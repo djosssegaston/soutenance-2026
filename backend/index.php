@@ -9,5 +9,5 @@ $base = rtrim(dirname($script), '/');
 if ($base === '' || $base === '.') {
     $base = '';
 }
-header('Location: ' . $base . '/public/');
+header('Location: '.$base.'/public/');
 exit;

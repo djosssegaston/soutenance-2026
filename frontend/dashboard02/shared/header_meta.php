@@ -40,9 +40,40 @@
     <!-- THEME UNIFIÉ (charte graphique porteur orange) -->
     <link href="../../asset/css/porteur-theme.css" rel="stylesheet">
 
+<?php
+    $cssDir = dirname($_SERVER['SCRIPT_FILENAME']).'/css';
+    $customV = is_file($cssDir.'/custom-dashboard.css') ? filemtime($cssDir.'/custom-dashboard.css') : 1;
+    $headerV = is_file($cssDir.'/header.css') ? filemtime($cssDir.'/header.css') : 1;
+    ?>
     <!-- CUSTOM CSS -->
-    <link href="css/custom-dashboard.css" rel="stylesheet">
+    <link href="css/custom-dashboard.css?v=<?= $customV ?>" rel="stylesheet">
 
     <!-- HEADER CSS -->
-    <link href="css/header.css" rel="stylesheet">
+    <link href="css/header.css?v=<?= $headerV ?>" rel="stylesheet">
+
+    <!-- PROJECTION OVERRIDE CSS (lisibilité grand écran / soutenance) -->
+    <link href="../shared/css/dashboard-projection.css?v=<?= filemtime(__DIR__.'/css/dashboard-projection.css') ?: 1 ?>" rel="stylesheet">
+
+    <!-- DYNAMIC PUSHER + ECHO (chargés à la demande par realtime-init.js) -->
+
+    <!-- GLOBAL FETCH WRAPPER: auto-include session cookies and AJAX headers -->
+    <script>
+    (function() {
+        const origFetch = window.fetch;
+        window.fetch = function(url, opts) {
+            opts = opts || {};
+            opts.credentials = opts.credentials || 'include';
+            opts.headers = opts.headers || {};
+            if (typeof opts.headers === 'object' && !Array.isArray(opts.headers) && !(opts.headers instanceof Headers)) {
+                if (!opts.headers['X-Requested-With']) {
+                    opts.headers['X-Requested-With'] = 'XMLHttpRequest';
+                }
+                if (!opts.headers['Accept']) {
+                    opts.headers['Accept'] = 'application/json';
+                }
+            }
+            return origFetch.call(this, url, opts);
+        };
+    })();
+    </script>
 </head>

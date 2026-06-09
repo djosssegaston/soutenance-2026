@@ -1,0 +1,76 @@
+[2026-05-18 10:27:28] === DÉBUT DU NETTOYAGE ===
+[2026-05-18 10:27:28] Connexion DB établie.
+[2026-05-18 10:27:28] Users à conserver: [1,3,2]
+[2026-05-18 10:27:28] Institutions à conserver: [1]
+[2026-05-18 10:27:28] Projets à conserver (porteur1): [2,14,15,16,17,18,19,20,21,23]
+[2026-05-18 10:27:28] Admin ID: 1, Porteur ID: 2, Institution User ID: 3
+[2026-05-18 10:27:28] Institution IDs conservées: [1]
+[2026-05-18 10:27:28] Project IDs conservés: [2,14,15,16,17,18,19,20,21,23]
+[2026-05-18 10:27:28] Transaction démarrée.
+[2026-05-18 10:27:28] personal_access_tokens supprimés: 0
+[2026-05-18 10:27:28] notifications supprimées: 1
+[2026-05-18 10:27:28] realtime_notifications supprimées: 0
+[2026-05-18 10:27:28] audit_logs supprimés: 0
+[2026-05-18 10:27:28] Projets à supprimer: 1 - ["Projet Test Remboursement"]
+[2026-05-18 10:27:28]   project_risk_scores supprimés: 1
+[2026-05-18 10:27:28]   project_status_histories supprimés: 0
+[2026-05-18 10:27:28]   project_validations supprimés: 0
+[2026-05-18 10:27:28]   project_documents supprimés: 0
+[2026-05-18 10:27:28]   project_comments supprimés: 0
+[2026-05-18 10:27:28]   institution_analyses supprimées: 0
+[2026-05-18 10:27:28]   interviews supprimés: 0
+[2026-05-18 10:27:28]   rendez_vous supprimés: 0
+[2026-05-18 10:27:28]   disputes supprimés: 0
+[2026-05-18 10:27:28]   remboursements supprimés: 0
+[2026-05-18 10:27:28]   transactions supprimées: 0
+[2026-05-18 10:27:28]   project_audits supprimés: 0
+[2026-05-18 10:27:28]   projets supprimés: 1
+[2026-05-18 10:27:28] Conversations orphelines vides supprimées: 1 - IDs: [2]
+[2026-05-18 10:27:28] Conversations liées aux institutions supprimées à traiter: [4,5,6]
+[2026-05-18 10:27:28] Messages supprimés dans conversations liées aux institutions supprimées: 10
+[2026-05-18 10:27:28] Conversations liées aux institutions supprimées: 3
+[2026-05-18 10:27:28] Institutions à supprimer: 4 - ["Rosine Ahouansou","Armand Houssou","Wilfried Sossou","Institution Test"]
+[2026-05-18 10:27:28] Institutions supprimées: 4
+[2026-05-18 10:27:28] Users à supprimer: 4 - ["contact@rosineahouansou.bj","contact@armandhoussou.bj","contact@wilfriedsossou.bj","porteur@test.com"]
+[2026-05-18 10:27:28] Users supprimés: 4
+[2026-05-18 10:27:28] analysis_histories orphelines supprimées: 0
+[2026-05-18 10:27:28] interview_histories orphelines supprimées: 0
+[2026-05-18 10:27:28] message_audits orphelins supprimés: 0
+[2026-05-18 10:27:28] remboursements orphelins (sans financement) supprimés: 0
+[2026-05-18 10:27:28] repayment_events orphelins supprimés: 0
+[2026-05-18 10:27:28] === TRANSACTION COMMITÉE AVEC SUCCÈS ===
+[2026-05-18 10:27:28] 
+=== RAPPORT FINAL ===
+[2026-05-18 10:27:28]   users: 3 lignes restantes
+[2026-05-18 10:27:28]   institutions: 1 lignes restantes
+[2026-05-18 10:27:28]   projects: 10 lignes restantes
+[2026-05-18 10:27:28]   financements: 1 lignes restantes
+[2026-05-18 10:27:28]   remboursements: 5 lignes restantes
+[2026-05-18 10:27:28]   conversations: 2 lignes restantes
+[2026-05-18 10:27:28]   conversation_participants: 0 lignes restantes
+[2026-05-18 10:27:28]   messages: 11 lignes restantes
+[2026-05-18 10:27:28]   notifications: 15 lignes restantes
+[2026-05-18 10:27:28]   rendez_vous: 5 lignes restantes
+[2026-05-18 10:27:28]   institution_analyses: 1 lignes restantes
+[2026-05-18 10:27:28]   interviews: 2 lignes restantes
+[2026-05-18 10:27:28]   project_documents: 22 lignes restantes
+[2026-05-18 10:27:28]   project_validations: 1 lignes restantes
+[2026-05-18 10:27:28]   audit_logs: 11 lignes restantes
+[2026-05-18 10:27:28]   project_status_histories: 6 lignes restantes
+[2026-05-18 10:27:28]   project_risk_scores: 9 lignes restantes
+[2026-05-18 10:27:28]   personal_access_tokens: 6 lignes restantes
+[2026-05-18 10:27:28]   analysis_histories: 3 lignes restantes
+[2026-05-18 10:27:28]   interview_histories: 4 lignes restantes
+[2026-05-18 10:27:28]   message_audits: 2 lignes restantes
+[2026-05-18 10:27:28]   repayment_events: 1 lignes restantes
+[2026-05-18 10:27:28]   repayment_disputes: 0 lignes restantes
+[2026-05-18 10:27:28]   repayment_histories: 0 lignes restantes
+[2026-05-18 10:27:28]   disputes: 0 lignes restantes
+[2026-05-18 10:27:28]   project_comments: 0 lignes restantes
+[2026-05-18 10:27:28]   transactions: 0 lignes restantes
+[2026-05-18 10:27:28]   financement_documents: 0 lignes restantes
+[2026-05-18 10:27:28]   financement_histories: 0 lignes restantes
+[2026-05-18 10:27:28]   remboursement_confirmations: 0 lignes restantes
+[2026-05-18 10:27:28]   realtime_notifications: 1 lignes restantes
+[2026-05-18 10:27:28] 
+=== NETTOYAGE TERMINÉ AVEC SUCCÈS ===

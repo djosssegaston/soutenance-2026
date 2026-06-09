@@ -5,7 +5,7 @@
 			<div class="footer-wrapper">
 				<div class="footer__three-widget">
 					<div class="footer__three-widget-about">
-						<a href="<?php echo htmlspecialchars(frontend_public_url('index.php'), ENT_QUOTES, 'UTF-8'); ?>"><img src="<?php echo htmlspecialchars(frontend_public_asset('img/logo-5.png'), ENT_QUOTES, 'UTF-8'); ?>" alt=""></a>
+						<a href="<?php echo htmlspecialchars(frontend_public_url('index.php'), ENT_QUOTES, 'UTF-8'); ?>"><img src="<?php echo htmlspecialchars(frontend_public_asset('img/logo.png'), ENT_QUOTES, 'UTF-8'); ?>?v=<?php echo time(); ?>" alt=""></a>
 						<p>Nous vous proposons des solutions innovantes qui favorisent une croissance et un succès durables</p>
 						<form action="#">
 							<input type="email" placeholder="Email Address">
@@ -23,28 +23,11 @@
 							<li><a href="<?php echo htmlspecialchars(frontend_public_url('company-history.php'), ENT_QUOTES, 'UTF-8'); ?>">Historique</a></li>
 							<li><a href="<?php echo htmlspecialchars(frontend_public_url('faq.php'), ENT_QUOTES, 'UTF-8'); ?>">FAQ</a></li>
 							<li><a href="<?php echo htmlspecialchars(frontend_public_url('contact.php'), ENT_QUOTES, 'UTF-8'); ?>">Contact-Nous</a></li>
+							<li><a href="<?php echo htmlspecialchars(frontend_public_url('privacy.php'), ENT_QUOTES, 'UTF-8'); ?>">Confidentialité</a></li>
 						</ul>
 					</div>
 				</div>
-				<div class="footer__three-widget">
-					<h5>Services</h5>
-					<div class="footer__three-widget-solution">
-						<ul>
-							<li>
-								<a href="service-details.html"> <i class="far fa-chevron-double-right"></i> Retirement Planning </a>
-							</li>
-							<li>
-								<a href="service-details.html"> <i class="far fa-chevron-double-right"></i> Digital Marketing </a>
-							</li>
-							<li>
-								<a href="service-details.html"> <i class="far fa-chevron-double-right"></i> App Development </a>
-							</li>
-							<li>
-								<a href="service-details.html"> <i class="far fa-chevron-double-right"></i> Investment Advisory </a>
-							</li>
-						</ul>
-					</div>
-				</div>
+			
 				<div class="footer__three-widget">
 					<h5>Contacte Info</h5>
 					<div class="footer__three-widget-contact-info">
@@ -67,7 +50,7 @@
 						</div>
 					</div>
 					<div class="col-xl-5 col-lg-6">
-						<div class="copyright__one-right"> <a href="about.html">Trams & Condition</a> <a href="about.html">politique de confidentialité</a> </div>
+						<div class="copyright__one-right"> <a href="<?php echo htmlspecialchars(frontend_public_url('privacy.php'), ENT_QUOTES, 'UTF-8'); ?>">Politique de confidentialité</a> </div>
 					</div>
 				</div>
 			</div>
@@ -104,6 +87,8 @@
 	<script src="<?php echo htmlspecialchars(frontend_public_asset('js/jquery.waypoints.min.js'), ENT_QUOTES, 'UTF-8'); ?>"></script>
 	<!-- Custom JS -->
 	<script src="<?php echo htmlspecialchars(frontend_public_asset('js/custom.js'), ENT_QUOTES, 'UTF-8'); ?>"></script>
+	<!-- SweetAlert2 -->
+	<script src="<?php echo htmlspecialchars(frontend_public_asset('js/plugins/sweet-alert/sweetalert.min.js'), ENT_QUOTES, 'UTF-8'); ?>"></script>
 </body>
 
 </html>

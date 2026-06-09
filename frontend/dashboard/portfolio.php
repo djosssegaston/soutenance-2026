@@ -10,7 +10,7 @@ foreach ($projects as $project) {
 
 $page_title = 'Portfolio';
 $page_subtitle = 'Mesurez la performance du portefeuille et la qualité des actifs financés.';
-$page_active_nav = 'portfolio';
+$page_active_nav = 'financed-portfolio';
 $page_document_title = 'Portfolio - ALOGOTO';
 
 include __DIR__ . '/components/institution_page_start.php';
@@ -88,14 +88,25 @@ include __DIR__ . '/components/institution_page_start.php';
           <div class="col-12 col-md-6 col-xl-3">
             <section class="dashboard-card portfolio-track-card hover-lift h-100">
               <p class="portfolio-track-card__meta mb-1"><?php echo dashboard_escape($project['name']); ?></p>
+              <span id="financeStatus-<?php echo dashboard_escape($project['row_id']); ?>" class="status-badge <?php echo dashboard_escape($project['status_class']); ?> mb-2"><?php echo dashboard_escape($project['status_label']); ?></span>
               <h4 class="mb-1"><?php echo dashboard_escape(dashboard_format_fcfa($project['amount_invested'])); ?></h4>
               <p class="portfolio-track-card__meta mb-3">Score qualité <?php echo dashboard_escape((string) $project['quality_score']); ?>/100</p>
               <div class="dashboard-progress">
                 <div class="dashboard-progress__bar bg-success-token" style="width: <?php echo dashboard_escape((string) $project['quality_score']); ?>%;"></div>
               </div>
               <p class="portfolio-track-card__meta mt-2"><?php echo dashboard_escape($project['risk_label']); ?> • ROI <?php echo dashboard_escape((string) $project['estimated_roi']); ?>%</p>
+              <div class="institution-action-group mt-3">
+                <form method="POST" action="<?php echo dashboard_escape($project['finance_url']); ?>" class="inline-form" style="display:inline;">
+                  <?php echo csrf_field(); ?>
+                  <input type="hidden" name="project_id" value="<?php echo dashboard_escape($project['id']); ?>">
+                  <button type="submit" class="btn-dashboard outline sm">
+                    <span>Enregistrer financement</span>
+                  </button>
+                </form>
+              </div>
             </section>
           </div>
 <?php endforeach; ?>
         </div>
+        <p id="portfolioFeedback" class="institution-page-subtle mt-2" hidden></p>
 <?php include __DIR__ . '/components/institution_page_end.php'; ?>

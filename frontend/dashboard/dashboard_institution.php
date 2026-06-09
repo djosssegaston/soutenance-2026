@@ -1,14 +1,19 @@
 ﻿<?php
 require_once __DIR__ . '/../includes/path_helpers.php';
 
+// Dashboard accessible sans authentification
+$institutionUser = null;
+$institution = null;
+
+// Données utilisateur dynamiques
 $page_title = "Tableau de bord";
-$page_subtitle = "Banque Atlantique - Vue d’ensemble";
+$page_subtitle = $institution ? $institution->nom . " - Vue d'ensemble" : "Institution financière";
 $page_active_nav = "dashboard";
 $mobile_nav_context = "institution";
-$mobile_nav_messages_badge = 3;
-$mobile_nav_notifications_badge = 3;
-$dashboard_user_name = "Banque Atlantique";
-$dashboard_user_id = "partenaires@banqueatlantique.ci";
+$mobile_nav_messages_badge = 0; // Sera mis à jour via API
+$mobile_nav_notifications_badge = 0; // Sera mis à jour via API
+$dashboard_user_name = $institution ? $institution->nom : "Institution";
+$dashboard_user_id = $institutionUser ? $institutionUser->email : "institution@alogoto.com";
 $dashboard_user_role = "Institution financière";
 ?>
 <!DOCTYPE html>
@@ -88,7 +93,7 @@ $dashboard_user_role = "Institution financière";
                 </span>
                 <p class="stat-card__label stat-label">Portfolio Actif</p>
               </div>
-              <h4 class="stat-card__value stat-value text-center">45 projets</h4>
+              <h4 class="stat-card__value stat-value text-center"><span id="kpi-portfolio-active">--</span></h4>
               <p class="stat-card__trend stat-trend is-up">
                 <i class="bi bi-arrow-up-right"></i>
                 <span>+3</span>
@@ -104,7 +109,7 @@ $dashboard_user_role = "Institution financière";
                 </span>
                 <p class="stat-card__label stat-label">Volume Investi</p>
               </div>
-              <h4 class="stat-card__value stat-value text-center">245M FCFA</h4>
+              <h4 class="stat-card__value stat-value text-center"><span id="kpi-volume-investi">--</span></h4>
               <p class="stat-card__trend stat-trend is-up">
                 <i class="bi bi-arrow-up-right"></i>
                 <span>+12%</span>
@@ -120,7 +125,7 @@ $dashboard_user_role = "Institution financière";
                 </span>
                 <p class="stat-card__label stat-label">ROI Moyen</p>
               </div>
-              <h4 class="stat-card__value stat-value text-center">10.8%</h4>
+              <h4 class="stat-card__value stat-value text-center"><span id="kpi-roi-moyen">--</span></h4>
               <p class="stat-card__trend stat-trend is-up">
                 <i class="bi bi-arrow-up-right"></i>
                 <span>+1.2%</span>
@@ -136,7 +141,7 @@ $dashboard_user_role = "Institution financière";
                 </span>
                 <p class="stat-card__label stat-label">Score Performance</p>
               </div>
-              <h4 class="stat-card__value stat-value text-center">94/100</h4>
+              <h4 class="stat-card__value stat-value text-center"><span id="kpi-performance-score">--</span></h4>
               <p class="stat-card__trend stat-trend is-up">
                 <i class="bi bi-arrow-up-right"></i>
                 <span>+2</span>
@@ -167,7 +172,7 @@ $dashboard_user_role = "Institution financière";
             $table_id = "institutionProjects";
             $table_search_placeholder = "Rechercher un projet";
             $table_html = <<<'HTML'
-<table class="table dashboard-table data-table align-middle">
+<table class="table dashboard-table data-table align-middle" data-items-per-page="10">
   <thead>
     <tr>
       <th>ID</th>
@@ -179,67 +184,14 @@ $dashboard_user_role = "Institution financière";
       <th>Statut</th>
     </tr>
   </thead>
-  <tbody>
+  <tbody id="institution-projects-tbody">
     <tr>
-      <td>PRJ-012</td>
-      <td>Coopérative Cacao Abidjan</td>
-      <td>Agriculture</td>
-      <td>12M FCFA</td>
-      <td><span class="risk-badge risk-low">Faible</span></td>
-      <td>
-        <div class="d-flex align-items-center gap-2">
-          <div class="mini-progress mini-progress--score"><div class="mini-progress__bar mini-progress__bar--success" style="width:85%;"></div></div>
-          <small>85</small>
-        </div>
-      </td>
-      <td><span class="status-badge status-approved approved">Approuvé</span></td>
-    </tr>
-    <tr>
-      <td>PRJ-015</td>
-      <td>Clinique Mobile Bamako</td>
-      <td>Santé</td>
-      <td>25M FCFA</td>
-      <td><span class="risk-badge risk-medium">Moyen</span></td>
-      <td>
-        <div class="d-flex align-items-center gap-2">
-          <div class="mini-progress mini-progress--score"><div class="mini-progress__bar" style="width:72%;"></div></div>
-          <small>72</small>
-        </div>
-      </td>
-      <td><span class="status-badge status-visible submitted">Visible</span></td>
-    </tr>
-    <tr>
-      <td>PRJ-018</td>
-      <td>EdTech Plateforme Dakar</td>
-      <td>Technologie</td>
-      <td>15M FCFA</td>
-      <td><span class="risk-badge risk-low">Faible</span></td>
-      <td>
-        <div class="d-flex align-items-center gap-2">
-          <div class="mini-progress mini-progress--score"><div class="mini-progress__bar mini-progress__bar--success" style="width:91%;"></div></div>
-          <small>91</small>
-        </div>
-      </td>
-      <td><span class="status-badge status-approved approved">Approuvé</span></td>
-    </tr>
-    <tr>
-      <td>PRJ-021</td>
-      <td>Transport Électrique Lomé</td>
-      <td>Transport</td>
-      <td>40M FCFA</td>
-      <td><span class="risk-badge risk-high">Élevé</span></td>
-      <td>
-        <div class="d-flex align-items-center gap-2">
-          <div class="mini-progress mini-progress--score"><div class="mini-progress__bar mini-progress__bar--danger" style="width:58%;"></div></div>
-          <small>58</small>
-        </div>
-      </td>
-      <td><span class="status-badge status-visible submitted">Visible</span></td>
+      <td colspan="7" class="text-center text-muted">Chargement des projets...</td>
     </tr>
   </tbody>
 </table>
 HTML;
-            $table_pagination = '<button class="dashboard-page-btn page-btn active">1</button><button class="dashboard-page-btn page-btn">2</button><button class="dashboard-page-btn page-btn">3</button>';
+            $table_auto_paginate = true;
             include 'components/data_table.html';
             ?>
           </div>
@@ -296,7 +248,142 @@ HTML;
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
   <!-- Scripts dashboard -->
+  <script src="<?php echo htmlspecialchars(dashboard_asset('js/api-client.js'), ENT_QUOTES, 'UTF-8'); ?>"></script>
+  <script src="<?php echo htmlspecialchars(dashboard_asset('js/chart-manager.js'), ENT_QUOTES, 'UTF-8'); ?>"></script>
   <script src="<?php echo htmlspecialchars(dashboard_asset('js/dashboard.js'), ENT_QUOTES, 'UTF-8'); ?>"></script>
   <script src="<?php echo htmlspecialchars(dashboard_asset('js/dashboard-enhancements.js'), ENT_QUOTES, 'UTF-8'); ?>"></script>
+  
+  <!-- Script de chargement des données dynamiques du dashboard Institution -->
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    loadInstitutionKPIs();
+    loadInstitutionProjects();
+    loadNotificationCounts();
+    initInstitutionPerformanceChart();
+  });
+
+  async function loadInstitutionKPIs() {
+    try {
+      const kpis = await apiFetch('dashboard/institution/stats');
+      
+      const kpiPortfolio = document.getElementById('kpi-portfolio-active');
+      const kpiVolume = document.getElementById('kpi-volume-investi');
+      const kpiROI = document.getElementById('kpi-roi-moyen');
+      const kpiScore = document.getElementById('kpi-performance-score');
+      
+      if (kpiPortfolio) kpiPortfolio.textContent = kpis.projects_financed + ' projets';
+      if (kpiVolume) kpiVolume.textContent = formatMoney(kpis.total_invested);
+      if (kpiROI) kpiROI.textContent = kpis.roi_average + '%';
+      if (kpiScore) kpiScore.textContent = kpis.performance_score + '/100';
+      
+    } catch (error) {
+      console.error('Erreur chargement KPIs Institution:', error);
+    }
+  }
+
+  async function loadInstitutionProjects() {
+    try {
+      const response = await apiFetch('dashboard/institution/projects');
+      const tbody = document.querySelector('#institution-projects-tbody');
+      
+      if (!tbody) return;
+      
+      if (!response.projects || response.projects.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">Aucun projet disponible</td></tr>';
+        return;
+      }
+      
+      tbody.innerHTML = response.projects.map(project => {
+        const riskHtml = project.risk_score !== null && project.risk_score !== undefined
+          ? `<span class="badge ${project.risk_score < 30 ? 'bg-success' : project.risk_score < 60 ? 'bg-warning' : 'bg-danger'}">${project.risk_score}/100</span>`
+          : '<span class="text-muted">N/A</span>';
+        
+        const statutColors = {
+          'admin_validated': 'bg-success',
+          'under_institution_review': 'bg-warning',
+          'interview_scheduled': 'bg-info',
+          'institution_accepted': 'bg-success',
+          'funded': 'bg-success',
+          'active': 'bg-primary',
+        };
+        const badgeColor = statutColors[project.statut] || 'bg-secondary';
+        
+        return `
+          <tr>
+            <td>${project.code}</td>
+            <td>${escapeHtml(project.titre)}</td>
+            <td>${escapeHtml(project.secteur)}</td>
+            <td class="fw-semibold">${formatMoney(project.montant_demande)}</td>
+            <td>${riskHtml}</td>
+            <td><span class="badge ${badgeColor}">${escapeHtml(project.statut_label)}</span></td>
+            <td><a href="/projets/${project.id}" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i></a></td>
+          </tr>
+        `;
+      }).join('');
+      
+    } catch (error) {
+      console.error('Erreur chargement projets Institution:', error);
+    }
+  }
+
+  async function loadNotificationCounts() {
+    try {
+      const counts = await apiFetch('dashboard/counts');
+      
+      const messagesBadge = document.querySelector('.mobile-nav__badge--messages');
+      const notificationsBadge = document.querySelector('.mobile-nav__badge--notifications');
+      
+      if (messagesBadge) {
+        messagesBadge.textContent = counts.messages_count;
+        messagesBadge.style.display = counts.messages_count > 0 ? 'inline-block' : 'none';
+      }
+      
+      if (notificationsBadge) {
+        notificationsBadge.textContent = counts.notifications_count;
+        notificationsBadge.style.display = counts.notifications_count > 0 ? 'inline-block' : 'none';
+      }
+    } catch (error) {
+      console.error('Erreur chargement notifications:', error);
+    }
+  }
+
+  async function initInstitutionPerformanceChart() {
+    try {
+      const response = await apiFetch('dashboard/institution/portfolio');
+      
+      const canvas = document.getElementById('institutionPerformanceChart');
+      if (!canvas) return;
+      
+      if (!window.chartManager) {
+        console.warn('chartManager non disponible');
+        return;
+      }
+      
+      window.chartManager.initChart('institutionPerformanceChart', {
+        type: 'line',
+        data: {
+          labels: response.labels || [],
+          datasets: [{
+            label: 'Performance Portfolio',
+            data: response.performance_data || [],
+            borderColor: '#00C486',
+            backgroundColor: 'rgba(0, 196, 134, 0.1)',
+            fill: true,
+            tension: 0.4
+          }]
+        }
+      });
+      
+    } catch (error) {
+      console.error('Erreur graphique performance:', error);
+    }
+  }
+  
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.appendChild(document.createTextNode(text));
+    return div.innerHTML;
+  }
+  </script>
 </body>
 </html>

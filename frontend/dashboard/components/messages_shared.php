@@ -57,27 +57,31 @@ if (!function_exists('dashboard_messages_prepare')) {
   display: grid;
   grid-template-columns: minmax(300px, 34%) minmax(0, 1fr);
   min-height: clamp(640px, calc(100vh - 170px), 860px);
+  height: clamp(640px, calc(100vh - 170px), 860px);
   overflow: hidden;
   position: relative;
-  border-radius: 22px;
+  border-radius: 12px;
   border: 1px solid var(--border-color-2);
   background: #ffffff;
-  box-shadow: 0 24px 60px rgba(12, 52, 46, 0.08);
-}
-
-.whatsapp-shell::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.3) 0%, rgba(245, 247, 246, 0.65) 60%, rgba(245, 247, 246, 0.9) 100%);
-  z-index: -1;
+  box-shadow: 0 8px 32px rgba(6, 42, 38, 0.1);
 }
 
 .lucide-icon {
   width: 18px;
   height: 18px;
-  stroke-width: 1.7;
+  stroke-width: 1.5;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: inherit;
+}
+
+.lucide-icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  stroke: currentColor;
+  fill: none;
 }
 
 .whatsapp-sidebar {
@@ -85,16 +89,21 @@ if (!function_exists('dashboard_messages_prepare')) {
   display: flex;
   flex-direction: column;
   min-width: 0;
+  min-height: 0;
+  height: 100%;
   border-right: 1px solid var(--border-color-2);
-  background: linear-gradient(180deg, #f9fbf9 0%, #f2f5f4 100%);
+  background: #f0f0f0;
 }
 
 .whatsapp-sidebar__top {
   display: grid;
   gap: 12px;
-  padding: 16px 16px 12px;
+  padding: 16px;
   border-bottom: 1px solid var(--border-color-2);
   background: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 3;
 }
 
 .whatsapp-heading {
@@ -106,17 +115,24 @@ if (!function_exists('dashboard_messages_prepare')) {
 
 .whatsapp-heading h6 {
   margin: 0 0 2px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-heading-color);
+}
+
+.whatsapp-heading p {
+  font-size: 12px;
 }
 
 .whatsapp-pill {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 10px;
+  padding: 6px 12px;
   border-radius: 999px;
-  background: rgba(243, 156, 18, 0.16);
-  color: #c06a00;
-  font-weight: 700;
+  background: rgba(0, 196, 134, 0.16);
+  color: var(--primary-color-1);
+  font-weight: 600;
   font-size: 12px;
 }
 
@@ -124,11 +140,11 @@ if (!function_exists('dashboard_messages_prepare')) {
   display: flex;
   align-items: center;
   gap: 10px;
-  min-height: 44px;
-  padding: 10px 12px;
-  border-radius: 14px;
+  min-height: 40px;
+  padding: 8px 12px;
+  border-radius: 20px;
   border: 1px solid var(--border-color-2);
-  background: #f6f8f7;
+  background: #f5f5f5;
 }
 
 .whatsapp-search input {
@@ -143,13 +159,21 @@ if (!function_exists('dashboard_messages_prepare')) {
   font-size: 13px;
 }
 
+.whatsapp-search input::placeholder {
+  color: #999;
+}
+
 .whatsapp-conversation-list {
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
-  padding: 8px;
+  padding: 4px;
   display: grid;
-  gap: 4px;
+  gap: 0;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  scrollbar-gutter: stable;
 }
 
 .whatsapp-conversation {
@@ -158,38 +182,61 @@ if (!function_exists('dashboard_messages_prepare')) {
   grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: 12px;
-  padding: 10px 12px;
+  padding: 8px 8px;
+  margin: 0 8px;
   border: 0;
-  border-radius: 16px;
+  border-radius: 8px;
   background: transparent;
   text-align: left;
   cursor: pointer;
-  transition: background-color 0.18s ease, transform 0.18s ease;
+  transition: background-color 0.15s ease;
+}
+
+.whatsapp-animate-item {
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  will-change: opacity, transform;
+}
+
+.whatsapp-shell.is-animate-enabled .whatsapp-animate-item {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.whatsapp-shell.is-animate-enabled .whatsapp-animate-item.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .whatsapp-animate-item {
+    transition: none;
+    transform: none;
+  }
 }
 
 .whatsapp-conversation:hover {
-  background: rgba(243, 156, 18, 0.1);
-  transform: translateY(-1px);
+  background: #f0f0f0;
 }
 
 .whatsapp-conversation.is-active {
-  background: rgba(0, 122, 92, 0.08);
-  border: 1px solid rgba(0, 122, 92, 0.16);
+  background: rgba(0, 196, 134, 0.15);
 }
 
 .whatsapp-avatar {
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
-  background: rgba(243, 156, 18, 0.18);
-  color: #c06a00;
+  background: var(--primary-color-3);
+  color: #fff;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   flex-shrink: 0;
-  box-shadow: inset 0 0 0 1px rgba(243, 156, 18, 0.24);
+  box-shadow: 0 6px 14px rgba(252, 160, 40, 0.2);
 }
 
 .whatsapp-conversation__body {
@@ -208,21 +255,22 @@ if (!function_exists('dashboard_messages_prepare')) {
 .whatsapp-name {
   margin: 0;
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--text-heading-color);
 }
 
 .whatsapp-time {
   color: var(--p-color);
-  font-size: 11px;
+  font-size: 12px;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .whatsapp-snippet {
   margin: 0;
-  color: var(--p-color);
+  color: #999;
   font-size: 12px;
-  line-height: 1.35;
+  line-height: 1.3;
   display: -webkit-box;
   -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
@@ -230,19 +278,19 @@ if (!function_exists('dashboard_messages_prepare')) {
 }
 
 .whatsapp-unread {
-  min-width: 22px;
-  height: 22px;
+  min-width: 20px;
+  height: 20px;
   padding: 0 6px;
   border-radius: 999px;
-  background: var(--primary-color-1, #f39c12);
+  background: var(--primary-color-1);
   color: #fff;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 700;
   flex-shrink: 0;
-  box-shadow: 0 6px 12px rgba(243, 156, 18, 0.3);
+  margin-left: auto;
 }
 
 .whatsapp-thread {
@@ -250,7 +298,14 @@ if (!function_exists('dashboard_messages_prepare')) {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(180deg, #f8faf9 0%, #f3f7f5 100%);
+  min-height: 0;
+  height: 100%;
+  background-color: #ffffff;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cdefs%3E%3Cstyle%3E.icon { fill: %23FCA028; opacity: 0.08; }%3C/style%3E%3C/defs%3E%3Cg%3E%3Ctext x='10' y='30' class='icon' font-size='24'%3E💬%3C/text%3E%3Ctext x='80' y='60' class='icon' font-size='20'%3E☎️%3C/text%3E%3Ctext x='140' y='40' class='icon' font-size='18'%3E📎%3C/text%3E%3Ctext x='30' y='100' class='icon' font-size='22'%3E📄%3C/text%3E%3Ctext x='120' y='110' class='icon' font-size='20'%3E🔊%3C/text%3E%3Ctext x='60' y='150' class='icon' font-size='24'%3E✔️%3C/text%3E%3Ctext x='160' y='170' class='icon' font-size='20'%3E⏰%3C/text%3E%3Ctext x='15' y='180' class='icon' font-size='18'%3E📍%3C/text%3E%3C/g%3E%3C/svg%3E");
+  background-size: 200px 200px;
+  background-position: 0 0;
+  background-repeat: repeat;
+  background-attachment: fixed;
 }
 
 .whatsapp-thread__header {
@@ -258,9 +313,9 @@ if (!function_exists('dashboard_messages_prepare')) {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 14px 18px;
-  border-bottom: 1px solid var(--border-color-2);
-  background: rgba(255, 255, 255, 0.96);
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(0, 196, 134, 0.2);
+  background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(8px);
 }
 
@@ -284,29 +339,38 @@ if (!function_exists('dashboard_messages_prepare')) {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  margin: 0 0 2px;
+  margin: 0 0 3px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-heading-color);
 }
 
 .whatsapp-back {
-  width: 38px;
-  height: 38px;
+  width: 36px;
+  height: 36px;
   border: 0;
-  border-radius: 12px;
+  border-radius: 50%;
   display: none;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 122, 92, 0.12);
-  color: #004734;
+  background: transparent;
+  color: var(--primary-color-1);
   flex-shrink: 0;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.whatsapp-back:hover {
+  background: #f0f0f0;
 }
 
 .whatsapp-status {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  color: #0b7a62;
+  gap: 5px;
+  color: #999;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 400;
   max-width: 100%;
   white-space: nowrap;
   overflow: hidden;
@@ -315,37 +379,49 @@ if (!function_exists('dashboard_messages_prepare')) {
 
 .whatsapp-status::before {
   content: '';
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background: currentColor;
-  opacity: 0.8;
+  opacity: 1;
+  flex-shrink: 0;
 }
 
 .whatsapp-status.is-offline {
-  color: var(--p-color);
+  color: #999;
+}
+
+.whatsapp-status.is-offline::before {
+  background: #999;
 }
 
 .whatsapp-status.is-away {
-  color: var(--primary-color-3, #f39c12);
+  color: var(--primary-color-3);
+}
+
+.whatsapp-status.is-away::before {
+  background: var(--primary-color-3);
 }
 
 .whatsapp-icon-btn {
-  width: 38px;
-  height: 38px;
+  width: 36px;
+  height: 36px;
+  aspect-ratio: 1 / 1;
   border: 0;
-  border-radius: 12px;
+  border-radius: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 122, 92, 0.08);
-  color: #004734;
-  transition: transform 0.2s ease, background-color 0.2s ease;
+  padding: 0;
+  background: transparent;
+  color: var(--primary-color-1);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  flex-shrink: 0;
 }
 
 .whatsapp-icon-btn:hover {
-  transform: translateY(-1px);
-  background: rgba(243, 156, 18, 0.16);
+  background: #f0f0f0;
 }
 
 .whatsapp-thread__messages {
@@ -354,27 +430,32 @@ if (!function_exists('dashboard_messages_prepare')) {
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 18px;
+  gap: 8px;
+  padding: 16px;
+  background: transparent;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  scrollbar-gutter: stable;
 }
 
 .whatsapp-day {
   align-self: center;
   padding: 6px 12px;
-  border-radius: 999px;
-  background: rgba(0, 122, 92, 0.08);
-  color: #004734;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
+  border-radius: 12px;
+  background: #f0f0f0;
+  color: #666;
+  font-size: 12px;
+  font-weight: 500;
+  margin: 8px 0;
 }
 
 .whatsapp-message {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   align-self: flex-start;
-  max-width: min(78%, 620px);
+  max-width: min(70%, 600px);
 }
 
 .whatsapp-message--outgoing {
@@ -382,18 +463,23 @@ if (!function_exists('dashboard_messages_prepare')) {
 }
 
 .whatsapp-bubble {
-  padding: 12px 14px;
-  border-radius: 18px 18px 18px 8px;
-  background: #f6f8f7;
+  padding: 8px 12px;
+  border-radius: 12px 12px 12px 0;
+  background: #e8f5f0;
   color: var(--text-heading-color);
-  box-shadow: 0 8px 20px rgba(6, 42, 38, 0.05);
-  border: 1px solid rgba(12, 52, 46, 0.06);
+  word-break: break-word;
+  font-size: 14px;
+  line-height: 1.4;
 }
 
 .whatsapp-message--outgoing .whatsapp-bubble {
-  border-radius: 18px 18px 8px 18px;
-  background: rgba(243, 156, 18, 0.12);
-  border: 1px solid rgba(243, 156, 18, 0.28);
+  border-radius: 12px 12px 0 12px;
+  background: var(--primary-color-1);
+  color: #fff;
+}
+
+.whatsapp-bubble p {
+  margin: 0;
 }
 
 .whatsapp-bubble--file {
@@ -401,13 +487,20 @@ if (!function_exists('dashboard_messages_prepare')) {
   grid-template-columns: auto 1fr;
   gap: 10px;
   align-items: center;
-  border: 1px dashed rgba(243, 156, 18, 0.4);
-  background: rgba(243, 156, 18, 0.06);
+  padding: 10px 12px;
+  background: #e8f5f0;
+}
+
+.whatsapp-message--outgoing .whatsapp-bubble--file {
+  background: rgba(0, 196, 134, 0.2);
 }
 
 .whatsapp-bubble--file.is-pdf {
-  background: rgba(215, 65, 72, 0.08);
-  border-color: rgba(215, 65, 72, 0.32);
+  background: rgba(243, 81, 32, 0.1);
+}
+
+.whatsapp-message--outgoing .whatsapp-bubble--file.is-pdf {
+  background: rgba(243, 81, 32, 0.15);
 }
 
 .whatsapp-file__meta {
@@ -427,55 +520,66 @@ if (!function_exists('dashboard_messages_prepare')) {
   display: inline-flex;
   align-items: center;
   gap: 3px;
-  min-width: 120px;
+  min-width: 100px;
 }
 
 .whatsapp-wave span {
-  width: 3px;
-  border-radius: 999px;
+  width: 2px;
+  border-radius: 1px;
   background: currentColor;
-  opacity: 0.6;
+  opacity: 0.7;
 }
 
-.whatsapp-wave span:nth-child(1) { height: 10px; }
-.whatsapp-wave span:nth-child(2) { height: 16px; }
-.whatsapp-wave span:nth-child(3) { height: 12px; }
-.whatsapp-wave span:nth-child(4) { height: 18px; }
-.whatsapp-wave span:nth-child(5) { height: 11px; }
-.whatsapp-wave span:nth-child(6) { height: 15px; }
+.whatsapp-wave span:nth-child(1) { height: 8px; }
+.whatsapp-wave span:nth-child(2) { height: 12px; }
+.whatsapp-wave span:nth-child(3) { height: 10px; }
+.whatsapp-wave span:nth-child(4) { height: 14px; }
+.whatsapp-wave span:nth-child(5) { height: 9px; }
+.whatsapp-wave span:nth-child(6) { height: 11px; }
 
 .whatsapp-message__meta {
   display: inline-flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 6px;
-  color: var(--p-color);
-  font-size: 11px;
+  gap: 4px;
+  color: #999;
+  font-size: 12px;
   padding: 0 4px;
+}
+
+.whatsapp-message--outgoing .whatsapp-message__meta {
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .whatsapp-checks {
   display: inline-flex;
   align-items: center;
-  color: var(--p-color);
+  color: #999;
+  font-size: 14px;
+}
+
+.whatsapp-message--outgoing .whatsapp-checks {
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .whatsapp-checks.is-read {
-  color: #0b7a62;
+  color: #00C486;
+}
+
+.whatsapp-message--outgoing .whatsapp-checks.is-read {
+  color: rgba(255, 255, 255, 0.95);
 }
 
 .whatsapp-typing {
   align-self: flex-start;
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 14px;
-  border-radius: 999px;
-  background: #fff;
-  border: 1px solid var(--border-color-2);
-  color: var(--p-color);
-  font-size: 12px;
-  box-shadow: 0 6px 20px rgba(6, 42, 38, 0.06);
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 12px 12px 12px 0;
+  background: #e8f5f0;
+  color: var(--text-heading-color);
+  font-size: 13px;
 }
 
 .whatsapp-typing__dots {
@@ -487,8 +591,8 @@ if (!function_exists('dashboard_messages_prepare')) {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: currentColor;
-  opacity: 0.35;
+  background: var(--primary-color-1);
+  opacity: 0.5;
   animation: whatsappTyping 1.2s infinite ease-in-out;
 }
 
@@ -496,21 +600,21 @@ if (!function_exists('dashboard_messages_prepare')) {
 .whatsapp-typing__dots span:nth-child(3) { animation-delay: 0.3s; }
 
 .whatsapp-compose {
-  padding: 14px 18px 18px;
-  border-top: 1px solid var(--border-color-2);
-  background: rgba(255, 255, 255, 0.98);
+  padding: 12px 16px;
+  border-top: 1px solid rgba(0, 196, 134, 0.2);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
 }
 
 .whatsapp-compose__bar {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 12px;
-  border-radius: 18px;
+  padding: 8px 12px;
+  border-radius: 20px;
   border: 1px solid var(--border-color-2);
   background: #fff;
   min-width: 0;
-  box-shadow: 0 6px 18px rgba(6, 42, 38, 0.05);
 }
 
 .whatsapp-compose__input {
@@ -523,47 +627,89 @@ if (!function_exists('dashboard_messages_prepare')) {
   background: transparent;
   font-size: 14px;
   color: var(--text-heading-color);
+  resize: none;
+  max-height: 100px;
+}
+
+.whatsapp-compose__input::placeholder {
+  color: #ccc;
 }
 
 .whatsapp-send {
-  width: 44px;
-  height: 44px;
-  min-width: 44px;
-  border-radius: 14px;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
   padding: 0 !important;
-  justify-content: center !important;
-  background: var(--primary-color-1, #f39c12);
   border: none;
-  color: #fff;
-  box-shadow: 0 10px 18px rgba(243, 156, 18, 0.35);
+  background: var(--primary-color-1) !important;
+  color: #fff !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer;
+  transition: transform 0.2s ease, filter 0.2s ease;
+  flex-shrink: 0;
 }
 
 .whatsapp-send:hover {
-  filter: brightness(1.05);
+  filter: brightness(1.1);
+  transform: scale(1.05);
 }
 
 @keyframes whatsappTyping {
-  0%, 80%, 100% {
-    transform: scale(0.85);
-    opacity: 0.3;
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: 0.6;
   }
-  40% {
-    transform: scale(1);
-    opacity: 0.85;
+  30% {
+    transform: translateY(-8px);
+    opacity: 1;
   }
 }
 
 @media (max-width: 1199.98px) {
   .whatsapp-shell {
-    grid-template-columns: minmax(260px, 36%) minmax(0, 1fr);
+    grid-template-columns: minmax(260px, 35%) minmax(0, 1fr);
     min-height: calc(100vh - 160px);
+    height: calc(100vh - 160px);
+  }
+
+  .whatsapp-thread__header {
+    padding: 10px 14px;
+  }
+
+  .whatsapp-thread__messages {
+    padding: 14px;
+  }
+
+  .whatsapp-compose {
+    padding: 10px 14px;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .whatsapp-shell {
+    grid-template-columns: minmax(240px, 40%) minmax(0, 1fr);
+  }
+
+  .whatsapp-conversation {
+    padding: 6px 8px;
+  }
+
+  .whatsapp-avatar {
+    width: 40px;
+    height: 40px;
+    font-size: 11px;
   }
 }
 
 @media (max-width: 767.98px) {
   .whatsapp-shell {
     grid-template-columns: 1fr;
-    min-height: calc(100vh - 132px);
+    min-height: calc(100vh - 110px);
+    height: calc(100vh - 110px);
   }
 
   .whatsapp-sidebar,
@@ -587,100 +733,184 @@ if (!function_exists('dashboard_messages_prepare')) {
     display: inline-flex;
   }
 
-  .whatsapp-thread__header,
-  .whatsapp-thread__messages,
-  .whatsapp-compose {
-    padding-left: 10px;
-    padding-right: 10px;
-  }
-
   .whatsapp-thread__header {
-    display: grid;
-    grid-template-columns: 12% minmax(0, 64%) 12% 12%;
-    align-items: center;
-    gap: 0;
-    padding-top: 8px;
-    padding-bottom: 8px;
+    padding: 10px 12px;
+    gap: 6px;
   }
 
   .whatsapp-thread__identity {
-    grid-column: 2;
-    gap: 6px;
-    flex: 1 1 auto;
-    width: 100%;
+    flex: 1;
   }
 
-  .whatsapp-thread__identity .whatsapp-avatar {
-    width: 34px;
-    height: 34px;
+  .whatsapp-avatar {
+    width: 36px;
+    height: 36px;
     font-size: 10px;
   }
 
   .whatsapp-thread__name {
     font-size: 12px;
-    line-height: 1.15;
-    margin-bottom: 1px !important;
   }
 
   .whatsapp-status {
-    font-size: 10px;
-    gap: 4px;
+    font-size: 11px;
   }
 
-  .whatsapp-back,
-  .whatsapp-thread__header .whatsapp-icon-btn {
-    width: 100%;
-    height: 30px;
-    min-width: 0;
-    font-size: 12px;
-    border-radius: 10px;
-    background: transparent;
-    padding: 0;
+  .whatsapp-thread__messages {
+    gap: 6px;
+    padding: 12px;
   }
 
   .whatsapp-message {
-    max-width: 88%;
+    max-width: 85%;
+  }
+
+  .whatsapp-bubble {
+    padding: 7px 10px;
+    font-size: 13px;
   }
 
   .whatsapp-compose {
-    padding-top: 8px;
-    padding-bottom: 10px;
+    padding: 10px 12px;
   }
 
   .whatsapp-compose__bar {
-    display: grid;
-    grid-template-columns: 12% 12% minmax(0, 52%) 12% 12%;
-    align-items: center;
-    gap: 0;
     padding: 6px 8px;
-    border-radius: 14px;
-  }
-
-  .whatsapp-compose__bar .whatsapp-icon-btn {
-    width: 100%;
-    height: 28px;
-    min-width: 0;
-    font-size: 12px;
-    border-radius: 10px;
-    background: transparent;
-    padding: 0;
-  }
-
-  .whatsapp-compose__input {
-    font-size: 13px;
-    padding: 0 2px;
-    flex: 1 1 100%;
-    width: 100%;
+    gap: 6px;
   }
 
   .whatsapp-send {
-    width: 100%;
+    width: 32px;
     height: 32px;
-    min-width: 0;
-    font-size: 12px;
-    padding: 0 !important;
-    border-radius: 10px;
+    min-width: 32px;
   }
+
+  .whatsapp-icon-btn {
+    width: 30px;
+    height: 30px;
+  }
+
+  .whatsapp-icon-btn .lucide-icon,
+  .whatsapp-send .lucide-icon {
+    width: 16px;
+    height: 16px;
+  }
+
+  .whatsapp-sidebar__top {
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .whatsapp-heading h6 {
+    font-size: 14px;
+  }
+
+  .whatsapp-search {
+    min-height: 36px;
+    padding: 6px 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .whatsapp-heading h6 {
+    font-size: 12px;
+  }
+
+  .whatsapp-heading p {
+    font-size: 11px;
+  }
+
+  .whatsapp-message {
+    max-width: 90%;
+  }
+
+  .whatsapp-thread__header {
+    gap: 4px;
+    padding: 8px 10px;
+  }
+
+  .whatsapp-compose__bar {
+    padding: 6px;
+    gap: 5px;
+  }
+}
+
+/* Overrides: style WhatsApp-like split + orange icon pattern */
+.whatsapp-sidebar,
+.whatsapp-conversation-list {
+  background: #f4f6f7;
+}
+
+.whatsapp-sidebar,
+.whatsapp-thread {
+  overflow: hidden;
+}
+
+.whatsapp-thread {
+  background-color: #fff9f2;
+  background-image:
+    linear-gradient(180deg, rgba(252, 160, 40, 0.035), rgba(255, 255, 255, 0)),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'%3E%3Cg fill='none' stroke='%23FCA028' stroke-opacity='0.14' stroke-width='2'%3E%3Crect x='10' y='12' width='26' height='18' rx='6'/%3E%3Cpath d='M18 30l8 6'/%3E%3Ccircle cx='70' cy='20' r='7'/%3E%3Crect x='90' y='12' width='24' height='16' rx='5'/%3E%3Crect x='32' y='54' width='28' height='18' rx='6'/%3E%3Cpath d='M40 72l8 6'/%3E%3Ccircle cx='106' cy='64' r='6'/%3E%3Crect x='12' y='94' width='24' height='16' rx='5'/%3E%3Crect x='72' y='92' width='28' height='18' rx='6'/%3E%3Cpath d='M80 110l8 6'/%3E%3Cpath d='M108 36h14m-7-7v14'/%3E%3Cpath d='M20 84h12m-6-6v12'/%3E%3Cpath d='M54 102h10m-5-5v10'/%3E%3C/g%3E%3Cg fill='%23FCA028' fill-opacity='0.1'%3E%3Ccircle cx='22' cy='44' r='2'/%3E%3Ccircle cx='120' cy='46' r='2'/%3E%3Ccircle cx='58' cy='128' r='2'/%3E%3Ccircle cx='120' cy='114' r='2'/%3E%3Ccircle cx='94' cy='88' r='2'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 140px 140px;
+  background-repeat: repeat;
+  background-attachment: fixed;
+  isolation: isolate;
+}
+
+.whatsapp-thread::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 160 160'%3E%3Cg fill='%23FCA028' fill-opacity='0.28'%3E%3Crect x='12' y='14' width='28' height='20' rx='6'/%3E%3Cpolygon points='22,34 30,34 22,42'/%3E%3Ccircle cx='76' cy='26' r='8'/%3E%3Crect x='102' y='18' width='22' height='14' rx='4'/%3E%3Crect x='46' y='70' width='30' height='18' rx='5'/%3E%3Cpolygon points='54,88 60,88 54,94'/%3E%3Ccircle cx='124' cy='82' r='7'/%3E%3Crect x='16' y='110' width='22' height='14' rx='4'/%3E%3Ccircle cx='78' cy='122' r='6'/%3E%3Crect x='112' y='114' width='28' height='18' rx='6'/%3E%3Cpolygon points='120,132 128,132 120,140'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 140px 140px;
+  background-position: 0 0;
+  background-repeat: repeat;
+  opacity: 0.1;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.whatsapp-thread__header,
+.whatsapp-thread__messages,
+.whatsapp-compose {
+  position: relative;
+  z-index: 1;
+}
+
+/* Thread palette: replace green with brand orange */
+.whatsapp-thread .whatsapp-thread__header {
+  border-bottom: 1px solid rgba(252, 160, 40, 0.25);
+}
+
+.whatsapp-thread .whatsapp-compose {
+  border-top: 1px solid rgba(252, 160, 40, 0.25);
+}
+
+.whatsapp-thread .whatsapp-icon-btn {
+  color: var(--primary-color-3);
+}
+
+.whatsapp-thread .whatsapp-send {
+  background: var(--primary-color-3) !important;
+  color: #fff !important;
+}
+
+.whatsapp-thread .whatsapp-message--outgoing .whatsapp-bubble {
+  background: var(--primary-color-3);
+  color: #fff;
+}
+
+.whatsapp-thread .whatsapp-message--outgoing .whatsapp-bubble--file {
+  background: rgba(252, 160, 40, 0.2);
+  color: #111;
+}
+
+.whatsapp-thread .whatsapp-typing__dots span {
+  background: var(--primary-color-3);
+}
+
+.whatsapp-thread .whatsapp-checks.is-read {
+  color: var(--primary-color-3);
 }
 CSS;
   }
@@ -712,6 +942,63 @@ CSS;
   function refreshIcons(scope) {
     if (window.lucide && typeof window.lucide.createIcons === 'function') {
       window.lucide.createIcons(scope || shell.querySelectorAll('[data-lucide]'));
+    }
+  }
+
+  function setupScrollAnimations() {
+    var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion) {
+      return;
+    }
+
+    var listRoot = shell.querySelector('.whatsapp-conversation-list');
+    var threadRoot = shell.querySelector('.whatsapp-thread__messages');
+    shell.classList.add('is-animate-enabled');
+    var observer = window.IntersectionObserver
+      ? new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { root: listRoot || null, threshold: 0.1 })
+      : null;
+
+    function observeNodes(nodes, root) {
+      if (!nodes || !nodes.length) {
+        return;
+      }
+      if (!window.IntersectionObserver) {
+        nodes.forEach(function (node) { node.classList.add('is-visible'); });
+        return;
+      }
+      if (observer && root === listRoot) {
+        nodes.forEach(function (node) { observer.observe(node); });
+        return;
+      }
+      var localObserver = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            localObserver.unobserve(entry.target);
+          }
+        });
+      }, { root: root || null, threshold: 0.1 });
+      nodes.forEach(function (node) { localObserver.observe(node); });
+    }
+
+    conversationButtons.forEach(function (button, index) {
+      button.style.transitionDelay = (index % 12) * 30 + 'ms';
+    });
+    observeNodes(conversationButtons, listRoot);
+
+    if (threadRoot) {
+      var threadItems = Array.prototype.slice.call(threadRoot.querySelectorAll('.whatsapp-animate-item'));
+      threadItems.forEach(function (item, index) {
+        item.style.transitionDelay = (index % 12) * 25 + 'ms';
+      });
+      observeNodes(threadItems, threadRoot);
     }
   }
 
@@ -800,7 +1087,7 @@ CSS;
 
     meta += '</div>';
 
-    return '<article class="whatsapp-message' + (message.outgoing ? ' whatsapp-message--outgoing' : '') + '">' + bubble + meta + '</article>';
+    return '<article class="whatsapp-message whatsapp-animate-item' + (message.outgoing ? ' whatsapp-message--outgoing' : '') + '">' + bubble + meta + '</article>';
   }
 
   function renderThread(conversationId) {
@@ -829,6 +1116,8 @@ CSS;
     threadBody.innerHTML = html;
     threadBody.scrollTop = threadBody.scrollHeight;
     refreshIcons(threadBody.querySelectorAll('[data-lucide]'));
+
+    setupScrollAnimations();
   }
 
   conversationButtons.forEach(function (button) {
@@ -864,6 +1153,7 @@ CSS;
 
   renderThread(currentConversationId);
   refreshIcons(shell.querySelectorAll('[data-lucide]'));
+  setupScrollAnimations();
 })();
 JS;
 
@@ -930,18 +1220,17 @@ JS;
 
               <div class="whatsapp-conversation-list">
 <?php foreach ($conversationCards as $conversation): ?>
-                <button type="button" class="whatsapp-conversation<?php echo !empty($conversation['active']) ? ' is-active' : ''; ?>" data-conversation-id="<?php echo $escapeValue($conversation['id']); ?>">
-                  <span class="whatsapp-avatar"><?php echo $escapeValue($conversation['avatar']); ?></span>
+                <button type="button" class="whatsapp-conversation whatsapp-animate-item<?php echo !empty($conversation['active']) ? ' is-active' : ''; ?>" data-conversation-id="<?php echo $escapeValue($conversation['id']); ?>" aria-label="Sélectionner <?php echo $escapeValue($conversation['name']); ?>">
+                  <span class="whatsapp-avatar" title="<?php echo $escapeValue($conversation['name']); ?>"><?php echo $escapeValue($conversation['avatar']); ?></span>
                   <span class="whatsapp-conversation__body">
                     <span class="whatsapp-conversation__top">
                       <span class="whatsapp-name"><?php echo $escapeValue($conversation['name']); ?></span>
                       <span class="whatsapp-time"><?php echo $escapeValue($conversation['time']); ?></span>
                     </span>
-                    <span class="whatsapp-snippet"><?php echo $escapeValue($conversation['snippet']); ?></span>
-                    <span class="d-block text-muted small"><?php echo $escapeValue($conversation['role'] ?? $conversation['status']); ?></span>
+                    <p class="whatsapp-snippet"><?php echo $escapeValue($conversation['snippet']); ?></p>
                   </span>
 <?php if (($conversation['unread'] ?? 0) > 0): ?>
-                  <span class="whatsapp-unread"><?php echo $escapeValue((string) $conversation['unread']); ?></span>
+                  <span class="whatsapp-unread" aria-label="<?php echo $escapeValue((string) $conversation['unread']); ?> messages non lus"><?php echo $escapeValue((string) $conversation['unread']); ?></span>
 <?php endif; ?>
                 </button>
 <?php endforeach; ?>
@@ -956,33 +1245,24 @@ JS;
                 <div class="whatsapp-thread__identity">
                   <span class="whatsapp-avatar" data-thread-avatar><?php echo $escapeValue($activeConversation['avatar']); ?></span>
                   <div class="whatsapp-thread__copy">
-                    <h6 class="whatsapp-thread__name mb-1" data-thread-name><?php echo $escapeValue($activeConversation['name']); ?></h6>
+                    <h6 class="whatsapp-thread__name" data-thread-name><?php echo $escapeValue($activeConversation['name']); ?></h6>
                     <p class="whatsapp-status mb-0" data-thread-status><?php echo $escapeValue($activeConversation['status']); ?></p>
                   </div>
                 </div>
-                <button type="button" class="whatsapp-icon-btn" aria-label="Appel vocal">
-                  <span class="lucide-icon" data-lucide="phone"></span>
-                </button>
-                <button type="button" class="whatsapp-icon-btn" aria-label="Appel video">
-                  <span class="lucide-icon" data-lucide="video"></span>
-                </button>
               </header>
 
               <div class="whatsapp-thread__messages" data-thread-body></div>
 
               <footer class="whatsapp-compose">
                 <div class="whatsapp-compose__bar">
-                  <button type="button" class="whatsapp-icon-btn" aria-label="Emoji">
-                    <span class="lucide-icon" data-lucide="smile"></span>
-                  </button>
-                  <button type="button" class="whatsapp-icon-btn" aria-label="Piece jointe">
+                  <button type="button" class="whatsapp-icon-btn" aria-label="Pièce jointe" title="Ajouter une pièce jointe">
                     <span class="lucide-icon" data-lucide="paperclip"></span>
                   </button>
                   <input type="text" class="whatsapp-compose__input" placeholder="<?php echo $escapeValue($options['compose_placeholder']); ?>" aria-label="<?php echo $escapeValue($options['compose_placeholder']); ?>" />
-                  <button type="button" class="whatsapp-icon-btn" aria-label="Message vocal">
+                  <button type="button" class="whatsapp-icon-btn" aria-label="Message vocal" title="Enregistrer un message vocal">
                     <span class="lucide-icon" data-lucide="mic"></span>
                   </button>
-                  <button type="button" class="dashboard-btn-primary btn-dashboard primary whatsapp-send" aria-label="Envoyer">
+                  <button type="button" class="whatsapp-send" aria-label="Envoyer le message" title="Envoyer">
                     <span class="lucide-icon" data-lucide="send"></span>
                   </button>
                 </div>

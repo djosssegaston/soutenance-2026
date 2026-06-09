@@ -23,12 +23,34 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
+        $firstNames = [
+            'Armand', 'Chantal', 'Emmanuel', 'Nadine', 'Aicha', 'Komi', 'Gildas', 'Rosine',
+            'Wilfried', 'Gloria', 'Sonia', 'Fidele', 'Pacome', 'Ornella', 'Marius', 'Prisca',
+            'Germain', 'Eulalie', 'Odilon', 'Clarisse',
+        ];
+        $lastNames = [
+            'Hounkpe', 'Dossou', 'Zinsou', 'Adjovi', 'Tchibozo', 'Kponton', 'Sossou', 'Agossa',
+            'Hounnou', 'Sossoukpe', 'Ahouansou', 'Hounkpatin', 'Houssou', 'Koudjo', 'Alladaye', 'Yehouenou',
+        ];
+
+        $first = $this->faker->randomElement($firstNames);
+        $last = $this->faker->randomElement($lastNames);
+        $name = $first.' '.$last;
+
+        $emailLocal = Str::slug($first.'.'.$last, '.');
+        $email = $emailLocal.$this->faker->unique()->numberBetween(10, 999).'@alogoto.bj';
+
+        $phone = '+229 '.$this->faker->numerify('## ## ## ##');
+
         return [
-            'name' => fake()->name(),
-            'email' => fake()->unique()->safeEmail(),
+            'name' => $name,
+            'email' => $email,
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
+            'role' => 'porteur',
+            'telephone' => $phone,
+            'statut' => $this->faker->randomElement(['actif', 'verifie']),
         ];
     }
 

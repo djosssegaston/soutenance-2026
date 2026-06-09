@@ -1,5 +1,9 @@
 <?php
 
+if (isset($institutionData) && is_array($institutionData)) {
+    return $institutionData;
+}
+
 return [
   'projects' => [
     [
@@ -196,3 +200,4 @@ return [
     'type' => 'Institution financière',
   ],
 ];
+

@@ -1,0 +1,2069 @@
+<?php 
+require_once __DIR__ . "/../path_helpers.php"; 
+require_once __DIR__ . "/../auth_helpers.php"; 
+
+if (!dashboard02_auth_check()) {
+    header("Location: /frontend/dashboard02/porteur/login.php");
+    exit;
+}
+$user = dashboard02_user();
+if (isset($user['role']) && $user['role'] !== 'porteur') {
+    header("Location: /frontend/dashboard02/porteur/index.php");
+    exit;
+}
+?>
+<head>
+    <!-- DONNÉES META -->
+    <meta charset="UTF-8">
+
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, user-scalable=0'>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="Adminixor – Template d'administration et de tableau de bord Bootstrap 5">
+    <meta name="author" content="Techne Infosys">
+    <meta name="keywords"
+        content="template d'administration, template Adminixor, template de tableau de bord">
+
+    <!-- FAVICON -->
+    <link rel="shortcut icon" type="image/x-icon" href="../../asset/images/brand/favicon.ico">
+
+    <!-- TITRE -->
+    <title>Alogoto</title>
+    <!-- CSS BOOTSTRAP -->
+    <link id="style" href="../../asset/css/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- CSS DE STYLE -->
+    <link href="../../asset/css/style.css" rel="stylesheet">
+
+    <!-- CSS des plugins -->
+    <link href="../../asset/css/plugins.css" rel="stylesheet">
+
+    <!--- CSS DES ICÔNES DE POLICE -->
+    <link href="../../asset/css/icons.css" rel="stylesheet">
+
+    <!-- CSS du sélecteur interne -->
+    <link href="../../asset/switcher/css/switcher.css" rel="stylesheet">
+    <link href="../../asset/switcher/demo.css" rel="stylesheet">
+    <link href="../../asset/css/porteur-theme.css" rel="stylesheet">
+    
+    <!-- RESPONSIVITE DU LOGO -->
+    <style>
+        /* Logo dans le header horizontal */
+        .logo-horizontal .header-brand-img {
+            max-width: 100%;
+            height: auto;
+            transition: all 0.3s ease;
+        }
+        
+        /* Logo dans la sidebar */
+        .side-header .header-brand1 .header-brand-img {
+            max-width: 100%;
+            height: auto;
+            transition: all 0.3s ease;
+        }
+        
+        /* Écrans très larges (≥ 1400px) */
+        @media (min-width: 1400px) {
+            .logo-horizontal .header-brand-img,
+            .side-header .header-brand1 .header-brand-img {
+                max-width: 180px;
+            }
+        }
+        
+        /* Écrans larges (1200px - 1399px) */
+        @media (min-width: 1200px) and (max-width: 1399px) {
+            .logo-horizontal .header-brand-img,
+            .side-header .header-brand1 .header-brand-img {
+                max-width: 160px;
+            }
+        }
+        
+        /* Écrans moyens (992px - 1199px) */
+        @media (min-width: 992px) and (max-width: 1199px) {
+            .logo-horizontal .header-brand-img,
+            .side-header .header-brand1 .header-brand-img {
+                max-width: 140px;
+            }
+        }
+        
+        /* Tablettes paysage (768px - 991px) */
+        @media (min-width: 768px) and (max-width: 991px) {
+            .logo-horizontal .header-brand-img,
+            .side-header .header-brand1 .header-brand-img {
+                max-width: 120px;
+            }
+        }
+        
+        /* Tablettes portrait (576px - 767px) */
+        @media (min-width: 576px) and (max-width: 767px) {
+            .logo-horizontal .header-brand-img,
+            .side-header .header-brand1 .header-brand-img {
+                max-width: 100px;
+            }
+        }
+        
+        /* Mobiles (≤ 575px) */
+        @media (max-width: 575px) {
+            .logo-horizontal .header-brand-img,
+            .side-header .header-brand1 .header-brand-img {
+                max-width: 80px;
+            }
+        }
+        
+        /* Mobiles très petits (≤ 375px) */
+        @media (max-width: 375px) {
+            .logo-horizontal .header-brand-img,
+            .side-header .header-brand1 .header-brand-img {
+                max-width: 70px;
+            }
+        }
+        
+        /* Mobiles ultra petits (≤ 320px) */
+        @media (max-width: 320px) {
+            .logo-horizontal .header-brand-img,
+            .side-header .header-brand1 .header-brand-img {
+                max-width: 60px;
+            }
+        }
+        
+        /* Sidebar réduite */
+        .sidebar-mini.sidenav-toggled .side-header .header-brand1 .header-brand-img {
+            max-width: 40px !important;
+        }
+        
+        /* Amélioration de la qualité d'image */
+        .header-brand-img {
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+        }
+        
+        /* Centrage du logo sur mobile */
+        @media (max-width: 767px) {
+            .side-header {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 10px 0;
+            }
+            
+            .logo-horizontal {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+        }
+        
+        /* RESPONSIVITE DES DROPDOWNS NOTIFICATIONS ET MESSAGES */
+        
+        /* Container des dropdowns */
+        .notifications,
+        .message {
+            position: relative;
+        }
+        
+        /* Menu dropdown de base - CACHÉ PAR DÉFAUT */
+        .notifications .dropdown-menu,
+        .message .dropdown-menu {
+            width: 320px;
+            max-width: 90vw;
+            max-height: 70vh;
+            overflow: hidden;
+            display: none;
+            flex-direction: column;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+        }
+        
+        /* Afficher le dropdown quand il a la classe .show */
+        .notifications .dropdown-menu.show,
+        .message .dropdown-menu.show {
+            display: flex;
+        }
+        
+        /* Header du dropdown */
+        .drop-heading {
+            padding: 12px 16px;
+            flex-shrink: 0;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .drop-heading h6 {
+            font-size: 14px;
+            line-height: 1.4;
+            margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        /* Contenu scrollable */
+        .notifications-menu,
+        .message-menu {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            max-height: calc(70vh - 100px);
+            padding: 8px 0;
+        }
+        
+        /* scrollbar personnalisée */
+        .notifications-menu::-webkit-scrollbar,
+        .message-menu::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .notifications-menu::-webkit-scrollbar-track,
+        .message-menu::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        .notifications-menu::-webkit-scrollbar-thumb,
+        .message-menu::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        
+        .notifications-menu::-webkit-scrollbar-thumb:hover,
+        .message-menu::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        
+        /* Items de notification */
+        .notifications-menu .dropdown-item {
+            padding: 12px 16px;
+            display: block;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background 0.2s ease;
+        }
+        
+        .notifications-menu .dropdown-item:last-child {
+            border-bottom: none;
+        }
+        
+        .notifications-menu .dropdown-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .notifications-menu h5 {
+            font-size: 13px;
+            font-weight: 600;
+            line-height: 1.4;
+            margin-bottom: 4px;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        
+        .notifications-menu p {
+            font-size: 12px;
+            line-height: 1.5;
+            margin: 0;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        
+        .notifications-menu .text-sm {
+            font-size: 11px;
+            white-space: nowrap;
+        }
+        
+        /* Items de message */
+        .message-menu .dropdown-item {
+            padding: 12px 16px;
+            display: flex;
+            align-items: flex-start;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background 0.2s ease;
+        }
+        
+        .message-menu .dropdown-item:last-child {
+            border-bottom: none;
+        }
+        
+        .message-menu .dropdown-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .message-menu .avatar {
+            flex-shrink: 0;
+            width: 40px;
+            height: 40px;
+        }
+        
+        .message-menu .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+        
+        .message-menu .wd-90p {
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
+        }
+        
+        .message-menu h5 {
+            font-size: 13px;
+            font-weight: 600;
+            line-height: 1.4;
+            margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .message-menu small {
+            font-size: 11px;
+            flex-shrink: 0;
+            margin-left: 8px;
+        }
+        
+        .message-menu span {
+            font-size: 12px;
+            line-height: 1.5;
+            display: block;
+            margin-top: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        /* Footer du dropdown */
+        .dropdown-menu .dropdown-item.text-center {
+            padding: 10px;
+            font-size: 13px;
+            font-weight: 500;
+            border-top: 2px solid #e9ecef;
+            flex-shrink: 0;
+        }
+        
+        /* Positionnement du dropdown */
+        .dropdown-menu-end {
+            right: 0 !important;
+            left: auto !important;
+        }
+        
+        /* Mobiles - ajustements */
+        @media (max-width: 767px) {
+            .notifications .dropdown-menu,
+            .message .dropdown-menu {
+                position: fixed !important;
+                top: 60px !important;
+                right: 10px !important;
+                left: 10px !important;
+                width: auto !important;
+                max-width: calc(100vw - 20px);
+                max-height: 60vh;
+                z-index: 9999;
+            }
+            
+            .notifications-menu,
+            .message-menu {
+                max-height: calc(60vh - 100px);
+            }
+        }
+        
+        /* Tablettes */
+        @media (min-width: 768px) and (max-width: 991px) {
+            .notifications .dropdown-menu,
+            .message .dropdown-menu {
+                width: 300px;
+            }
+        }
+        
+        /* Empêcher le débordement sur petits écrans */
+        @media (max-width: 575px) {
+            .nav-link.icon {
+                padding: 8px;
+                margin: 0 2px;
+            }
+            
+            .pulse,
+            .pulse-danger {
+                width: 8px;
+                height: 8px;
+                font-size: 8px;
+            }
+        }
+        
+        /* Correction du positionnement des icônes */
+        .d-flex.order-lg-2 {
+            flex-wrap: nowrap;
+            align-items: center;
+        }
+        
+        .dropdown.d-flex {
+            display: flex !important;
+            align-items: center;
+        }
+        
+        /* Animation d'ouverture fluide */
+        .dropdown-menu.show {
+            animation: dropdownSlideIn 0.2s ease-out;
+        }
+        
+        @keyframes dropdownSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* BARRE DE NAVIGATION MOBILE/TABLETTE FIXE EN BAS */
+        .mobile-bottom-nav {
+            display: none;
+            position: fixed;
+            inset: auto 0 0 0;
+            background: #ffffff;
+            box-shadow: 0 -6px 24px rgba(0, 0, 0, 0.12);
+            z-index: 10000;
+            padding: 10px 12px 12px;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .mobile-bottom-nav__container {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            align-items: end;
+            gap: 6px;
+            max-width: 640px;
+            margin: 0 auto;
+        }
+        
+        .mobile-bottom-nav__slot,
+        .mobile-bottom-nav__container > .dropdown {
+            min-width: 0;
+            display: flex;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .mobile-bottom-nav__item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 76px;
+            min-height: 56px;
+            padding: 6px 4px;
+            margin: 0 auto;
+            text-decoration: none;
+            color: #6c757d;
+            transition: color 0.25s ease, transform 0.25s ease, background-color 0.25s ease, box-shadow 0.25s ease;
+            position: relative;
+            border-radius: 18px;
+        }
+        
+        .mobile-bottom-nav__item:hover,
+        .mobile-bottom-nav__item:active {
+            color: var(--porteur-accent);
+            transform: translateY(-1px);
+        }
+        
+        .mobile-bottom-nav__item.active {
+            color: var(--porteur-accent);
+            background: var(--porteur-accent-soft);
+        }
+        
+        .mobile-bottom-nav__item--menu {
+            width: clamp(54px, 13vw, 60px);
+            max-width: clamp(54px, 13vw, 60px);
+            min-width: clamp(54px, 13vw, 60px);
+            min-height: clamp(54px, 13vw, 60px);
+            margin-top: clamp(-24px, -4vw, -18px);
+            padding: 8px 5px;
+            border-radius: clamp(18px, 4vw, 20px);
+            background: var(--porteur-accent);
+            color: #ffffff;
+            box-shadow: 0 10px 20px rgba(var(--porteur-accent-rgb), 0.24);
+            z-index: 2;
+        }
+        
+        .mobile-bottom-nav__item--menu:hover,
+        .mobile-bottom-nav__item--menu:active,
+        .mobile-bottom-nav__item--menu.active {
+            color: #ffffff;
+            background: var(--porteur-accent);
+            transform: translateY(-2px);
+        }
+        
+        .mobile-bottom-nav__icon {
+            font-size: 22px;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .mobile-bottom-nav__item--menu .mobile-bottom-nav__icon {
+            font-size: clamp(19px, 4.6vw, 21px);
+            margin-bottom: 2px;
+        }
+        
+        .mobile-bottom-nav__label {
+            font-size: 10px;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 64px;
+        }
+        
+        .mobile-bottom-nav__item--menu .mobile-bottom-nav__label {
+            color: #ffffff;
+            max-width: none;
+        }
+        
+        .mobile-bottom-nav__badge {
+            position: absolute;
+            top: -4px;
+            right: -8px;
+            background: #F35120;
+            color: #ffffff;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 600;
+            border: 2px solid #ffffff;
+        }
+        
+        .mobile-bottom-nav__divider {
+            display: none;
+        }
+        
+        /* Afficher la barre sur mobile et tablette */
+        @media (max-width: 991px) {
+            .mobile-bottom-nav {
+                display: block;
+            }
+            
+            body {
+                padding-bottom: 98px;
+            }
+            
+            .main-content {
+                padding-bottom: 108px !important;
+            }
+        }
+        
+        /* Cacher tous les icones du haut sur mobile/tablette et centrer le logo */
+        @media (max-width: 991px) {
+            .header-right-icons,
+            .main-header-center,
+            .app-header .app-sidebar__toggle {
+                display: none !important;
+            }
+            
+            .app-header .main-container > .d-flex {
+                justify-content: center;
+                align-items: center;
+                min-height: 50px;
+            }
+            
+            .app-header .logo-horizontal {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 100%;
+                margin: 0 auto;
+            }
+            
+            .app-header .logo-horizontal .header-brand-img {
+                margin: 0 auto;
+            }
+
+            .app .app-sidebar {
+                inset-block-start: 64px;
+            }
+        }
+
+        /* Tablettes : header un peu plus compact pour libérer le haut de la sidebar */
+        @media (min-width: 768px) and (max-width: 991px) {
+            .app-header .main-container > .d-flex {
+                min-height: 60px;
+            }
+
+            .app .app-sidebar {
+                inset-block-start: 60px;
+            }
+
+            body .app-sidebar:not(.horizontal-main) .main-sidemenu {
+                padding-top: 15px;
+            }
+        }
+        
+        /* Optimisation pour très petits écrans */
+        @media (max-width: 375px) {
+            .mobile-bottom-nav {
+                padding-inline: 8px;
+            }
+            
+            .mobile-bottom-nav__container {
+                gap: 4px;
+            }
+            
+            .mobile-bottom-nav__icon {
+                font-size: 20px;
+            }
+            
+            .mobile-bottom-nav__item {
+                max-width: 68px;
+                min-height: 52px;
+                padding: 4px 2px;
+            }
+            
+            .mobile-bottom-nav__item--menu {
+                width: 52px;
+                max-width: 52px;
+                min-width: 52px;
+                min-height: 52px;
+                margin-top: -18px;
+                border-radius: 16px;
+            }
+            
+            .mobile-bottom-nav__label {
+                font-size: 9px;
+            }
+        }
+        
+        /* Dropdowns pour mobile */
+        .mobile-search-dropdown,
+        .mobile-notifications-dropdown,
+        .mobile-messages-dropdown,
+        .mobile-profile-dropdown {
+            position: fixed !important;
+            bottom: 96px !important;
+            top: auto !important;
+            left: 10px !important;
+            right: 10px !important;
+            width: auto !important;
+            max-width: calc(100vw - 20px) !important;
+            max-height: 60vh;
+            z-index: 10001;
+            margin: 0;
+            display: none;
+            transform: none !important;
+        }
+        
+        .mobile-search-dropdown.show,
+        .mobile-notifications-dropdown.show,
+        .mobile-messages-dropdown.show,
+        .mobile-profile-dropdown.show {
+            display: flex !important;
+            flex-direction: column;
+        }
+        
+        .mobile-search-dropdown {
+            max-height: 200px;
+        }
+        
+        /* Empêcher le comportement par défaut de Bootstrap */
+        .dropdown-menu[data-bs-popper] {
+            transform: none !important;
+        }
+
+    </style>
+</head>
+
+<body class="app sidebar-mini ltr light-mode">
+
+    <!--{ Pre-loder start }-->
+    <div id="global-loader">
+        <img src="../../asset/images/loader.svg" class="loader-img" alt="Chargement">
+    </div>
+    <!--{ Pre-loder end }-->
+     <!--{ Début du sélecteur }-->
+     <div class="switcher-wrapper">
+        <div class="demo_changer">
+            <div class="p-4 m-0 lh-1 border-start template-customizer-header position-relative py-3 d-flex align-items-center justify-content-between">
+                <div>
+                    <h3 class="template-customizer-t-panel_header mb-2">Personnalisation</h3>
+                    <!-- <p class="template-customizer-t-panel_sub_header mb-0">Personnalis</p> -->
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <a href="javascript:void(0)" id="ThemeReset" class="text-danger"><i class="fe fe-refresh-ccw fs-17 text-danger"></i></a>
+                </div>
+            </div>
+            <div class="form_holder sidebar-right1 ps ps--active-y">
+                <div class="row">
+                    <div class="predefined_styles">
+                        <div class="swichermainleft">
+                            <h4 class="mt-0"><i class="zmdi zmdi-invert-colors"></i> Palette de couleurs</h4>
+                            <div class="skin-body theme-colors">
+                                <div class="switch_section">
+                                    <div class="d-flex flex-wrap align-items-center gap-2">
+                                        <div class="form-check p-0"> 
+                                            <input class="form-check-input color-input color-primary-1" type="radio" name="theme-primary" id="switcher-primary1"> 
+                                        </div>
+                                        <div class="form-check p-0"> 
+                                            <input class="form-check-input color-input color-primary-2" type="radio" name="theme-primary" id="switcher-primary2"> 
+                                        </div>
+                                        <div class="form-check p-0"> 
+                                            <input class="form-check-input color-input color-primary-3" type="radio" name="theme-primary" id="switcher-primary3"> 
+                                        </div>
+                                        <div class="form-check p-0"> 
+                                            <input class="form-check-input color-input color-primary-4" type="radio" name="theme-primary" id="switcher-primary4"> 
+                                        </div>
+                                        <div class="form-check p-0"> 
+                                            <input class="form-check-input color-input color-primary-5" type="radio" name="theme-primary" id="switcher-primary5"> 
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Variables globales
+const csrfToken = '<?php echo $csrf_token ?? ""; ?>';
+
+// Charger les notifications dynamiquement
+document.addEventListener('DOMContentLoaded', function() {
+    loadNotifications();
+    loadMessageCount();
+    
+    // Polling notifications toutes les 60 secondes
+    setInterval(loadNotifications, 60000);
+});
+
+function loadNotifications() {
+    fetch('/api/notifications?limit=6', {
+        method: 'GET',
+        headers: {
+            'X-CSRF-TOKEN': csrfToken,
+            'Content-Type': 'application/json'
+        },
+        credentials: 'same-origin'
+    })
+    .then(response => response.json())
+    .then(data => {
+        updateNotifications(data.notifications || []);
+        updateNotificationCount(data.unread_count || 0);
+    })
+    .catch(error => console.error('Erreur chargement notifications:', error));
+}
+
+function loadMessageCount() {
+    fetch('/api/notifications/unread-count', {
+        method: 'GET',
+        headers: {
+            'X-CSRF-TOKEN': csrfToken,
+            'Content-Type': 'application/json'
+        },
+        credentials: 'same-origin'
+    })
+    .then(response => response.json())
+    .then(data => {
+        const pulseDanger = document.querySelector('.pulse-danger');
+        if (pulseDanger && data.count > 0) {
+            pulseDanger.style.display = 'block';
+        }
+    })
+    .catch(error => console.error('Erreur compteur messages:', error));
+}
+
+function updateNotifications(notifications) {
+    const menu = document.getElementById('notifications-menu');
+    if (!menu) return;
+    
+    if (notifications.length === 0) {
+        menu.innerHTML = `
+            <div class="text-center p-4 text-muted">
+                <i class="fe fe-bell fa-2x mb-2"></i>
+                <p class="mb-0">Aucune notification</p>
+            </div>
+        `;
+        return;
+    }
+    
+    let html = '';
+    notifications.forEach(notif => {
+        const timeAgo = getTimeAgo(notif.created_at);
+        html += `
+            <div class="d-flex align-items-start dropdown-item ${notif.read_at ? '' : 'fw-bold'}">
+                <div class="flex-grow-1">
+                    <div class="d-flex align-items-start justify-content-between mb-1">
+                        <a href="${notif.link || 'javascript:void(0)'}" class="p-0">
+                            <h5 class="mb-0">${notif.titre || 'Notification'}</h5>
+                        </a>
+                        ${notif.read_at ? '' : `<a href="javascript:void(0)" class="text-danger p-0 mark-read" data-id="${notif.id}"><i class="fe fe-x"></i></a>`}
+                    </div>
+                    <a href="${notif.link || 'javascript:void(0)'}" class="p-0 d-flex align-items-end justify-content-between">
+                        <p class="mb-0 text-muted">${notif.message || ''}</p>
+                        <span class="text-sm ms-2 text-nowrap">${timeAgo}</span>
+                    </a>
+                </div>
+            </div>
+        `;
+    });
+    
+    menu.innerHTML = html;
+    
+    // Attacher les événements pour marquer comme lu
+    menu.querySelectorAll('.mark-read').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            markAsRead(this.getAttribute('data-id'));
+        });
+    });
+}
+
+function updateNotificationCount(count) {
+    const pulse = document.getElementById('notif-pulse');
+    if (pulse) {
+        if (count > 0) {
+            pulse.style.display = 'block';
+        } else {
+            pulse.style.display = 'none';
+        }
+    }
+}
+
+function markAsRead(notificationId) {
+    fetch(`/api/notifications/${notificationId}/read`, {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': csrfToken,
+            'Content-Type': 'application/json'
+        },
+        credentials: 'same-origin'
+    })
+    .then(() => loadNotifications())
+    .catch(error => console.error('Erreur marquage lecture:', error));
+}
+
+function getTimeAgo(dateString) {
+    const now = new Date();
+    const date = new Date(dateString);
+    const seconds = Math.floor((now - date) / 1000);
+    
+    if (seconds < 60) return 'À l\'instant';
+    if (seconds < 3600) return Math.floor(seconds / 60) + ' min';
+    if (seconds < 86400) return Math.floor(seconds / 3600) + ' h';
+    return Math.floor(seconds / 86400) + ' j';
+}
+</script>
+
+</body>
+</html>
+                        <div class="swichermainleft">
+                            <h4> <i class="ti ti-directions"></i> VERSIONS LTR et RTL</h4>
+                            <div class="skin-body">
+                                <div class="switch_section">
+                                    <div class="switch-toggle d-flex"> <span class="me-auto">Version LTR</span>
+                                        <label for="myonoffswitch23" class="switch switch-square">
+                                            <input type="radio" name="onoffswitch7" id="myonoffswitch23"
+                                                class="switch-input" checked="">
+                                            <span class="switch-toggle-slider">
+                                                <span class="switch-on"></span>
+                                                <span class="switch-off"></span>
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="switch-toggle d-flex mt-2">
+                                        <span class="me-auto">Version RTL</span>
+                                        <label for="myonoffswitch24" class="switch switch-square">
+                                            <input type="radio" name="onoffswitch7" id="myonoffswitch24"
+                                                class="switch-input">
+                                            <span class="switch-toggle-slider">
+                                                <span class="switch-on"></span>
+                                                <span class="switch-off"></span>
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="swichermainleft">
+                            <h4> <i class="fe fe-sun"></i> Style du thème clair</h4>
+                            <div class="skin-body">
+                                <div class="switch_section">
+                                    <div class="switch-toggle d-flex"> <span class="me-auto">Thème clair</span>
+                                        <label for="myonoffswitch1"  class="switch switch-square">
+                                            <input type="radio" name="onoffswitch1" id="myonoffswitch1" class="switch-input" checked=""> 
+                                            <span class="switch-toggle-slider">
+                                                <span class="switch-on"></span>
+                                                <span class="switch-off"></span>
+                                            </span> 
+                                        </label> 
+                                    </div>
+                               
+                                </div>
+                            </div>
+                        </div>
+                        <div class="swichermainleft">
+                            <h4> <i class="ti ti-moon-stars"></i> Style du thème sombre</h4>
+                            <div class="skin-body">
+                                <div class="switch_section">
+                                    <div class="switch-toggle d-flex mt-2"> <span class="me-auto">Thème sombre</span>
+                                        <label for="myonoffswitch2" class="switch switch-square">
+                                            <input type="radio" name="onoffswitch1" id="myonoffswitch2" class="switch-input"> 
+                                            <span class="switch-toggle-slider">
+                                                <span class="switch-on"></span>
+                                                <span class="switch-off"></span>
+                                            </span> 
+                                        </label> 
+                                    </div>
+                                
+                                </div>
+                            </div>
+                        </div>
+                  
+                        <div class="swichermainleft">
+                            <h4>Styles du menu</h4>
+                            <div class="skin-body">
+                                <div class="switch_section">
+                                    <div class="switch-toggle lightMenu d-flex"> <span class="me-auto">Menu clair</span>
+                                        <label for="myonoffswitch3" class="switch switch-square">
+                                            <input type="radio" name="onoffswitch2" id="myonoffswitch3" class="switch-input" checked="">
+                                            <span class="switch-toggle-slider">
+                                                <span class="switch-on"></span>
+                                                <span class="switch-off"></span>
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="switch-toggle darkMenu d-flex mt-2">
+                                        <span class="me-auto">Menu sombre</span>
+                                        <label for="myonoffswitch5" class="switch switch-square">
+                                            <input type="radio" name="onoffswitch2" id="myonoffswitch5"
+                                                class="switch-input">
+                                            <span class="switch-toggle-slider">
+                                                <span class="switch-on"></span>
+                                                <span class="switch-off"></span>
+                                            </span>
+                                        </label>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="swichermainleft">
+                            <h4> <i class="ti ti-brush"></i> Styles de l'en-tête</h4>
+                            <div class="skin-body">
+                                <div class="switch_section">
+                                    <div class="switch-toggle lightHeader d-flex">
+                                        <span class="me-auto">En-tête clair</span>
+                                        <label for="myonoffswitch6" class="switch switch-square">
+                                            <input type="radio" name="onoffswitch3" id="myonoffswitch6" class="switch-input" checked="">
+                                            <span class="switch-toggle-slider">
+                                                <span class="switch-on"></span>
+                                                <span class="switch-off"></span>
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="switch-toggle darkHeader d-flex mt-2">
+                                        <span class="me-auto">En-tête sombre</span>
+                                        <label for="myonoffswitch8" class="switch switch-square">
+                                            <input type="radio" name="onoffswitch3" id="myonoffswitch8" class="switch-input">
+                                            <span class="switch-toggle-slider">
+                                                <span class="switch-on"></span>
+                                                <span class="switch-off"></span>
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--{ Fin du sélecteur }-->
+    <!-- PAGE -->
+    <div class="page">
+        <div class="page-main">
+           
+             <!--{ app header start }-->
+            <div class="app-header header sticky">
+                <div class="container-fluid main-container">
+                    <div class="d-flex">
+                        <a aria-label="Hide Sidebar" class="app-sidebar__toggle" data-bs-toggle="sidebar"
+                            href="javascript:void(0)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round"
+                                class="feather feather-grid status_toggle middle sidebar-toggle">
+                                <rect x="3" y="3" width="7" height="7"></rect>
+                                <rect x="14" y="3" width="7" height="7"></rect>
+                                <rect x="14" y="14" width="7" height="7"></rect>
+                                <rect x="3" y="14" width="7" height="7"></rect>
+                            </svg>
+                        </a>
+                        <!-- sidebar-toggle-->
+                        <a class="logo-horizontal " href="index.html">
+                            <img src="../../asset/images/brand/logo-white.png" class="header-brand-img desktop-logo"
+                                alt="logo">
+                            <img src="../../asset/images/brand/logo-dark.png" class="header-brand-img light-logo1"
+                                alt="logo">
+                        </a>
+                        <!-- LOGO -->
+                        <div class="d-flex order-lg-2 ms-auto header-right-icons">
+                            <!-- SEARCH -->
+                            <button class="navbar-toggler navresponsive-toggler d-lg-none ms-auto" type="button"
+                                data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent-4"
+                                aria-controls="navbarSupportedContent-4" aria-expanded="false"
+                                aria-label="Toggle navigation">
+                                <span class="navbar-toggler-icon fe fe-more-vertical"></span>
+                            </button>
+                            <div class="navbar navbar-collapse responsive-navbar p-0">
+                                <div class="collapse navbar-collapse" id="navbarSupportedContent-4">
+                                    <div class="d-flex order-lg-2">
+                                        <div class="dropdown d-lg-none d-flex">
+                                            <a href="javascript:void(0)" class="nav-link icon"
+                                                data-bs-toggle="dropdown">
+                                                <i class="fe fe-search"></i>
+                                            </a>
+                                            <div class="dropdown-menu header-search dropdown-menu-start">
+                                                <div class="input-group w-100 p-2">
+                                                    <input type="text" class="form-control" placeholder="Rechercher.....">
+                                                    <div class="input-group-text btn btn-primary">
+                                                        <i class="fa fa-search" aria-hidden="true"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                       
+                                        <!-- COUNTRY -->
+                                        <div class="d-flex">
+                                            <a class="nav-link icon theme-layout nav-link-bg layout-setting">
+                                                <span class="dark-layout"><i class="ti ti-moon-stars"></i></span>
+                                                <span class="light-layout"><i class="fe fe-sun"></i></span>
+                                            </a>
+                                        </div>
+                                        <!-- Theme-Layout -->
+
+                                        <!-- CART -->
+
+                                        <!-- NOTIFICATIONS -->
+                                        <div class="dropdown  d-flex notifications">
+                                            <a class="nav-link icon" data-bs-toggle="dropdown"><i
+                                                    class="fe fe-bell"></i><span id="notif-pulse" class=" pulse" style="display: none;"></span>
+                                            </a>
+                                            <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                                                <div class="drop-heading border-bottom">
+                                                    <div class="d-flex">
+                                                        <h6 class="mt-1 mb-0 fs-16 fw-semibold text-dark">Notifications
+                                                        </h6>
+                                                    </div>
+                                                </div>
+                                                <div id="notifications-menu" class="notifications-menu">
+                                                    <div class="text-center p-4 text-muted">
+                                                        <div class="spinner-border spinner-border-sm" role="status">
+                                                            <span class="visually-hidden">Chargement...</span>
+                                                        </div>
+                                                        <p class="mt-2 mb-0">Chargement...</p>
+                                                    </div>
+                                                </div>
+                                                <div class="dropdown-divider m-0"></div>
+                                                <a href="notifications.php"
+                                                    class="dropdown-item text-center p-3 text-muted">Voir toutes les
+                                                    notifications</a>
+                                            </div>
+                                        </div>
+                                                </div>
+                                                <div class="notifications-menu">
+                                                    <div class="d-flex align-items-start dropdown-item">
+                                                        <div class="flex-grow-1">
+                                                            <div
+                                                                class="d-flex align-items-start justify-content-between mb-1">
+                                                                <a href="index.html#" class="p-0">
+                                                                    <h5 class="mb-0">Desktop notification turned on</h5>
+                                                                </a>
+                                                                <a href="index.html#" class="text-danger p-0"><i
+                                                                        class="fe fe-x"></i></a>
+                                                            </div>
+                                                            <a href="index.html"
+                                                                class="p-0 d-flex align-items-end justify-content-between p-12">
+                                                                <p class="mb-0 text-muted">
+                                                                    Now you will receive desktop notifications
+                                                                </p>
+                                                                <span class="text-sm ms-2 text-nowrap">1 min ago</span>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                    <div class="d-flex align-items-start dropdown-item">
+                                                        <div class="flex-grow-1">
+                                                            <div
+                                                                class="d-flex align-items-start justify-content-between mb-1">
+                                                                <a href="index.html#" class="p-0">
+                                                                    <h5 class="mb-0">Admin settings</h5>
+                                                                </a>
+                                                                <a href="index.html#" class="text-danger p-0"><i
+                                                                        class="fe fe-x"></i></a>
+                                                            </div>
+                                                            <a href="index.html"
+                                                                class="p-0 d-flex align-items-end justify-content-between p-12">
+                                                                <p class="mb-0 text-muted">
+                                                                    Setup complete
+                                                                </p>
+                                                                <span class="text-sm ms-2 text-nowrap">8 min ago</span>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                    <div class="d-flex align-items-start dropdown-item">
+                                                        <div class="flex-grow-1">
+                                                            <div
+                                                                class="d-flex align-items-start justify-content-between mb-1">
+                                                                <a href="index.html#" class="p-0">
+                                                                    <h5 class="mb-0">Mailbox</h5>
+                                                                </a>
+                                                                <a href="index.html#" class="text-danger p-0"><i
+                                                                        class="fe fe-x"></i></a>
+                                                            </div>
+                                                            <a href="index.html"
+                                                                class="p-0 d-flex align-items-end justify-content-between p-12">
+                                                                <p class="mb-0 text-muted">
+                                                                    you have 15 unread mails.
+                                                                </p>
+                                                                <span class="text-sm ms-2 text-nowrap">9 min ago</span>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                    <div class="d-flex align-items-start dropdown-item">
+                                                        <div class="flex-grow-1">
+                                                            <div
+                                                                class="d-flex align-items-start justify-content-between mb-1">
+                                                                <a href="index.html#" class="p-0">
+                                                                    <h5 class="mb-0">Order received</h5>
+                                                                </a>
+                                                                <a href="index.html#" class="text-danger p-0"><i
+                                                                        class="fe fe-x"></i></a>
+                                                            </div>
+                                                            <a href="index.html"
+                                                                class="p-0 d-flex align-items-end justify-content-between p-12">
+                                                                <p class="mb-0 text-muted">
+                                                                    Nouveau order received.
+                                                                </p>
+                                                                <span class="text-sm ms-2 text-nowrap">10 min ago</span>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                    <div class="d-flex align-items-start dropdown-item">
+                                                        <div class="flex-grow-1">
+                                                            <div
+                                                                class="d-flex align-items-start justify-content-between mb-1">
+                                                                <a href="index.html#" class="p-0">
+                                                                    <h5 class="mb-0">Desktop notification turned on</h5>
+                                                                </a>
+                                                                <a href="index.html#" class="text-danger p-0"><i
+                                                                        class="fe fe-x"></i></a>
+                                                            </div>
+                                                            <a href="index.html"
+                                                                class="p-0 d-flex align-items-end justify-content-between p-12">
+                                                                <p class="mb-0 text-muted">
+                                                                    Now you will receive desktop notifications
+                                                                </p>
+                                                                <span class="text-sm ms-2 text-nowrap">16 min ago</span>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="dropdown-divider m-0"></div>
+                                                <a href="basic-alert.html"
+                                                    class="dropdown-item text-center p-3 text-muted">Voir all
+                                                    Notification</a>
+                                            </div>
+                                            
+                                        </div>
+                                        <!-- NOTIFICATIONS -->
+                                        <div class="dropdown  d-flex message">
+                                            <a class="nav-link icon text-center" data-bs-toggle="dropdown">
+                                                <i class="fe fe-message-square"></i><span class="pulse-danger"></span>
+                                            </a>
+                                            <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                                                <div class="drop-heading border-bottom">
+                                                    <div class="d-flex">
+                                                        <h6 class="mt-1 mb-0 fs-16 fw-semibold text-dark">You have 4
+                                                            Messages</h6>
+                                                    </div>
+                                                </div>
+                                                <div class="message-menu message-menu-scroll">
+                                                    <a class="dropdown-item d-flex" href="private-chat.html">
+                                                        <span
+                                                            class="avatar avatar-md  me-3 align-self-center cover-image">
+                                                            <img src="../../asset/images/profiles/1.jpg" alt="">
+                                                        </span>
+                                                        <div class="wd-90p">
+                                                            <div class="d-flex">
+                                                                <h5 class="mb-1">John Smith</h5>
+                                                                <small class="text-muted ms-auto text-end">
+                                                                    3:00 am
+                                                                </small>
+                                                            </div>
+                                                            <span>Ajoutered new feature to the dashboard...</span>
+                                                        </div>
+                                                    </a>
+                                                    <a class="dropdown-item d-flex" href="private-chat.html">
+                                                        <span
+                                                            class="avatar avatar-md  me-3 align-self-center cover-image">
+                                                            <img src="../../asset/images/profiles/15.jpg" alt="">
+                                                        </span>
+                                                        <div class="wd-90p">
+                                                            <div class="d-flex">
+                                                                <h5 class="mb-1">Emily Johnson</h5>
+                                                                <small class="text-muted ms-auto text-end">
+                                                                    4:20 am
+                                                                </small>
+                                                            </div>
+                                                            <span>Uploaded photos from the event...</span>
+                                                        </div>
+                                                    </a>
+                                                    <a class="dropdown-item d-flex" href="private-chat.html">
+                                                        <span
+                                                            class="avatar avatar-md  me-3 align-self-center cover-image">
+                                                            <img src="../../asset/images/profiles/12.jpg" alt="">
+                                                        </span>
+                                                        <div class="wd-90p">
+                                                            <div class="d-flex">
+                                                                <h5 class="mb-1">Michael Brown</h5>
+                                                                <small class="text-muted ms-auto text-end">
+                                                                    6:30 pm
+                                                                </small>
+                                                            </div>
+                                                            <span>Terminé the final review...</span>
+                                                        </div>
+                                                    </a>
+
+                                                    <a class="dropdown-item d-flex" href="private-chat.html">
+                                                        <span
+                                                            class="avatar avatar-md  me-3 align-self-center cover-image">
+                                                            <img src="../../asset/images/profiles/3.jpg" alt="">
+                                                        </span>
+                                                        <div class="wd-90p">
+                                                            <div class="d-flex">
+                                                                <h5 class="mb-1">Sarah Davis</h5>
+                                                                <small class="text-muted ms-auto text-end">
+                                                                    7:00 pm
+                                                                </small>
+                                                            </div>
+                                                            <span>Received approval for project proposal...</span>
+                                                        </div>
+                                                    </a>
+
+                                                </div>
+                                                <div class="dropdown-divider m-0"></div>
+                                                <a href="private-chat.html"
+                                                    class="dropdown-item text-center p-3 text-muted">See all
+                                                    Messages</a>
+                                            </div>
+                                        </div>
+
+                                        <div class="demo-icon nav-link icon">
+                                            <i class="fe fe-settings text_primary"></i>
+                                        </div>
+                                        <!-- SIDE-MENU -->
+                                        <div class="dropdown d-flex">
+                                            <a class="nav-link icon full-screen-link nav-link-bg">
+                                                <i class="fe fe-minimize fullscreen-button"></i>
+                                            </a>
+                                        </div>
+                                        <!-- FULL-SCREEN -->
+                                        <div class="dropdown d-flex profile-1">
+                                            <a href="javascript:void(0)" data-bs-toggle="dropdown" class="nav-link user-dropdown">
+                                                <?php if($user && !empty($user->avatar_path)): ?>
+                                                    <img src="<?php echo e($user->avatar_path); ?>" alt="profile-user" class="profile-user avatar cover-image">
+                                                <?php else: ?>
+                                                    <div class="avatar avatar-md bg-primary-transparent text-primary cover-image d-flex align-items-center justify-content-center" style="width:40px; height:40px; border-radius:50%;">
+                                                        <span class="fs-15 fw-semibold"><?php echo e(strtoupper(substr($user->name ?? 'U', 0, 1))); ?></span>
+                                                    </div>
+                                                <?php endif; ?>
+                                            </a>
+                                            <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                                                <div class="drop-heading">
+                                                    <div class="text-center">
+                                                        <h5 class="text-dark mb-0 fs-14 fw-semibold"><?php echo e($user->name ?? 'Utilisateur'); ?></h5>
+                                                        <small class="text-muted"><?php echo e(match($user->role ?? '') { 'porteur' => 'Porteur de Projet', 'institution' => 'Institution Financière', 'admin' => 'Administrateur', default => 'Utilisateur' }); ?></small>
+                                                    </div>
+                                                </div>
+                                                <div class="dropdown-divider m-0"></div>
+                                                <a class="dropdown-item" href="profil.php">
+                                                    <i class="dropdown-icon fe fe-user"></i> Profil
+                                                </a>
+                                                <a class="dropdown-item" href="securite.php">
+                                                    <i class="dropdown-icon fe fe-lock"></i> Sécurité
+                                                </a>
+                                                <a class="dropdown-item" href="<?php echo e($logout_url ?? '/logout'); ?>">
+                                                    <i class="dropdown-icon fe fe-alert-circle"></i> Déconnexion
+                                                </a>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--{ app header end }-->
+             <!--{ app sidebar start }-->
+             <div class="sticky">
+                <div class="app-sidebar__overlay" data-bs-toggle="sidebar"></div>
+                <div class="app-sidebar">
+             <div class="side-header">
+                        <a class="header-brand1" href="index.html">
+                            <img src="../../asset/images/brand/logo-white.png" class="header-brand-img desktop-logo"
+                                alt="logo">
+                            <img src="../../asset/images/brand/icon-dark.png" class="header-brand-img toggle-logo"
+                                alt="logo">
+                            <img src="../../asset/images/brand/icon-dark.png" class="header-brand-img light-logo"
+                                alt="logo">
+                            <img src="../../asset/images/brand/logo-dark.png" class="header-brand-img light-logo1"
+                                alt="logo">
+                        </a>
+                        <!-- LOGO -->
+                    </div>
+                    <div class="main-sidemenu">
+                        <div class="slide-left disabled" id="slide-left"><svg xmlns="http://www.w3.org/2000/svg"
+                                fill="#7b8191" width="24" height="24" viewBox="0 0 24 24">
+                                <path d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z" />
+                            </svg></div>
+                        <ul class="side-menu">
+                            <li class="sub-category">
+                                <!-- <h3>Main</h3> -->
+                            </li>
+                            <li class="slide" >
+                                <a class="sidenav-menu-item" data-bs-toggle="slide" href="index.php">
+                                    <i class="side-menu__icon  typcn typcn-home"></i>
+                                    <span class="side-menu__label">Tableau de bord</span>
+                                    <!-- <i class="angle fe fe-chevron-right"></i> -->
+                                </a>
+                                <!-- <ul class="slide-menu">
+                                    <li class="panel sidetab-menu">
+                                        <div class="panel-body tabs-menu-body p-0 border-0">
+                                            <div class="tab-content">
+                                                <div class="tab-pane active" id="side1">
+                                                    <ul class="sidemenu-list">
+                                                        <li class="side-menu-label1"><a href="javascript:void(0)">Tableau de bords</a></li>
+                                                        <li><a href="dashboard_porteur.php" class="slide-item">Mes Projets</a></li>
+                                                        <li><a href="dashboard-ecommerce.html" class="slide-item">Créer un Projets</a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul> -->
+                            </li>
+
+                            <li class="sub-category">
+                                <h3>PROJET & DOCUMENTATION</h3>
+                            </li>
+                
+                            <li class="slide">
+                                <a class="sidenav-menu-item" data-bs-toggle="slide" href="mes_projets.php">
+                                    <i class="side-menu__icon fe fe-slack"></i>
+                                        <span class="side-menu__label">Mes Projets</span>
+                                        <!-- <i class="angle fe fe-chevron-right"></i> -->
+                                </a>
+                                <!-- <ul class="slide-menu">
+                                    <li class="panel sidetab-menu">
+                                        <div class="panel-body tabs-menu-body p-0 border-0">
+                                            <div class="tab-content">
+                                                <div class="tab-pane active" id="side1">
+                                                    <ul class="sidemenu-list">
+                                                        <li class="side-menu-label1"><a href="javascript:void(0)">Application</a></li>
+                                                        <li><a href="app-kanban.html" class="slide-item">Kanban</a></li>
+                                                        <li><a href="calendar.html" class="slide-item">Calendrier</a></li>
+                                                        <li><a href="app-calendar.html" class="slide-item">Event  Calendrier</a></li>
+                                                        <li><a href="app-list-calendar.html" class="slide-item">List Calendrier</a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul> -->
+                            </li>
+                            <li class="slide">
+                                <a class="sidenav-menu-item" data-bs-toggle="slide" href="creer_projet.php"><i
+                                        class="side-menu__icon  ion-plus-circled"></i><span
+                                        class="side-menu__label">Créer un projet</span>
+                                </a>
+                            </li>
+                             <li class="slide">
+                                <a class="sidenav-menu-item" data-bs-toggle="slide" href="document.php"><i
+                                        class="side-menu__icon  ion-filing"></i><span
+                                        class="side-menu__label">Documents</span>
+                                </a>
+                            </li> 
+
+                            <li class="sub-category">
+                                <h3>RENDEZ-VOUS & MESSAGES</h3>
+                            </li>
+                
+
+                             <li class="slide">
+                                <a class="sidenav-menu-item" href="rendez_vous.php"><i
+                                        class="side-menu__icon   fa fa-calendar"></i><span
+                                        class="side-menu__label">Rendez-vous</span>
+                                </a>
+                            </li>
+
+                            <li class="slide">
+                                <a class="sidenav-menu-item" href="messages.php"><i
+                                        class="side-menu__icon   ion-chatbubbles"></i><span
+                                        class="side-menu__label">Messages</span>
+                                </a>
+                            </li>
+
+                             
+
+                            <li class="sub-category">
+                                <h3>FINANCEMENT & ECHÉANCES</h3>
+                            </li>
+                
+                            <li class="slide">
+                                <a class="sidenav-menu-item" href="financement.php"><i
+                                        class="side-menu__icon fa fa-line-chart"></i><span
+                                        class="side-menu__label">Financement</span>
+                                </a>
+                            </li>
+                            <li class="slide">
+                                <a class="sidenav-menu-item" href="remboursement.php"><i
+                                        class="side-menu__icon fa fa-area-chart"></i><span
+                                        class="side-menu__label">Remboursement</span>
+                                </a>
+                            </li>
+                            <li class="slide">
+                                <a class="sidenav-menu-item" href="echances.php"><i
+                                        class="side-menu__icon ti ti-calculator"></i><span
+                                        class="side-menu__label">Échéances</span>
+                                </a>
+                            </li>
+                            <li class="sub-category">
+                                <h3>NOTIFICATIONS & PARAMÈTRES</h3>
+                            </li>
+                
+                            <li class="slide">
+                                <a class="sidenav-menu-item" href="notifications.php"><i
+                                        class="side-menu__icon fa fa-bell"></i><span
+                                        class="side-menu__label">Notifications</span>
+                                </a>
+                            </li>
+                            <li class="slide">
+                                <a class="sidenav-menu-item" href="profils.php"><i
+                                        class="side-menu__icon  ion-person"></i><span
+                                        class="side-menu__label">Profils</span>
+                                </a>
+                            </li>
+                            <li class="slide">
+                                <a class="sidenav-menu-item" href="securite.php"><i
+                                        class="side-menu__icon fa fa-shield"></i><span
+                                        class="side-menu__label">Sécurité</span>
+                                </a>
+                            </li>
+
+                            <!-- <li class="slide">
+                                <a class="sidenav-menu-item" data-bs-toggle="slide" href="javascript:void(0)"><i
+                                        class="side-menu__icon fe fe-user"></i><span
+                                        class="side-menu__label">Utilisateurs</span><i class="angle fe fe-chevron-right"></i>
+                                </a>
+                                <ul class="slide-menu">
+                                    <li class="panel sidetab-menu">
+                                        <div class="panel-body tabs-menu-body p-0 border-0">
+                                            <div class="tab-content">
+                                                <div class="tab-pane active" id="side1">
+                                                    <ul class="sidemenu-list">
+                                                        <li class="side-menu-label1"><a
+                                                                href="javascript:void(0)">Utilisateurs</a></li>
+                                                        <li><a href="user-list.html" class="slide-item">List</a></li>
+                                                        <li><a href="user-reports.html" class="slide-item">Reports</a>
+                                                        </li>
+                                                        <li class="sub-slide">
+                                                            <a class="sub-sidenav-menu-item" data-bs-toggle="sub-slide"
+                                                                href="javascript:void(0)"><span
+                                                                    class="sub-side-menu__label">Voir</span><i
+                                                                    class="sub-angle fe fe-chevron-right"></i></a>
+                                                            <ul class="sub-slide-menu">
+                                                                <li><a class="sub-slide-item"
+                                                                        href="user-account-view.html">Compte</a></li>
+                                                                <li><a class="sub-slide-item"
+                                                                        href="user-security-view.html">Sécurité</a></li>
+                                                                <li><a class="sub-slide-item"
+                                                                        href="user-billing-view.html">Facturation &
+                                                                        Plans</a></li>
+                                                                <li><a class="sub-slide-item"
+                                                                        href="user-notifications-view.html">Notifications</a>
+                                                                </li>
+                                                                <li><a class="sub-slide-item"
+                                                                        href="user-connections-view.html">Connexions</a>
+                                                                </li>
+                                                            </ul>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="slide">
+                                <a class="sidenav-menu-item" data-bs-toggle="slide" href="javascript:void(0)"><i
+                                        class="side-menu__icon fe fe-shopping-cart"></i><span
+                                        class="side-menu__label">Ecommerce</span><i
+                                        class="angle fe fe-chevron-right"></i>
+                                </a>
+                                <ul class="slide-menu">
+                                    <li class="panel sidetab-menu">
+                                        <div class="panel-body tabs-menu-body p-0 border-0">
+                                            <div class="tab-content">
+                                                <div class="tab-pane active" id="side1">
+                                                    <ul class="sidemenu-list">
+                                                        <li class="side-menu-label1"><a
+                                                                href="javascript:void(0)">Ecommerce</a></li>
+                                                        <li><a href="ecommerce-product-add.html" class="slide-item">Ajouter
+                                                                Product</a></li>
+                                                        <li><a href="ecommerce-product.html"
+                                                                class="slide-item">Produits</a></li>
+                                                        <li><a href="ecommerce-product-details.html"
+                                                                class="slide-item">Produits Detail</a></li>
+                                                        <li><a href="ecommerce-product-list.html"
+                                                                class="slide-item">Liste des produits</a></li>
+                                                        <li><a href="ecommerce-cart.html" class="slide-item">Panier</a>
+                                                        </li>
+                                                        <li><a href="ecommerce-wishlist.html"
+                                                                class="slide-item">Wishlist</a></li>
+                                                        <li><a href="ecommerce-order-list.html" class="slide-item">Order
+                                                                Lists</a></li>
+                                                        <li><a href="ecommerce-product-referral.html"
+                                                                class="slide-item">Referrals</a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="slide">
+                                <a class="sidenav-menu-item" data-bs-toggle="slide" href="javascript:void(0)"><i
+                                        class="side-menu__icon fe fe-lock"></i><span
+                                        class="side-menu__label">Authentication</span><i
+                                        class="angle fe fe-chevron-right"></i>
+                                </a>
+                                <ul class="slide-menu">
+                                    <li class="panel sidetab-menu">
+                                        <div class="panel-body tabs-menu-body p-0 border-0">
+                                            <div class="tab-content">
+                                                <div class="tab-pane active" id="side1">
+                                                    <ul class="sidemenu-list">
+                                                        <li class="side-menu-label1"><a
+                                                                href="javascript:void(0)">Authentication</a></li>
+                                                        <li><a class="slide-item" href="authentication-signin.html">Sign
+                                                                up</a></li>
+                                                        <li><a class="slide-item" href="register.html">Sign in</a></li>
+                                                        <li><a class="slide-item" href="forgot-password.html"> Forgot
+                                                                Mot de passe </a></li>
+                                                        <li><a class="slide-item" href="lockscreen.html">Lock Screen</a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="slide">
+                                <a class="sidenav-menu-item" data-bs-toggle="slide" href="javascript:void(0)"><i
+                                        class="side-menu__icon fe fe-alert-triangle"></i><span
+                                        class="side-menu__label">Erreur Pages</span><i
+                                        class="angle fe fe-chevron-right"></i>
+                                </a>
+                                <ul class="slide-menu">
+                                    <li class="panel sidetab-menu">
+                                        <div class="panel-body tabs-menu-body p-0 border-0">
+                                            <div class="tab-content">
+                                                <div class="tab-pane active" id="side1">
+                                                    <ul class="sidemenu-list">
+                                                        <li class="side-menu-label1"><a
+                                                                href="javascript:void(0)">Authentication</a></li>
+                                                        <li><a class="slide-item" href="400.html">400</a></li>
+                                                        <li><a class="slide-item" href="401.html">401</a></li>
+                                                        <li><a class="slide-item" href="403.html">403 </a></li>
+                                                        <li><a class="slide-item" href="404.html">404</a></li>
+                                                        <li><a class="slide-item" href="500.html">500</a></li>
+                                                        <li><a class="slide-item" href="503.html">503</a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="sub-category">
+                                <h3>Elements</h3>
+                            </li>
+                            <li class="slide">
+                                <a class="sidenav-menu-item" data-bs-toggle="slide" href="javascript:void(0)"><i
+                                        class="side-menu__icon fe fe-layers"></i><span
+                                        class="side-menu__label">Basic</span><i class="angle fe fe-chevron-right"></i>
+                                </a>
+                                <ul class="slide-menu">
+                                    <li class="panel sidetab-menu">
+                                        <div class="panel-body tabs-menu-body p-0 border-0">
+                                            <div class="tab-content">
+                                                <div class="tab-pane active" id="side1">
+                                                    <ul class="sidemenu-list">
+                                                        <li class="side-menu-label1"><a
+                                                                href="javascript:void(0)">Basic</a>
+                                                        </li>
+                                                        <li><a class="slide-item" href="basic-alert.html">Alert</a></li>
+                                                        <li><a class="slide-item" href="basic-buttons.html">Button</a>
+                                                        </li>
+                                                        <li><a class="slide-item" href="basic-badges.html">Badges</a>
+                                                        </li>
+                                                        <li><a class="slide-item"
+                                                                href="basic-breadcrumb.html">Breadcrumb</a></li>
+                                                        <li><a class="slide-item" href="basic-cards.html">Cards</a></li>
+                                                        <li><a class="slide-item"
+                                                                href="basic-accordion.html">Accordion</a></li>
+                                                        <li><a class="slide-item"
+                                                                href="basic-carousel.html">Carousel</a></li>
+                                                        <li><a class="slide-item"
+                                                                href="basic-dropdowns.html">Dropdowns</a></li>
+                                                        <li><a class="slide-item"
+                                                                href="basic-offcanvas.html">Offcanvas</a></li>
+                                                        <li> <a class="slide-item"
+                                                                href="basic-pagination.html">Pagination</a></li>
+                                                        <li> <a class="slide-item"
+                                                                href="basic-progress.html">Progress</a></li>
+                                                        <li><a class="slide-item" href="basic-list-group.html">List
+                                                                group</a></li>
+                                                        <li><a class="slide-item" href="basic-modal.html">Modal</a></li>
+                                                        <li><a class="slide-item" href="basic-spinner.html">Spinner</a>
+                                                        </li>
+                                                        <li> <a class="slide-item" href="basic-tabs.html">Tabs</a></li>
+                                                        <li><a class="slide-item"
+                                                                href="basic-typography.html">Typography</a></li>
+                                                        <li><a class="slide-item"
+                                                                href="basic-tooltip-popover.html">Tooltip & popovers</a>
+                                                        </li>
+                                                        <li><a class="slide-item" href="basic-toasts.html">Toasts</a>
+                                                        </li>
+                                                        <li class="sub-slide">
+                                                            <a class="sub-sidenav-menu-item" data-bs-toggle="sub-slide"
+                                                                href="javascript:void(0)"><span
+                                                                    class="sub-side-menu__label">Utilities</span><i
+                                                                    class="sub-angle fe fe-chevron-right"></i></a>
+                                                            <ul class="sub-slide-menu">
+                                                                <li><a class="sub-slide-item"
+                                                                        href="avatars.html">Avatars</a></li>
+                                                                <li><a class="sub-slide-item"
+                                                                        href="position.html">Position</a></li>
+                                                                <li><a class="sub-slide-item"
+                                                                        href="columns.html">Columns</a></li>
+                                                                <li><a class="sub-slide-item" href="flex.html">Flex</a>
+                                                                </li>
+                                                                <li><a class="sub-slide-item"
+                                                                        href="gutters.html">Gutters</a></li>
+                                                                <li><a class="sub-slide-item" href="more.html">More</a>
+                                                                </li>
+                                                            </ul>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="slide">
+                                <a class="sidenav-menu-item" data-bs-toggle="slide" href="javascript:void(0)"><i
+                                        class="side-menu__icon fe fe-briefcase"></i><span
+                                        class="side-menu__label">Advance</span><i class="angle fe fe-chevron-right"></i>
+                                </a>
+                                <ul class="slide-menu">
+                                    <li class="panel sidetab-menu">
+                                        <div class="panel-body tabs-menu-body p-0 border-0">
+                                            <div class="tab-content">
+                                                <div class="tab-pane active" id="side1">
+                                                    <ul class="sidemenu-list">
+                                                        <li class="side-menu-label1"><a
+                                                                href="javascript:void(0)">Advance</a></li>
+                                                        <li><a class="slide-item" href="sweet-alert.html">Sweet
+                                                                alert</a></li>
+
+                                                        <li><a class="slide-item"
+                                                                href="notification.html">Notification</a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="slide">
+                                <a class="sidenav-menu-item" data-bs-toggle="slide" href="javascript:void(0)"><i
+                                        class="side-menu__icon ti ti-gift"></i><span
+                                        class="side-menu__label">icons</span><i class="angle fe fe-chevron-right"></i>
+                                </a>
+                                <ul class="slide-menu">
+                                    <li class="panel sidetab-menu">
+                                        <div class="panel-body tabs-menu-body p-0 border-0">
+                                            <div class="tab-content">
+                                                <div class="tab-pane active" id="side1">
+                                                    <ul class="sidemenu-list">
+                                                        <li class="side-menu-label1"><a
+                                                                href="javascript:void(0)">icons</a></li>
+                                                        <li><a class="slide-item" href="bootstrap-icons.html">Bootstrap
+                                                                Icônes</a></li>
+                                                        <li><a class="slide-item" href="tabler-icons.html">Tabler</a>
+                                                        </li>
+                                                        <li><a class="slide-item" href="fontawesome-icons.html">Font
+                                                                Awesome</a></li>
+                                                        <li><a class="slide-item"
+                                                                href="material-designicons-icons.html">Material Design
+                                                                Icônes</a></li>
+                                                        <li><a class="slide-item" href="simple-line-icons.html">Simple
+                                                                Line Icônes</a></li>
+                                                        <li><a class="slide-item" href="ionic-icons.html">Ionic
+                                                                Icônes</a></li>
+                                                        <li><a class="slide-item" href="feather-icons.html">Feather
+                                                                Icônes</a></li>
+                                                        <li><a class="slide-item" href="flags-icons.html">Flags
+                                                                Icônes</a></li>
+                                                        <li><a class="slide-item" href="payments-icons.html">Payments
+                                                                Icônes</a></li>
+                                                        <li><a class="slide-item" href="typicons.html">Typicons</a></li>
+                                                        <li><a class="slide-item" href="weather-icons.html">Weather
+                                                                Icônes</a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="sub-category">
+                                <h3>Maps & Graphiques</h3>
+                            </li>
+                            <li class="slide">
+                                <a class="sidenav-menu-item" data-bs-toggle="slide" href="javascript:void(0)"><i
+                                        class="side-menu__icon fe fe-map-pin"></i><span
+                                        class="side-menu__label">Maps</span><i class="angle fe fe-chevron-right"></i>
+                                </a>
+                                <ul class="slide-menu">
+                                    <li class="panel sidetab-menu">
+                                        <div class="panel-body tabs-menu-body p-0 border-0">
+                                            <div class="tab-content">
+                                                <div class="tab-pane active" id="side1">
+                                                    <ul class="sidemenu-list">
+                                                        <li class="side-menu-label1"><a
+                                                                href="javascript:void(0)">Maps</a></li>
+                                                        <li><a href="leaflet-maps.html" class="slide-item">Leaflet
+                                                                Maps</a></li>
+                                                        <li><a href="mapel-maps.html" class="slide-item">Mapel Maps</a>
+                                                        </li>
+                                                        <li><a href="vector-maps.html" class="slide-item">Vector
+                                                                Maps</a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="slide">
+                                <a class="sidenav-menu-item" data-bs-toggle="slide" href="javascript:void(0)"><i
+                                        class="side-menu__icon fe fe-bar-chart-2"></i><span
+                                        class="side-menu__label">Chart</span><i class="angle fe fe-chevron-right"></i>
+                                </a>
+                                <ul class="slide-menu">
+                                    <li class="panel sidetab-menu">
+                                        <div class="panel-body tabs-menu-body p-0 border-0">
+                                            <div class="tab-content">
+                                                <div class="tab-pane active" id="side1">
+                                                    <ul class="sidemenu-list">
+                                                        <li class="side-menu-label1"><a
+                                                                href="javascript:void(0)">Chart</a></li>
+                                                        <li><a href="chartjs.html" class="slide-item">ChartJs</a></li>
+                                                        <li><a href="flot-charts.html" class="slide-item">Flot
+                                                                Graphiques</a></li>
+                                                        <li><a href="echarts.html" class="slide-item">EGraphiques</a></li>
+                                                        <li><a href="morris-charts.html" class="slide-item">Morris
+                                                                Graphiques</a></li>
+                                                        <li><a href="nvd3-charts.html" class="slide-item">Nvd3
+                                                                Graphiques</a></li>
+                                                        <li class="sub-slide">
+                                                            <a class="sub-sidenav-menu-item" data-bs-toggle="sub-slide"
+                                                                href="javascript:void(0)"><span
+                                                                    class="sub-side-menu__label">C3 Graphiques</span><i
+                                                                    class="sub-angle fe fe-chevron-right"></i></a>
+                                                            <ul class="sub-slide-menu">
+                                                                <li><a class="sub-slide-item" href="c-charts.html">Bar
+                                                                        Graphiques</a></li>
+                                                                <li><a class="sub-slide-item"
+                                                                        href="line-chart.html">Line Graphiques</a></li>
+                                                                <li><a class="sub-slide-item"
+                                                                        href="dount-charts.html">Dount Graphiques</a></li>
+                                                                <li><a class="sub-slide-item" href="pie-chart.html">Pie
+                                                                        Graphiques</a></li>
+                                                            </ul>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="sub-category">
+                                <h3>Formulaires</h3>
+                            </li>
+                            <li class="slide">
+                                <a class="sidenav-menu-item" data-bs-toggle="slide" href="javascript:void(0)"><i
+                                        class="side-menu__icon ti ti-forms"></i><span class="side-menu__label">Formulaires
+                                        Elements</span><i class="angle fe fe-chevron-right"></i>
+                                </a>
+                                <ul class="slide-menu">
+                                    <li class="panel sidetab-menu">
+                                        <div class="panel-body tabs-menu-body p-0 border-0">
+                                            <div class="tab-content">
+                                                <div class="tab-pane active" id="side1">
+                                                    <ul class="sidemenu-list">
+                                                        <li class="side-menu-label1"><a href="javascript:void(0)">Formulaires
+                                                                Elements</a></li>
+                                                        <li><a class="slide-item" href="form-elements.html">Form
+                                                                Basic</a></li>
+                                                        <li><a class="slide-item" href="form-floating.html">Form
+                                                                Floating</a></li>
+                                                        <li><a class="slide-item" href="form-options.html">Form
+                                                                Options</a></li>
+                                                        <li><a class="slide-item" href="input-group.html">Input
+                                                                Groups</a></li>
+                                                        <li><a class="slide-item" href="form-input-spinners.html"> Form
+                                                                Input Spinners</a></li>
+                                                        <li><a class="slide-item" href="gerenal-elements.html">Gerenal
+                                                                Elements</a></li>
+                                                        <li><a class="slide-item" href="form-wizard.html">Form
+                                                                Wizard</a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="slide">
+                                <a class="sidenav-menu-item" data-bs-toggle="slide" href="javascript:void(0)"><i
+                                        class="side-menu__icon ti ti-plug"></i><span class="side-menu__label">Formulaires
+                                        Plugins</span><i class="angle fe fe-chevron-right"></i>
+                                </a>
+                                <ul class="slide-menu">
+                                    <li class="panel sidetab-menu">
+                                        <div class="panel-body tabs-menu-body p-0 border-0">
+                                            <div class="tab-content">
+                                                <div class="tab-pane active" id="side1">
+                                                    <ul class="sidemenu-list">
+                                                        <li class="side-menu-label1"><a href="javascript:void(0)">Formulaires
+                                                                Plugins</a></li>
+                                                        <li><a class="slide-item" href="form-datepicker.html">Date
+                                                                Pickers</a></li>
+                                                        <li><a class="slide-item" href="form-select.html">Select2</a>
+                                                        </li>
+                                                        <li><a class="slide-item" href="form-inputmask.html">Input
+                                                                Masks</a></li>
+                                                        <li><a class="slide-item" href="file-upload.html">File
+                                                                Upload</a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="slide">
+                                <a class="sidenav-menu-item" data-bs-toggle="slide" href="javascript:void(0)"><i
+                                        class="side-menu__icon ti ti-edit"></i><span class="side-menu__label">Text
+                                        Modifierors</span><i class="angle fe fe-chevron-right"></i>
+                                </a>
+                                <ul class="slide-menu">
+                                    <li class="panel sidetab-menu">
+                                        <div class="panel-body tabs-menu-body p-0 border-0">
+                                            <div class="tab-content">
+                                                <div class="tab-pane active" id="side1">
+                                                    <ul class="sidemenu-list">
+                                                        <li class="side-menu-label1"><a href="javascript:void(0)">Text
+                                                                Modifierors</a></li>
+                                                        <li class="sub-slide">
+                                                            <a class="sub-sidenav-menu-item" data-bs-toggle="sub-slide"
+                                                                href="javascript:void(0)"><span
+                                                                    class="sub-side-menu__label">CK editor</span><i
+                                                                    class="sub-angle fe fe-chevron-right"></i></a>
+                                                            <ul class="sub-slide-menu">
+                                                                <li><a class="sub-slide-item"
+                                                                        href="classic-editor.html">classic</a></li>
+                                                                <li><a class="sub-slide-item"
+                                                                        href="document-editor.html">Document</a></li>
+                                                                <li><a class="sub-slide-item"
+                                                                        href="inline-editor.html">Inline</a></li>
+                                                                <li><a class="sub-slide-item"
+                                                                        href="balloon-editor.html">Balloon</a></li>
+                                                            </ul>
+                                                        </li>
+                                                        <li><a href="quill-editor.html" class="slide-item">Quill
+                                                                Modifieror</a></li>
+                                                        <li><a href="tinymce-editor.html" class="slide-item">Tinymce
+                                                                Modifieror</a></li>
+                                                        <li><a href="markdown-editor.html" class="slide-item">Markdown
+                                                                Modifieror</a></li>
+                                                        <li><a href="summernote-editor.html"
+                                                                class="slide-item">Summernote Modifieror</a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="sub-category">
+                                <h3>Tableaux</h3>
+                            </li>
+                            <li class="slide">
+                                <a class="sidenav-menu-item" data-bs-toggle="slide" href="javascript:void(0)"><i
+                                        class="side-menu__icon ti ti-table"></i><span class="side-menu__label">Bootstrap
+                                        table</span><i class="angle fe fe-chevron-right"></i>
+                                </a>
+                                <ul class="slide-menu">
+                                    <li class="panel sidetab-menu">
+                                        <div class="panel-body tabs-menu-body p-0 border-0">
+                                            <div class="tab-content">
+                                                <div class="tab-pane active" id="side1">
+                                                    <ul class="sidemenu-list">
+                                                        <li class="side-menu-label1"><a
+                                                                href="javascript:void(0)">Bootstrap table</a></li>
+                                                        <li><a href="tbl-bootstrap.html" class="slide-item">Basic
+                                                                table</a></li>
+                                                        <li><a href="tbl-sizing.html" class="slide-item">Sizing
+                                                                table</a></li>
+                                                        <li><a href="tbl-styling.html" class="slide-item">Styling
+                                                                table</a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="slide">
+                                <a class="sidenav-menu-item" data-bs-toggle="slide" href="javascript:void(0)"><i
+                                        class="side-menu__icon bx bxs-shield-plus"></i><span
+                                        class="side-menu__label">Advance Table</span><i
+                                        class="angle fe fe-chevron-right"></i>
+                                </a>
+                                <ul class="slide-menu">
+                                    <li class="panel sidetab-menu">
+                                        <div class="panel-body tabs-menu-body p-0 border-0">
+                                            <div class="tab-content">
+                                                <div class="tab-pane active" id="side1">
+                                                    <ul class="sidemenu-list">
+                                                        <li class="side-menu-label1"><a
+                                                                href="javascript:void(0)">Advance Table</a></li>
+                                                        <li><a href="datatable.html" class="slide-item">datatable</a>
+                                                        </li>
+                                                        <li><a href="edit-table.html" class="slide-item">Modifier Tableaux</a>
+                                                        </li>
+                                                        <li><a href="tables-extension.html" class="slide-item">Tableaux
+                                                                Extension</a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="slide">
+                                <a class="sidenav-menu-item" data-bs-toggle="slide" href="javascript:void(0)">
+                                    <i class="side-menu__icon fe fe-sliders"></i>
+                                    <span class="side-menu__label">Level items</span><i
+                                        class="angle fe fe-chevron-right"></i>
+                                </a>
+                                <ul class="slide-menu">
+                                    <li class="panel sidetab-menu">
+                                        <div class="panel-body tabs-menu-body p-0 border-0">
+                                            <div class="tab-content">
+                                                <div class="tab-pane active" id="side1">
+                                                    <ul class="sidemenu-list">
+                                                        <li class="side-menu-label1"><a href="javascript:void(0)">Level
+                                                                items</a></li>
+                                                        <li><a href="javascript:void(0)" class="slide-item">Level-1</a>
+                                                        </li>
+                                                        <li class="sub-slide">
+                                                            <a class="sub-sidenav-menu-item" data-bs-toggle="sub-slide"
+                                                                href="javascript:void(0)"><span
+                                                                    class="sub-side-menu__label">Level-2</span><i
+                                                                    class="sub-angle fe fe-chevron-right"></i></a>
+                                                            <ul class="sub-slide-menu">
+                                                                <li><a class="sub-slide-item"
+                                                                        href="javascript:void(0)">Level-2.1</a></li>
+                                                                <li><a class="sub-slide-item"
+                                                                        href="javascript:void(0)">Level-2.2</a></li>
+                                                                <li class="sub-slide2">
+                                                                    <a class="sub-sidenav-menu-item"
+                                                                        href="javascript:void(0)"
+                                                                        data-bs-toggle="sub-slide2"><span
+                                                                            class="sub-side-menu__label">Level-2.3</span><i
+                                                                            class="sub-angle2 fe fe-chevron-right"></i></a>
+                                                                    <ul class="sub-slide-menu2">
+                                                                        <li><a href="javascript:void(0)"
+                                                                                class="sub-slide-item2">Level-2.3.1</a> 
+                                                                        </li>
+                                                                        <li><a href="javascript:void(0)"
+                                                                                class="sub-slide-item2">Level-2.3.2</a>
+                                                                        </li>
+                                                                        <li><a href="javascript:void(0)"
+                                                                                class="sub-slide-item2">Level-2.3.3</a>
+                                                                        </li>
+                                                                    </ul>
+                                                                </li>
+                                                                <li><a class="sub-slide-item"
+                                                                        href="javascript:void(0)">Level-2.4</a></li>
+                                                                <li><a class="sub-slide-item"
+                                                                        href="javascript:void(0)">Level-2.5</a></li> 
+                                                            </ul>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul> -->
+                        </ul>
+
+                        <div class="sidebar-logout">
+                            <form id="dashboard02-logout-form" method="POST"
+                                action="<?php echo htmlspecialchars($logout_url ?? '/logout', ENT_QUOTES, 'UTF-8'); ?>"
+                                class="d-none">
+                                <?php if (function_exists('csrf_field')): ?>
+                                    <?php echo csrf_field(); ?>
+                                <?php endif; ?>
+                            </form>
+                            <a class="sidebar-logout__link"
+                                href="<?php echo htmlspecialchars($logout_url ?? '/logout', ENT_QUOTES, 'UTF-8'); ?>"
+                                onclick="event.preventDefault(); document.getElementById('dashboard02-logout-form').submit();">
+                                <i class="side-menu__icon fa fa-sign-out"></i>
+                                <span class="side-menu__label">Déconnexion</span>
+                            </a>
+                        </div>
+
+                        <div class="slide-right" id="slide-right"><svg xmlns="http://www.w3.org/2000/svg" fill="#7b8191"
+                                width="24" height="24" viewBox="0 0 24 24">
+                                <path d="M10.707 17.707 16.414 12l-5.707-5.707-1.414 1.414L13.586 12l-4.293 4.293z" />
+                            </svg></div>
+                    </div>
+                    
+                </div>
+            </div>
+            <!--{ app sidebar end }--> 

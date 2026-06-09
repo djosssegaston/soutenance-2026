@@ -32,7 +32,7 @@ return [
 
         'local' => [
             'driver' => 'local',
-            'root' => storage_path('app/private'),
+            'root' => storage_path('app'),
             'serve' => true,
             'throw' => false,
             'report' => false,
@@ -43,6 +43,13 @@ return [
             'root' => storage_path('app/public'),
             'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/storage',
             'visibility' => 'public',
+            'throw' => false,
+            'report' => false,
+        ],
+
+        'secure_documents' => [
+            'driver' => 'local',
+            'root' => storage_path('secure_documents'),
             'throw' => false,
             'report' => false,
         ],

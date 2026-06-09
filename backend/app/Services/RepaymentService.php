@@ -1,0 +1,229 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\Project;
+use App\Models\Repayment;
+use App\Models\Transaction;
+use App\Models\User;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+
+class RepaymentService
+{
+    /**
+     * Récupérer les remboursements du porteur connecté
+     */
+    public function getPorteurRepayments(User $user, array $filters = []): array
+    {
+        $query = Repayment::with(['project', 'institution'])
+            ->whereHas('project', function ($q) use ($user) {
+                $q->where('user_id', $user->id);
+            });
+
+        if (! empty($filters['statut'])) {
+            $query->where('statut', $filters['statut']);
+        }
+
+        if (! empty($filters['project_id'])) {
+            $query->where('project_id', $filters['project_id']);
+        }
+
+        $repayments = $query->orderBy('date_echeance', 'asc')->get();
+
+        return [
+            'repayments' => $repayments,
+            'stats' => $this->calculateStats($repayments),
+        ];
+    }
+
+    /**
+     * Calculer les statistiques de remboursement
+     */
+    public function calculateStats($repayments): array
+    {
+        $totalRembourse = $repayments->where('statut', 'paye')->sum('montant_total');
+        $totalRestant = $repayments->where('statut', '!=', 'paye')->sum('montant_restant');
+        $totalEcheances = $repayments->count();
+        $payes = $repayments->where('statut', 'paye')->count();
+        $enRetard = $repayments->where('statut', 'en_retard')->count();
+
+        $tauxRemboursement = $totalEcheances > 0 ? round(($payes / $totalEcheances) * 100, 2) : 0;
+
+        return [
+            'total_rembourse' => $totalRembourse,
+            'total_restant' => $totalRestant,
+            'taux_remboursement' => $tauxRemboursement,
+            'en_retard' => $enRetard,
+            'total_echeances' => $totalEcheances,
+        ];
+    }
+
+    /**
+     * Initier un paiement de remboursement via FedaPay
+     */
+    public function initiateRepaymentPayment(Repayment $repayment, User $user, array $customerData = []): array
+    {
+        // Vérifier que le remboursement appartient au porteur
+        if ($repayment->project->user_id !== $user->id) {
+            throw new \RuntimeException('Accès non autorisé à ce remboursement.');
+        }
+
+        // Vérifier que le remboursement n'est pas déjà payé
+        if ($repayment->statut === 'paye') {
+            throw new \RuntimeException('Ce remboursement est déjà payé.');
+        }
+
+        $fedapayService = new FedaPayService;
+
+        $customerData = array_merge([
+            'firstname' => $user->prenom ?? explode(' ', $user->name)[0],
+            'lastname' => $user->nom ?? explode(' ', $user->name)[1] ?? 'Client',
+            'email' => $user->email,
+            'phone' => $user->telephone ?? '22900000000',
+        ], $customerData);
+
+        // Créer une transaction de type 'repayment'
+        $transaction = Transaction::create([
+            'project_id' => $repayment->project_id,
+            'user_id' => $user->id,
+            'institution_id' => $repayment->institution_id,
+            'type' => 'repayment',
+            'amount' => $repayment->montant_restant ?: $repayment->montant_total,
+            'currency' => 'XOF',
+            'status' => 'pending',
+            'metadata' => [
+                'repayment_id' => $repayment->id,
+                'initiated_at' => now()->toIso8601String(),
+            ],
+        ]);
+
+        try {
+            $result = $fedapayService->initiatePayment($repayment->project, $customerData);
+
+            $transaction->update([
+                'fedapay_transaction_id' => $result['transaction_id'],
+                'metadata' => array_merge($transaction->metadata ?? [], [
+                    'fedapay_token' => $result['token'],
+                ]),
+            ]);
+
+            Log::info('Repayment payment initiated', [
+                'repayment_id' => $repayment->id,
+                'transaction_id' => $transaction->id,
+                'amount' => $repayment->montant_restant ?: $repayment->montant_total,
+            ]);
+
+            return [
+                'payment_url' => $result['payment_url'],
+                'transaction_id' => $transaction->id,
+                'token' => $result['token'],
+            ];
+
+        } catch (\Exception $e) {
+            $transaction->update(['status' => 'failed']);
+            throw $e;
+        }
+    }
+
+    /**
+     * Confirmer un paiement de remboursement
+     */
+    public function confirmRepaymentPayment(Repayment $repayment, Transaction $transaction, array $webhookData = []): void
+    {
+        DB::transaction(function () use ($repayment, $transaction, $webhookData) {
+            // Mettre à jour le remboursement
+            $repayment->update([
+                'statut' => 'paye',
+                'date_paiement' => now(),
+                'montant_restant' => 0,
+                'methode_paiement' => $webhookData['payment_method'] ?? 'fedapay',
+                'transaction_reference' => $transaction->fedapay_transaction_id,
+                'commentaires' => 'Paiement confirmé via FedaPay',
+            ]);
+
+            // Mettre à jour la transaction
+            $transaction->markAsCompleted();
+            $transaction->update([
+                'metadata' => array_merge($transaction->metadata ?? [], [
+                    'completed_at' => now()->toIso8601String(),
+                    'fedapay_data' => $webhookData,
+                ]),
+            ]);
+
+            // Enregistrer l'historique
+            $this->logHistory($repayment, 'paid', $transaction->user_id, [
+                'amount' => $repayment->montant_total,
+                'method' => $repayment->methode_paiement,
+                'transaction_id' => $transaction->id,
+            ]);
+
+            // Vérifier si le projet est entièrement remboursé
+            $this->checkProjectCompletion($repayment->project);
+        });
+    }
+
+    /**
+     * Enregistrer dans l'historique
+     */
+    public function logHistory(Repayment $repayment, string $action, int $acteurId, array $details = []): void
+    {
+        DB::table('repayment_histories')->insert([
+            'repayment_id' => $repayment->id,
+            'action' => $action,
+            'acteur_type' => 'App\Models\User',
+            'acteur_id' => $acteurId,
+            'details' => json_encode($details),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
+    /**
+     * Récupérer l'historique d'un remboursement
+     */
+    public function getHistory(Repayment $repayment): array
+    {
+        $histories = DB::table('repayment_histories')
+            ->where('repayment_id', $repayment->id)
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($item) {
+                $item->details = json_decode($item->details, true);
+
+                return $item;
+            });
+
+        return $histories->toArray();
+    }
+
+    /**
+     * Vérifier si le projet est entièrement remboursé
+     */
+    private function checkProjectCompletion(Project $project): void
+    {
+        $targetAmount = max((float) $project->montant_finance, (float) $project->montant_demande);
+        $paidAmount = (float) Repayment::where('project_id', $project->id)
+            ->where('statut', 'paye')
+            ->sum('montant_total');
+
+        if ($targetAmount > 0 && $paidAmount >= $targetAmount) {
+            app(ProjectWorkflowService::class)->complete($project, $project->user_id);
+        }
+    }
+
+    /**
+     * Calculer les pénalités pour retard
+     */
+    public function calculatePenalty(Repayment $repayment): float
+    {
+        if ($repayment->statut !== 'en_retard' || ! $repayment->date_echeance) {
+            return 0;
+        }
+
+        $daysLate = now()->diffInDays($repayment->date_echeance);
+        $dailyRate = config('services.fedapay.penalty_daily_rate', 0.001);
+
+        return round((float) $repayment->montant_total * $dailyRate * $daysLate, 2);
+    }
+}

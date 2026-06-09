@@ -101,11 +101,11 @@
         slidesPerView: 1,
         effect: 'fade',
         fadeEffect: {
-            crossFade: false,
+            crossFade: true,
         },
-        speed: 1000,
+        speed: 1200,
         autoplay: {
-            delay: 5000,
+            delay: 6000,
             disableOnInteraction: false,
         },
         navigation: {
@@ -124,7 +124,7 @@
             $(selector + " .swiper-slide-active [data-animation]").each(function() {
                 let anim = $(this).data("animation");
                 let delay = $(this).data("delay");
-                let duration = $(this).data("duration");
+                let duration = $(this).data("duration") || "1.2s";
                 $(this)
                     .removeClass(anim + " animated")
                     .addClass(anim + " animated")
@@ -133,15 +133,21 @@
                         animationDelay: delay,
                         webkitAnimationDuration: duration,
                         animationDuration: duration,
-                    })
-                    .one("animationend", function() {
-                        $(this).removeClass(anim + " animated");
+                        webkitAnimationFillMode: "both",
+                        animationFillMode: "both",
+                        opacity: "",
                     });
             });
         };
         animated();
         init.on("slideChangeTransitionStart", function() {
-            $(selector + " [data-animation]").removeClass("animated");
+            $(selector + " .swiper-slide:not(.swiper-slide-active) [data-animation]")
+                .removeClass("animated")
+                .css({
+                    webkitAnimationFillMode: "",
+                    animationFillMode: "",
+                    opacity: 0,
+                });
         });
         init.on("slideChangeTransitionEnd", animated);
     }
@@ -319,19 +325,29 @@
 		loop: true,
 		spaceBetween: 30,
 		slidesPerView: 1,
-		fadeIn: true,
-		speed: 1500,
-		nav: true,
+		speed: 1200,
+		autoplay: {
+			delay: 5000,
+			disableOnInteraction: false,
+		},
 		navigation: {
-			nextEl: '.swiper-button-next',
-			prevEl: '.swiper-button-prev',
+			nextEl: '.testimonial__three .swiper-button-next',
+			prevEl: '.testimonial__three .swiper-button-prev',
 		},
 		breakpoints: {
+			576: {
+				slidesPerView: 1,
+				spaceBetween: 20,
+			},
 			768: {
 				slidesPerView: 2,
-				spaceBetween: 30,
+				spaceBetween: 25,
 			},
-			1400: {
+			992: {
+				slidesPerView: 2,
+				spaceBetween: 25,
+			},
+			1200: {
 				slidesPerView: 3,
 				spaceBetween: 30,
 			},
@@ -671,5 +687,57 @@
     });
     $Atags.on('mouseout', () => {
         $dragCursor.css('display', 'flex');
+    });
+
+    ///============= CSRF Token Setup =============\\\
+    let csrfToken = $('meta[name="csrf-token"]').attr('content');
+    if (csrfToken) {
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': csrfToken
+            }
+        });
+    }
+
+    ///============= Contact Form =============\\\
+    $('.contact__one-form').on('submit', function(e) {
+        e.preventDefault();
+        let $form = $(this);
+        let $btn = $form.find('button[type="submit"]');
+        let originalText = $btn.text();
+        $btn.prop('disabled', true).text('Envoi en cours...');
+        $.ajax({
+            url: '/contact/send',
+            method: 'POST',
+            data: {
+                name: $form.find('input[placeholder="Nom"]').val(),
+                email: $form.find('input[placeholder="Email"]').val(),
+                phone: $form.find('input[placeholder="Telephone"]').val(),
+                subject: $form.find('input[placeholder="Objet"]').val(),
+                message: $form.find('textarea').val(),
+            },
+            success: function(res) {
+                if (typeof ContactModal !== 'undefined') {
+                    ContactModal.success(res.message || 'Message envoyé avec succès !');
+                } else {
+                    alert(res.message || 'Message envoyé avec succès !');
+                }
+                $form[0].reset();
+            },
+            error: function(xhr) {
+                let msg = 'Une erreur est survenue. Veuillez réessayer.';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    msg = xhr.responseJSON.message;
+                }
+                if (typeof ContactModal !== 'undefined') {
+                    ContactModal.error(msg);
+                } else {
+                    alert(msg);
+                }
+            },
+            complete: function() {
+                $btn.prop('disabled', false).text(originalText);
+            }
+        });
     });
 })(jQuery);

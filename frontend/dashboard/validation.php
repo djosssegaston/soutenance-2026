@@ -54,7 +54,7 @@ include __DIR__ . '/components/institution_page_start.php';
 
         <div class="row dashboard-gap-20 mt-4 mb-5">
           <div class="col-12">
-            <section class="dashboard-card content-card dashboard-table-card">
+            <section class="dashboard-card content-card dashboard-table-card" data-auto-paginate="true">
               <div class="dashboard-table-card__header card-title">
                 <h6>Projets à valider</h6>
                 <div class="dashboard-table-card__actions">
@@ -65,7 +65,7 @@ include __DIR__ . '/components/institution_page_start.php';
                 </div>
               </div>
               <div class="dashboard-table-wrapper table-responsive">
-                <table class="table dashboard-table data-table align-middle">
+                <table class="table dashboard-table data-table align-middle" data-items-per-page="10">
                   <thead>
                     <tr>
                       <th>Projet</th>
@@ -101,11 +101,7 @@ include __DIR__ . '/components/institution_page_start.php';
                   </tbody>
                 </table>
               </div>
-              <div class="dashboard-pagination pagination-dashboard">
-                <button class="dashboard-page-btn page-btn active">1</button>
-                <button class="dashboard-page-btn page-btn">2</button>
-                <button class="dashboard-page-btn page-btn">3</button>
-              </div>
+              <div class="dashboard-pagination pagination-dashboard"></div>
             </section>
           </div>
         </div>

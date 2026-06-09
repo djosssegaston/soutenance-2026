@@ -54,6 +54,9 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
+    'frontend_login_url' => env('FRONTEND_LOGIN_URL', '/frontend/public/login.php'),
+    'frontend_logo_url' => env('FRONTEND_LOGO_URL', 'http://localhost/alogoto2/frontend/public/assets/img/logo.png'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Timezone

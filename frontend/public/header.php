@@ -29,7 +29,20 @@
 	<!-- Magnific Popup CSS -->
 	<link rel="stylesheet" href="<?php echo htmlspecialchars(frontend_public_asset('css/magnific-popup.css'), ENT_QUOTES, 'UTF-8'); ?>">
 	<!-- Custom CSS -->
-	<link rel="stylesheet" href="<?php echo htmlspecialchars(frontend_public_asset('sass/style.css?v=20260303-1'), ENT_QUOTES, 'UTF-8'); ?>"> 
+	<link rel="stylesheet" href="<?php echo htmlspecialchars(frontend_public_asset('sass/style.css?v=20260303-1'), ENT_QUOTES, 'UTF-8'); ?>">
+	<?php if (isset($csrf_token)): ?>
+	<meta name="csrf-token" content="<?php echo htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8'); ?>">
+	<?php endif; ?>
+	<style>
+		@media (min-width: 1800px) {
+			.section-padding { padding: 140px 0; }
+			.container { max-width: 1400px; }
+		}
+		@media (min-width: 2200px) {
+			.section-padding { padding: 160px 0; }
+			.container { max-width: 1600px; }
+		}
+	</style>
 </head>
 
 <body>
@@ -40,7 +53,7 @@
 				<div class="header__area-menubar">
 					<div class="header__area-menubar-left">
 						<div class="header__area-menubar-left-logo">
-							<a href="<?php echo htmlspecialchars(frontend_public_url('index.php'), ENT_QUOTES, 'UTF-8'); ?>"><img class="dark-n" src="<?php echo htmlspecialchars(frontend_public_asset('img/logo-4.png'), ENT_QUOTES, 'UTF-8'); ?>" alt=""></a>
+							<a href="<?php echo htmlspecialchars(frontend_public_url('index.php'), ENT_QUOTES, 'UTF-8'); ?>"><img class="dark-n" src="<?php echo htmlspecialchars(frontend_public_asset('img/logo.png'), ENT_QUOTES, 'UTF-8'); ?>?v=<?php echo time(); ?>" alt=""></a>
 						</div>
 					</div>
 					<div class="header__area-menubar-center">
@@ -51,7 +64,13 @@
 							<li><a href="<?php echo htmlspecialchars(frontend_public_url('services.php'), ENT_QUOTES, 'UTF-8'); ?>">Services</a></li>
 							<li><a href="<?php echo htmlspecialchars(frontend_public_url('company-history.php'), ENT_QUOTES, 'UTF-8'); ?>">Historique</a></li>
 							<li><a href="<?php echo htmlspecialchars(frontend_public_url('contact.php'), ENT_QUOTES, 'UTF-8'); ?>">Contactez-Nous</a></li>
-							<li><a href="<?php echo htmlspecialchars(frontend_public_url('login.php'), ENT_QUOTES, 'UTF-8'); ?>" style="color: var(--primary-color-3);">Connexion</a></li>
+							<li class="menu-item-has-children">
+								<a href="javascript:void(0)" style="color: var(--primary-color-3);">Connexion <i class="fas fa-chevron-down"></i></a>
+								<ul class="sub-menu">
+									<li><a href="<?php echo htmlspecialchars('/login/porteur', ENT_QUOTES, 'UTF-8'); ?>">Espace Porteur</a></li>
+									<li><a href="<?php echo htmlspecialchars('/login/institution', ENT_QUOTES, 'UTF-8'); ?>">Espace Institution</a></li>
+								</ul>
+							</li>
 							</ul>
 						</div>
 					</div>
@@ -66,37 +85,36 @@
 							<div class="header__area-menubar-right-sidebar-popup home-three">
 								<div class="sidebar-close-btn"> <i class="fal fa-times"></i> </div>
 								<div class="header__area-menubar-right-sidebar-popup-logo">
-									<a href="<?php echo htmlspecialchars(frontend_public_url('index.php'), ENT_QUOTES, 'UTF-8'); ?>"> <img src="<?php echo htmlspecialchars(frontend_public_asset('img/logo-5.png'), ENT_QUOTES, 'UTF-8'); ?>" alt=""> </a>
+									<a href="<?php echo htmlspecialchars(frontend_public_url('index.php'), ENT_QUOTES, 'UTF-8'); ?>"> <img src="<?php echo htmlspecialchars(frontend_public_asset('img/logo.png'), ENT_QUOTES, 'UTF-8'); ?>?v=<?php echo time(); ?>" alt=""> </a>
 								</div>
-								<p> Morbi et tellus imperdiet, aliquam nulla sed, dapibus erat. Aenean dapibus sem non purus venenatis vulputate. Donec accumsan eleifend blandit. Nullam auctor ligula </p>
+								<p> ALOGOTO vous aide à atteindre la paix financière grâce à des stratégies personnalisées et des conseils experts. Notre équipe est dédiée à comprendre vos besoins uniques et à vous fournir des solutions adaptées.</p>
 								<div class="header__area-menubar-right-sidebar-popup-contact">
-									<h4 class="mb-30">Get In Touch</h4>
+									<h4 class="mb-30">Prenez contact avec nous</h4>
 									<div class="header__area-menubar-right-sidebar-popup-contact-item">
 										<div class="header__area-menubar-right-sidebar-popup-contact-item-icon"> <i class="fal fa-phone-alt icon-animation"></i> </div>
-										<div class="header__area-menubar-right-sidebar-popup-contact-item-content"> <span>Call Now</span>
+										<div class="header__area-menubar-right-sidebar-popup-contact-item-content"> <span>Téléphone</span>
 											<h6>
-                                                    <a href="tel:+125(895)658568"
-                                                        >+125 (895) 658 568</a
+                                                    <a href="tel:+2290168552584"
+                                                        >+229 01 68 55 25 84</a
                                                     >
                                                 </h6> </div>
 									</div>
 									<div class="header__area-menubar-right-sidebar-popup-contact-item">
 										<div class="header__area-menubar-right-sidebar-popup-contact-item-icon"> <i class="fal fa-envelope"></i> </div>
-										<div class="header__area-menubar-right-sidebar-popup-contact-item-content"> <span>Quick Email</span>
+										<div class="header__area-menubar-right-sidebar-popup-contact-item-content"> <span>Adresse e-mail</span>
 											<h6>
                                                     <a
-                                                        href="mailto:info.help@gmail.com"
-                                                        >info.help@gmail.com</a
+                                                        href="mailto:alogoto03@gmail.com"
+                                                        >alogoto03@gmail.com</a
                                                     >
                                                 </h6> </div>
 									</div>
 									<div class="header__area-menubar-right-sidebar-popup-contact-item">
 										<div class="header__area-menubar-right-sidebar-popup-contact-item-icon"> <i class="fal fa-map-marker-alt"></i> </div>
-										<div class="header__area-menubar-right-sidebar-popup-contact-item-content"> <span>Office Address</span>
+										<div class="header__area-menubar-right-sidebar-popup-contact-item-content"> <span>Adresse</span>
 											<h6>
                                                     <a href="https://www.google.com/maps"
-                                                        >PV3M+X68 Welshpool United
-                                                        Kingdom</a
+                                                        >Benin, Cotonou,Porto-NOvo</a
                                                     >
                                                 </h6> </div>
 									</div>
@@ -120,7 +138,7 @@
 							<div class="responsive__menu-wrapper">
 								<div class="responsive__menu_wrap text-start mb-5">
 									<div class="logo-wrapper">
-										<a href="<?php echo htmlspecialchars(frontend_public_url('index.php'), ENT_QUOTES, 'UTF-8'); ?>"> <img src="<?php echo htmlspecialchars(frontend_public_asset('img/logo-5.png'), ENT_QUOTES, 'UTF-8'); ?>" alt="Logo"></a>
+										<a href="<?php echo htmlspecialchars(frontend_public_url('index.php'), ENT_QUOTES, 'UTF-8'); ?>"> <img src="<?php echo htmlspecialchars(frontend_public_asset('img/logo.png'), ENT_QUOTES, 'UTF-8'); ?>?v=<?php echo time(); ?>" alt="Logo"></a>
 									</div> <i class="fas fa-times close-hide-show"></i> </div>
 								<ul class="responsive-sidebar-menu-list">
 							<li class="responsive-sidebar-menu-list__item"> <a href="<?php echo htmlspecialchars(frontend_public_url('index.php'), ENT_QUOTES, 'UTF-8'); ?>" class="responsive-sidebar-menu-list__link">
@@ -140,8 +158,15 @@
 											</a> </li>
 									
 									        <li class="responsive-sidebar-menu-list__item"> <a href="<?php echo htmlspecialchars(frontend_public_url('contact.php'), ENT_QUOTES, 'UTF-8'); ?>" class="responsive-sidebar-menu-list__link">
-                                                Contact Us 
+                                                Contactez-Nous 
                                             </a> </li>
+											<li class="responsive-sidebar-menu-list__item"> <a href="<?php echo htmlspecialchars('/login/porteur', ENT_QUOTES, 'UTF-8'); ?>" class="responsive-sidebar-menu-list__link">
+												Connexion Porteur
+											</a> </li>
+											<li class="responsive-sidebar-menu-list__item"> <a href="<?php echo htmlspecialchars('/login/institution', ENT_QUOTES, 'UTF-8'); ?>" class="responsive-sidebar-menu-list__link">
+												Connexion Institution
+											</a> </li>
+
 								</ul>
 							</div>
 						</div>

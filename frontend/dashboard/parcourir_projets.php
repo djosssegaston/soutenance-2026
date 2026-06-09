@@ -1,7 +1,28 @@
 <?php
 require_once __DIR__ . '/components/dashboard_helpers.php';
-$institutionData = require __DIR__ . '/components/institution_data.php';
-$projects = $institutionData['projects'];
+
+$projects = \App\Models\Project::whereIn('statut', \App\Enums\ProjectStatus::institutionAvailableValues())
+    ->with('owner')
+    ->latest()
+    ->get()
+    ->map(function ($project) {
+        $statusEnum = $project->statusEnum();
+        return [
+            'id' => 'PRJ-' . str_pad($project->id, 3, '0', STR_PAD_LEFT),
+            'row_id' => $project->id,
+            'name' => $project->titre,
+            'sector' => $project->secteur ?? 'N/A',
+            'requested_amount' => $project->montant_demande,
+            'risk_label' => 'N/A',
+            'risk_class' => 'risk-badge risk-low',
+            'risk_score' => 0,
+            'status_label' => $statusEnum->label(),
+            'status_class' => $statusEnum->badgeClass(),
+            'analyze_url' => '/dashboard/institution/projets/' . $project->id . '/analyse',
+            'interview_url' => '/dashboard/institution/projets/' . $project->id . '/entretien',
+            'accept_url' => '/dashboard/institution/projets/' . $project->id . '/accepter',
+        ];
+    })->toArray();
 
 $lowRiskProjects = 0;
 $totalRequested = 0;
@@ -15,7 +36,7 @@ $averageTicket = count($projects) > 0 ? (int) round($totalRequested / count($pro
 
 $page_title = 'Parcourir les projets';
 $page_subtitle = 'Explorez les projets disponibles et priorisez les opportunités d’investissement.';
-$page_active_nav = 'browse';
+$page_active_nav = 'available-projects';
 $page_document_title = 'Parcourir les projets - ALOGOTO';
 
 include __DIR__ . '/components/institution_page_start.php';
@@ -80,7 +101,7 @@ include __DIR__ . '/components/institution_page_start.php';
             <?php
             ob_start();
             ?>
-<table class="table dashboard-table data-table align-middle">
+<table class="table dashboard-table data-table align-middle" data-items-per-page="10">
   <thead>
     <tr>
       <th>ID</th>
@@ -105,12 +126,35 @@ include __DIR__ . '/components/institution_page_start.php';
           <small><?php echo dashboard_escape((string) $project['risk_score']); ?>/100</small>
         </div>
       </td>
-      <td><span class="status-badge <?php echo dashboard_escape($project['status_class']); ?>"><?php echo dashboard_escape($project['status_label']); ?></span></td>
+      <td><span id="projectStatus-<?php echo dashboard_escape($project['row_id']); ?>" class="status-badge <?php echo dashboard_escape($project['status_class']); ?>"><?php echo dashboard_escape($project['status_label']); ?></span></td>
       <td>
-        <a href="analyse_risque.php" class="dashboard-btn-primary btn-dashboard primary sm">
-          <i class="bi bi-eye"></i>
-          <span>Voir le projet</span>
-        </a>
+        <div class="institution-action-group">
+          <a href="analyse_risque.php" class="dashboard-btn-primary btn-dashboard primary sm">
+            <i class="bi bi-eye"></i>
+            <span>Voir le projet</span>
+          </a>
+          <form method="POST" action="<?php echo dashboard_escape($project['analyze_url']); ?>" class="inline-form" style="display:inline;">
+            <?php echo csrf_field(); ?>
+            <input type="hidden" name="project_id" value="<?php echo dashboard_escape($project['id']); ?>">
+            <button type="submit" class="btn-dashboard outline sm">
+              <span>Analyser</span>
+            </button>
+          </form>
+          <form method="POST" action="<?php echo dashboard_escape($project['interview_url']); ?>" class="inline-form" style="display:inline;">
+            <?php echo csrf_field(); ?>
+            <input type="hidden" name="project_id" value="<?php echo dashboard_escape($project['id']); ?>">
+            <button type="submit" class="btn-dashboard outline sm">
+              <span>Planifier entretien</span>
+            </button>
+          </form>
+          <form method="POST" action="<?php echo dashboard_escape($project['accept_url']); ?>" class="inline-form" style="display:inline;">
+            <?php echo csrf_field(); ?>
+            <input type="hidden" name="project_id" value="<?php echo dashboard_escape($project['id']); ?>">
+            <button type="submit" class="btn-dashboard outline sm">
+              <span>Accepter</span>
+            </button>
+          </form>
+        </div>
       </td>
     </tr>
 <?php endforeach; ?>
@@ -121,9 +165,10 @@ include __DIR__ . '/components/institution_page_start.php';
             $table_title = 'Projets disponibles';
             $table_id = 'browseProjects';
             $table_search_placeholder = 'Rechercher un projet';
-            $table_pagination = '<button class="dashboard-page-btn page-btn active">1</button><button class="dashboard-page-btn page-btn">2</button><button class="dashboard-page-btn page-btn">3</button>';
+            $table_auto_paginate = true;
             include __DIR__ . '/components/data_table.html';
             ?>
+            <p id="institutionProjectsFeedback" class="institution-page-subtle mt-3" hidden></p>
           </div>
         </div>
 

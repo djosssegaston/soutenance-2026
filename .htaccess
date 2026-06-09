@@ -1,0 +1,39 @@
+Options -MultiViews
+
+<IfModule mod_php.c>
+    php_value upload_max_filesize 10M
+    php_value post_max_size 12M
+    php_value max_execution_time 120
+</IfModule>
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # ── Laravel Routes ──────────────────────────────────────────
+    RewriteRule ^login(/?.*)$ backend/public/index.php [L,QSA]
+    RewriteRule ^register(/?.*)$ backend/public/index.php [L,QSA]
+    RewriteRule ^logout$ backend/public/index.php [L,QSA]
+    RewriteRule ^forgot-password(/?.*)$ backend/public/index.php [L,QSA]
+    RewriteRule ^reset-password(/?.*)$ backend/public/index.php [L,QSA]
+    RewriteRule ^email(/?.*)$ backend/public/index.php [L,QSA]
+    RewriteRule ^otp(/?.*)$ backend/public/index.php [L,QSA]
+    RewriteRule ^auth(/?.*)$ backend/public/index.php [L,QSA]
+    RewriteRule ^contact(/?.*)$ backend/public/index.php [L,QSA]
+    RewriteRule ^fedapay(/?.*)$ backend/public/index.php [L,QSA]
+    RewriteRule ^payment(/?.*)$ backend/public/index.php [L,QSA]
+    RewriteRule ^documents(/?.*)$ backend/public/index.php [L,QSA]
+    RewriteRule ^dashboards$ backend/public/index.php [L,QSA]
+    RewriteRule ^dashboard(/?.*)$ backend/public/index.php [L,QSA]
+    RewriteRule ^porteur(/?.*)$ backend/public/index.php [L,QSA]
+    RewriteRule ^institution(/?.*)$ backend/public/index.php [L,QSA]
+    RewriteRule ^frontend/(asset|dashboard02|dashboard)(/.*)?$ backend/public/index.php [L,QSA]
+    RewriteRule ^api(/.*)?$ backend/public/index.php [L,QSA]
+
+    # ── Existing Files & Directories ────────────────────────────
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # ── Frontend Fallback ──────────────────────────────────────
+    RewriteRule ^$ index.php [L]
+</IfModule>

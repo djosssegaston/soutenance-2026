@@ -8,7 +8,7 @@ include 'header.php';
 		<div class="container">
 			<div class="breadcrumb__area-content">
 				<h2>Contact</h2> <span>
-                        <a href="index.html">
+                        <a href="index.php">
                             <i class="fas fa-home"></i>
                             Accueil
                         </a>

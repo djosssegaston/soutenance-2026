@@ -70,7 +70,7 @@ include __DIR__ . '/components/institution_page_start.php';
             <?php
             ob_start();
             ?>
-<table class="table dashboard-table data-table align-middle">
+<table class="table dashboard-table data-table align-middle" data-items-per-page="10">
   <thead>
     <tr>
       <th>Projet</th>
@@ -78,16 +78,27 @@ include __DIR__ . '/components/institution_page_start.php';
       <th>Montant</th>
       <th>Date paiement</th>
       <th>Statut</th>
+      <th>Actions</th>
     </tr>
   </thead>
   <tbody>
-<?php foreach ($repayments as $repayment): ?>
+<?php foreach ($repayments as $index => $repayment): ?>
     <tr>
       <td><?php echo dashboard_escape($repayment['project']); ?></td>
       <td><?php echo dashboard_escape($repayment['carrier']); ?></td>
       <td><?php echo dashboard_escape(dashboard_format_fcfa($repayment['amount'], false)); ?></td>
       <td><?php echo dashboard_escape($repayment['date']); ?></td>
-      <td><span class="status-badge <?php echo dashboard_escape($repayment['status_class']); ?>"><?php echo dashboard_escape($repayment['status_label']); ?></span></td>
+      <td><span id="repaymentStatus<?php echo $index; ?>" class="status-badge <?php echo dashboard_escape($repayment['status_class']); ?>"><?php echo dashboard_escape($repayment['status_label']); ?></span></td>
+      <td>
+        <form method="POST" action="/dashboard/institution/repayments/record" class="inline-form" style="display:inline;">
+          <?php echo csrf_field(); ?>
+          <input type="hidden" name="project_id" value="<?php echo dashboard_escape($repayment['id']); ?>">
+          <input type="hidden" name="amount" value="<?php echo dashboard_escape($repayment['amount']); ?>">
+          <button type="submit" class="btn-dashboard outline sm">
+            <span>Enregistrer remboursement</span>
+          </button>
+        </form>
+      </td>
     </tr>
 <?php endforeach; ?>
   </tbody>
@@ -97,9 +108,10 @@ include __DIR__ . '/components/institution_page_start.php';
             $table_title = 'Remboursements reçus';
             $table_id = 'institutionRepayments';
             $table_search_placeholder = 'Rechercher un remboursement';
-            $table_pagination = '<button class="dashboard-page-btn page-btn active">1</button><button class="dashboard-page-btn page-btn">2</button><button class="dashboard-page-btn page-btn">3</button>';
+            $table_auto_paginate = true;
             include __DIR__ . '/components/data_table.html';
             ?>
+            <p id="repaymentFeedback" class="institution-page-subtle mt-3" hidden>Notifications envoyées à l admin, au porteur et au prêteur.</p>
           </div>
         </div>
 <?php include __DIR__ . '/components/institution_page_end.php'; ?>

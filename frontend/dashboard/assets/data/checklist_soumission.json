@@ -1,0 +1,8 @@
+{
+  "items": [
+    { "label": "Resume executif complete", "completed": true },
+    { "label": "Projection de tresorerie sur 12 a 18 mois", "completed": true },
+    { "label": "Garanties et justificatifs juridiques", "completed": false },
+    { "label": "Plan d execution et calendrier de decaissement", "completed": false }
+  ]
+}

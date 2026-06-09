@@ -15,7 +15,7 @@ include __DIR__ . '/components/admin_page_start.php';
             <?php
             ob_start();
             ?>
-<table class="table dashboard-table data-table align-middle">
+<table class="table dashboard-table data-table align-middle" data-items-per-page="10">
   <thead>
     <tr>
       <th>Utilisateur</th>
@@ -40,7 +40,7 @@ include __DIR__ . '/components/admin_page_start.php';
             $table_title = 'Historique système';
             $table_id = 'adminAuditLogs';
             $table_search_placeholder = 'Rechercher une action';
-            $table_pagination = '<button class="dashboard-page-btn page-btn active">1</button><button class="dashboard-page-btn page-btn">2</button><button class="dashboard-page-btn page-btn">3</button>';
+            $table_auto_paginate = true;
             include __DIR__ . '/components/data_table.html';
             ?>
           </div>

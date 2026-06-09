@@ -35,9 +35,17 @@ include __DIR__ . '/components/porteur_page_start.php';
               </div>
 
               <div class="text-center mt-4">
-                <button type="button" class="dashboard-btn-primary btn-dashboard primary">
+                <button type="button" id="btn-edit-profile" class="dashboard-btn-primary btn-dashboard primary">
                   <i class="bi bi-pencil-square"></i>
                   <span>Modifier profil</span>
+                </button>
+                <button type="button" id="btn-save-profile" class="dashboard-btn-primary btn-dashboard primary" style="display: none;">
+                  <i class="bi bi-check"></i>
+                  <span>Sauvegarder</span>
+                </button>
+                <button type="button" id="btn-cancel-profile" class="btn-dashboard outline" style="display: none;">
+                  <i class="bi bi-x"></i>
+                  <span>Annuler</span>
                 </button>
               </div>
             </section>
@@ -51,19 +59,27 @@ include __DIR__ . '/components/porteur_page_start.php';
               <div class="row g-3">
                 <div class="col-12 col-md-6">
                   <label class="form-label">Nom</label>
-                  <input type="text" class="form-control" value="<?php echo porteur_escape($profile['name']); ?>" readonly />
+                  <input type="text" id="profile-name" class="form-control" value="<?php echo porteur_escape($profile['name']); ?>" readonly />
                 </div>
                 <div class="col-12 col-md-6">
                   <label class="form-label">Email</label>
-                  <input type="email" class="form-control" value="<?php echo porteur_escape($profile['email']); ?>" readonly />
+                  <input type="email" id="profile-email" class="form-control" value="<?php echo porteur_escape($profile['email']); ?>" readonly />
                 </div>
                 <div class="col-12 col-md-6">
                   <label class="form-label">Telephone</label>
-                  <input type="text" class="form-control" value="<?php echo porteur_escape($profile['phone']); ?>" readonly />
+                  <input type="text" id="profile-phone" class="form-control" value="<?php echo porteur_escape($profile['phone']); ?>" readonly />
                 </div>
                 <div class="col-12 col-md-6">
                   <label class="form-label">Organisation</label>
-                  <input type="text" class="form-control" value="<?php echo porteur_escape($profile['organisation']); ?>" readonly />
+                  <input type="text" id="profile-organisation" class="form-control" value="<?php echo porteur_escape($profile['organisation'] ?? ''); ?>" readonly />
+                </div>
+                <div class="col-12">
+                  <label class="form-label">Bio</label>
+                  <textarea id="profile-bio" class="form-control" rows="3" readonly><?php echo porteur_escape($profile['bio'] ?? ''); ?></textarea>
+                </div>
+                <div class="col-12">
+                  <label class="form-label">Localisation</label>
+                  <input type="text" id="profile-location" class="form-control" value="<?php echo porteur_escape($profile['location'] ?? ''); ?>" readonly />
                 </div>
                 <div class="col-12">
                   <label class="form-label">Photo profil</label>

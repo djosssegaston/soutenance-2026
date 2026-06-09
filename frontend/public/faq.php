@@ -5,6 +5,47 @@ include 'header.php';
     :root {
         --primary-color-1: var(--primary-color-3);
     }
+    @media (max-width: 991px) {
+        .faq__three .row > .col-xl-6 {
+            margin-bottom: 30px;
+        }
+        .faq__three.pt-100.pb-100 {
+            padding: 60px 0;
+        }
+    }
+    @media (max-width: 767px) {
+        .faq-collapse-item-card-header h6 {
+            font-size: 14px;
+        }
+        .faq-collapse-item-card-header-content p {
+            font-size: 14px;
+        }
+        .faq__three.pt-100.pb-100 {
+            padding: 40px 0;
+        }
+    }
+    @media (max-width: 575px) {
+        .faq-collapse-item-card-header h6 {
+            font-size: 13px;
+        }
+        .faq-collapse-item-card-header {
+            padding: 14px 16px;
+        }
+        .faq-collapse-item-card-header-content {
+            padding: 0 16px 14px;
+        }
+        .faq__three.pt-100.pb-100 {
+            padding: 30px 0;
+        }
+    }
+    @media (max-width: 400px) {
+        .faq-collapse-item-card-header h6 {
+            font-size: 12px;
+        }
+        .faq-collapse-item-card-header-content p {
+            font-size: 13px;
+        }
+    }
 </style>
 
 <body>
@@ -13,7 +54,7 @@ include 'header.php';
 		<div class="container">
 			<div class="breadcrumb__area-content">
 				<h2>FAQ</h2> <span>
-                        <a href="index.html">
+                        <a href="index.php">
                             <i class="fas fa-home"></i>
                             Accueil
                         </a>

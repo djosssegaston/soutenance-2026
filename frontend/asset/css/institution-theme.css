@@ -175,6 +175,7 @@ a:focus,
 .nav-tabs .nav-link.active,
 .form-check-input:checked,
 .form-check-input[type="checkbox"]:indeterminate {
+  color: #fff !important;
   background-color: var(--porteur-accent) !important;
   border-color: var(--porteur-accent) !important;
 }
@@ -416,7 +417,7 @@ body .app-sidebar:not(.horizontal-main) .sidebar-logout__link:focus .side-menu__
   }
 
   body .app-sidebar:not(.horizontal-main) .sidebar-logout {
-    padding: 16px 16px calc(110px + env(safe-area-inset-bottom));
+    padding: 16px 16px 16px;
   }
 }
 
@@ -429,5 +430,27 @@ body .app-sidebar:not(.horizontal-main) .sidebar-logout__link:focus .side-menu__
     min-height: 54px;
     padding-inline: 14px;
     border-radius: 16px;
+  }
+}
+
+/* ── ── SIDEBAR TOUJOURS AU-DESSUS DU HEADER/FOOTER ── ── */
+body .app-sidebar {
+  z-index: 1060 !important;
+}
+
+/* ── ── FOOTER FIXE (toutes les pages dashboard) ── ──
+     Le footer ne doit JAMAIS cacher un élément ni empiéter sur la zone de la
+     sidebar. Sur desktop il est fixed au bottom et commence après la sidebar ;
+     sur mobile il reste dans le flux.                                         */
+@media (min-width: 992px) {
+  .footer {
+    position: fixed;
+    bottom: 0;
+    inset-inline-start: 270px;
+    right: 0;
+    z-index: 50;
+  }
+  body {
+    padding-bottom: 60px;
   }
 }
