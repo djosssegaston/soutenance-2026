@@ -194,9 +194,9 @@ $(document).ready(function() {
               <section class="dashboard-card hover-lift mb-3 p-3">
                 <div class="d-flex justify-content-between align-items-center">
                   <div>
-                    <h6 class="mb-1">${p.project?.titre || 'N/A'}</h6>
+                    <h6 class="mb-1">${p.project?.titre || ''}</h6>
                     <p class="mb-1 text-muted small">
-                      <strong>${p.institution?.nom || 'N/A'}</strong> propose 
+                      <strong>${p.institution?.nom || ''}</strong> propose 
                       ${(p.montant_propose || 0).toLocaleString('fr-FR')} FCFA
                       &agrave; ${p.taux_interet || 0}% sur ${p.duree || 0} mois
                     </p>

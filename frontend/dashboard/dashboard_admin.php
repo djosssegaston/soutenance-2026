@@ -277,7 +277,7 @@ $dashboard_user_role = "Administrateur plateforme";
     <tr>
       <td>PRJ-<?php echo str_pad($p->id, 3, '0', STR_PAD_LEFT); ?></td>
       <td><?php echo htmlspecialchars($p->titre); ?></td>
-      <td><?php echo htmlspecialchars($p->owner->name ?? 'N/A'); ?></td>
+      <td><?php echo htmlspecialchars($p->owner->name ?? ''); ?></td>
       <td><?php echo number_format($p->montant_demande, 0, ',', ' '); ?> FCFA</td>
       <td><span class="status-badge <?php echo $statusEnum->badgeClass(); ?>"><?php echo $statusEnum->label(); ?></span></td>
     </tr>

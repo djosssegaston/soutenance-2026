@@ -382,15 +382,22 @@ Route::post('/contact/send', [\App\Http\Controllers\Api\ContactController::class
 // Webhook FedaPay (PUBLIC - pas d'authentification)
 Route::post('/fedapay/webhook', [PaymentController::class, 'webhook'])->name('fedapay.webhook');
 
+// Callback FedaPay (PUBLIC - appelé par FedaPay après paiement)
+Route::get('/payment/callback', [PaymentController::class, 'callback'])->name('payment.callback');
+
+// Pages de résultat de paiement (PUBLIC - FedaPay peut rediriger sans session)
+Route::get('/payment/success', [PaymentController::class, 'paymentSuccess'])->name('payment.success');
+Route::get('/payment/failed', [PaymentController::class, 'paymentFailed'])->name('payment.failed');
+
+// Bypass FedaPay sandbox (PUBLIC - permet de simuler le checkout)
+Route::match(['get', 'post'], '/payment/bypass-confirm/{transaction}', [PaymentController::class, 'bypassConfirm'])->name('payment.bypass.confirm');
+Route::get('/payment/bypass-cancel/{transaction}', [PaymentController::class, 'bypassCancel'])->name('payment.bypass.cancel');
+
 // Routes de paiement (AUTHENTIFIÉ)
 Route::middleware(['auth'])->group(function () {
     // Paiement projet
     Route::get('/payment/{project}', [PaymentController::class, 'showPaymentForm'])->name('payment.show');
     Route::post('/payment/{project}', [PaymentController::class, 'initiatePayment'])->name('payment.initiate');
-
-    // Callbacks
-    Route::get('/payment/success', [PaymentController::class, 'paymentSuccess'])->name('payment.success');
-    Route::get('/payment/failed', [PaymentController::class, 'paymentFailed'])->name('payment.failed');
 
     // API vérification statut
     Route::get('/payment/status/{transactionId}', [PaymentController::class, 'checkStatus'])->name('payment.status');

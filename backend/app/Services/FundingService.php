@@ -81,7 +81,7 @@ class FundingService
                 return [
                     'type' => 'statut',
                     'project_id' => $h->project_id,
-                    'project_titre' => $h->project->titre ?? 'N/A',
+                    'project_titre' => $h->project->titre ?? '',
                     'ancien_statut' => $h->old_status,
                     'nouveau_statut' => $h->new_status,
                     'raison' => $h->reason,
@@ -102,10 +102,10 @@ class FundingService
                 return [
                     'type' => 'transaction',
                     'project_id' => $t->project_id,
-                    'project_titre' => $t->project->titre ?? 'N/A',
+                    'project_titre' => $t->project->titre ?? '',
                     'montant' => (float) $t->amount,
-                    'methode' => $t->fedapay_payment_method ?? 'N/A',
-                    'reference' => $t->fedapay_transaction_id ?? 'N/A',
+                    'methode' => $t->fedapay_payment_method ?? '',
+                    'reference' => $t->fedapay_transaction_id ?? '',
                     'date' => ($t->paid_at ?? $t->created_at)->format('d M Y H:i'),
                     'timestamp' => ($t->paid_at ?? $t->created_at)->timestamp,
                 ];

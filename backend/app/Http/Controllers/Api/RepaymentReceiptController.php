@@ -4,13 +4,55 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\AuditLog;
+use App\Models\Echeance;
 use App\Models\Funding;
 use App\Models\Repayment;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class RepaymentReceiptController extends Controller
 {
+    public function getReceiptByEcheance($echeanceId)
+    {
+        $echeance = Echeance::findOrFail($echeanceId);
+
+        $repayment = Repayment::where('financement_id', $echeance->financement_id)
+            ->where('date_echeance', $echeance->date_echeance)
+            ->first();
+
+        if (! $repayment) {
+            return response()->json(['success' => false, 'message' => 'Aucun remboursement trouvé pour cette échéance.'], 404);
+        }
+
+        return $this->generateReceipt($repayment->id);
+    }
+
+    public function downloadReceiptPdf($echeanceId)
+    {
+        $echeance = Echeance::with(['project.owner', 'institution'])->findOrFail($echeanceId);
+
+        $repayment = Repayment::where('financement_id', $echeance->financement_id)
+            ->where('date_echeance', $echeance->date_echeance)
+            ->firstOrFail();
+
+        $receiptNumber = 'REC-'.str_pad((string) $repayment->id, 6, '0', STR_PAD_LEFT).'-'.$repayment->created_at?->format('Ymd');
+
+        $data = [
+            'receipt_number' => $receiptNumber,
+            'date' => now()->format('d/m/Y H:i'),
+            'project' => $echeance->project,
+            'porteur' => $echeance->project?->owner,
+            'repayment' => $repayment,
+            'institution' => $echeance->institution,
+            'generated_by' => auth()->user()?->name ?? 'Système',
+        ];
+
+        $pdf = Pdf::loadView('pdfs.receipt', $data);
+
+        return $pdf->download('facture_'.$repayment->id.'.pdf');
+    }
+
     public function generateReceipt($repaymentId)
     {
         $repayment = Repayment::with(['project.owner'])->findOrFail($repaymentId);
@@ -21,19 +63,19 @@ class RepaymentReceiptController extends Controller
             'receipt_number' => $receiptNumber,
             'date' => now()->format('d/m/Y H:i'),
             'project' => [
-                'title' => $repayment->project?->titre ?? 'N/A',
+                'title' => $repayment->project?->titre ?? '',
                 'code' => 'PRJ-'.str_pad((string) $repayment->project_id, 3, '0', STR_PAD_LEFT),
             ],
             'porteur' => [
-                'name' => $repayment->project?->owner?->name ?? 'N/A',
-                'email' => $repayment->project?->owner?->email ?? 'N/A',
+                'name' => $repayment->project?->owner?->name ?? '',
+                'email' => $repayment->project?->owner?->email ?? '',
             ],
             'repayment' => [
                 'montant_total' => (float) $repayment->montant_total,
                 'montant_rembourse' => (float) $repayment->montant_rembourse,
                 'montant_restant' => (float) ($repayment->montant_restant ?? $repayment->montant_total - $repayment->montant_rembourse),
-                'date_echeance' => $repayment->date_echeance?->format('d/m/Y') ?? 'N/A',
-                'date_paiement' => $repayment->date_paiement?->format('d/m/Y') ?? 'N/A',
+                'date_echeance' => $repayment->date_echeance?->format('d/m/Y') ?? '',
+                'date_paiement' => $repayment->date_paiement?->format('d/m/Y') ?? '',
                 'statut' => $repayment->statut,
                 'statut_label' => $this->statusLabel($repayment->statut),
             ],
@@ -122,7 +164,7 @@ class RepaymentReceiptController extends Controller
             ->get()
             ->map(fn ($r) => [
                 'id' => $r->id,
-                'project_title' => $r->project?->titre ?? 'N/A',
+                'project_title' => $r->project?->titre ?? '',
                 'montant_due' => (float) $r->montant_total,
                 'montant_restant' => (float) ($r->montant_restant ?? $r->montant_total),
                 'date_echeance' => $r->date_echeance?->format('d/m/Y'),
@@ -153,8 +195,8 @@ class RepaymentReceiptController extends Controller
             ->get()
             ->map(fn ($r) => [
                 'id' => $r->id,
-                'project_title' => $r->project?->titre ?? 'N/A',
-                'porteur_name' => $r->project?->owner?->name ?? 'N/A',
+                'project_title' => $r->project?->titre ?? '',
+                'porteur_name' => $r->project?->owner?->name ?? '',
                 'montant_due' => (float) $r->montant_total,
                 'montant_restant' => (float) ($r->montant_restant ?? $r->montant_total),
                 'date_echeance' => $r->date_echeance?->format('d/m/Y'),
@@ -207,7 +249,7 @@ class RepaymentReceiptController extends Controller
     {
         AuditLog::log(
             auth()->id(),
-            'Reçu de remboursement généré: #'.$repayment->id.' ('.($repayment->project?->titre ?? 'N/A').')',
+            'Reçu de remboursement généré: #'.$repayment->id.' ('.($repayment->project?->titre ?? '').')',
             'bi-receipt',
             'info',
             'info'

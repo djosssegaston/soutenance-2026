@@ -78,22 +78,26 @@ $totalRembourse = $dashboardData['repayment_stats']['total_rembourse'] ?? 0;
 $recentProjects = $dashboardData['recent_projects'] ?? collect();
 
 $projectsJson = $recentProjects->map(function ($p) {
-    $isFinanced = ($p->montant_finance > 0) || $p->financements->isNotEmpty();
+    $aFundingDecaisse = $p->financements->contains(fn($f) => in_array($f->statut, ['disbursed', 'active']));
+    $aFundingPropose = $p->financements->contains(fn($f) => in_array($f->statut, ['proposed', 'awaiting_borrower_plan', 'awaiting_imf_validation']));
+    $isFinanced = ($p->montant_finance > 0) || $aFundingDecaisse;
     $status = $isFinanced
         ? ['label' => 'Projet déjà financé', 'color' => 'success']
-        : dashboard02_project_status_badge($p->statut ?? 'draft');
+        : ($aFundingPropose
+            ? ['label' => 'Financement proposé', 'color' => 'info']
+            : dashboard02_project_status_badge($p->statut ?? 'draft'));
     return [
         'id' => $p->id,
         'titre' => $p->titre,
-        'secteur' => $p->secteur ?? 'N/A',
+        'secteur' => $p->secteur ?? '',
         'montant_demande' => (float) ($p->montant_demande ?? 0),
         'montant_finance' => (float) ($p->montant_finance ?? 0),
         'statut' => $p->statut,
         'statut_label' => $status['label'],
         'statut_color' => $status['color'],
         'description' => $p->description ?? '',
-        'created_at' => $p->created_at ? $p->created_at->format('d M Y') : 'N/A',
-        'updated_at' => $p->updated_at ? $p->updated_at->format('d M Y') : 'N/A',
+        'created_at' => $p->created_at ? $p->created_at->format('d M Y') : '',
+        'updated_at' => $p->updated_at ? $p->updated_at->format('d M Y') : '',
         'institution_nom' => $p->financements->first()?->institution?->nom ?? '',
         'progression' => ($p->montant_demande ?? 0) > 0 ? (int) round((($p->montant_finance ?? 0) / ($p->montant_demande ?? 1)) * 100) : 0,
         'can_edit' => (\App\Enums\ProjectStatus::fromStorage($p->statut))?->canOwnerModify() ?? false,
@@ -253,11 +257,22 @@ $projectsJson = $recentProjects->map(function ($p) {
                                                         </div>
                                                     </td>
                                                     <td>
-                                                        <?php if ($project->montant_finance > 0 || $project->financements->isNotEmpty()): ?>
-                                                            <span class="badge bg-success-transparent rounded-pill text-success p-2 px-3">Projet déjà financé</span>
-                                                        <?php else: ?>
-                                                            <span class="badge bg-<?php echo $status['color']; ?>-transparent rounded-pill text-<?php echo $status['color']; ?> p-2 px-3"><?php echo dashboard02_escape($status['label']); ?></span>
-                                                        <?php endif; ?>
+<?php
+    $aFundingDecaisse = $project->financements->contains(fn($f) => in_array($f->statut, ['disbursed', 'active']));
+    $aFundingPropose = $project->financements->contains(fn($f) => in_array($f->statut, ['proposed', 'awaiting_borrower_plan', 'awaiting_imf_validation']));
+    $isFinanced = ($project->montant_finance > 0) || $aFundingDecaisse;
+    if ($isFinanced):
+        $badgeLabel = 'Projet déjà financé';
+        $badgeColor = 'success';
+    elseif ($aFundingPropose):
+        $badgeLabel = 'Financement proposé';
+        $badgeColor = 'info';
+    else:
+        $badgeLabel = $status['label'];
+        $badgeColor = $status['color'];
+    endif;
+    ?>
+    <span class="badge bg-<?php echo $badgeColor; ?>-transparent rounded-pill text-<?php echo $badgeColor; ?> p-2 px-3"><?php echo dashboard02_escape($badgeLabel); ?></span>
                                                     </td>
                                                     <td>
                                                         <div class="g-1">

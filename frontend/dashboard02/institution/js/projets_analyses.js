@@ -210,7 +210,7 @@ async function viewAnalysisDetails(id) {
                                 </div>
                             </div>
                             <h6>Description du projet</h6>
-                            <p class="text-muted">${analysis.project.description || 'N/A'}</p>
+                            <p class="text-muted">${analysis.project.description || ''}</p>
 
                             <h6 class="mt-4">Documents Attachés</h6>
                             ${docListHtml}

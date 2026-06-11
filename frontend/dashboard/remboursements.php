@@ -26,9 +26,9 @@ foreach ($repayments as $repayment) {
 }
 
 $latestPaidAmount = $latestPaid ? porteur_format_fcfa($latestPaid['amount'], false) : '0 FCFA';
-$latestPaidDate = $latestPaid ? $latestPaid['date'] : 'N/A';
+$latestPaidDate = $latestPaid ? $latestPaid['date'] : '';
 $nextPendingAmount = $nextPending ? porteur_format_fcfa($nextPending['amount'], false) : '0 FCFA';
-$nextPendingDate = $nextPending ? $nextPending['date'] : 'N/A';
+$nextPendingDate = $nextPending ? $nextPending['date'] : '';
 
 $page_title = 'Remboursements';
 $page_subtitle = 'Visualisez l historique des paiements et les echeances sous surveillance.';

@@ -99,10 +99,12 @@ class AdminProjectController extends Controller
         }
         $project->audits = $audits;
 
-        $isFinanced = ($project->montant_finance > 0) || $project->financements->isNotEmpty();
+        $aFundingDecaisse = $project->financements->contains(fn ($f) => in_array($f->statut, ['disbursed', 'active']));
+        $aFundingPropose = $project->financements->contains(fn ($f) => in_array($f->statut, ['proposed', 'awaiting_borrower_plan', 'awaiting_imf_validation']));
+        $isFinanced = ($project->montant_finance > 0) || $aFundingDecaisse;
         $data = $project->toArray();
-        $data['statut_label'] = $isFinanced ? 'Projet déjà financé' : $this->getStatusLabel($project->statut ?? 'draft');
-        $data['statut_color'] = $isFinanced ? 'success' : $this->getStatusColor($project->statut ?? 'draft');
+        $data['statut_label'] = $isFinanced ? 'Projet déjà financé' : ($aFundingPropose ? 'Financement proposé' : $this->getStatusLabel($project->statut ?? 'draft'));
+        $data['statut_color'] = $isFinanced ? 'success' : ($aFundingPropose ? 'info' : $this->getStatusColor($project->statut ?? 'draft'));
         $data['is_financed'] = $isFinanced;
 
         return response()->json([

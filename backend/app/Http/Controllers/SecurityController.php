@@ -54,7 +54,7 @@ class SecurityController extends Controller
 
                 return [
                     'id' => $session->id,
-                    'ip_address' => $session->ip_address ?? 'N/A',
+                    'ip_address' => $session->ip_address ?? '',
                     'device' => $agent['device'],
                     'browser' => $agent['browser'],
                     'platform' => $agent['platform'],
@@ -120,8 +120,8 @@ class SecurityController extends Controller
                     'action' => $action['label'],
                     'icon' => $action['icon'],
                     'color' => $action['color'],
-                    'ip' => $log->ip ?? 'N/A',
-                    'date' => $log->date ? $log->date->format('d M Y H:i') : ($log->created_at ? $log->created_at->format('d M Y H:i') : 'N/A'),
+                    'ip' => $log->ip ?? '',
+                    'date' => $log->date ? $log->date->format('d M Y H:i') : ($log->created_at ? $log->created_at->format('d M Y H:i') : ''),
                 ];
             });
 
@@ -200,8 +200,8 @@ class SecurityController extends Controller
                 ->limit(5)
                 ->get()
                 ->map(fn ($log) => [
-                    'date' => $log->date ? $log->date->format('d M Y H:i') : ($log->created_at ? $log->created_at->format('d M Y H:i') : 'N/A'),
-                    'ip' => $log->ip ?? 'N/A',
+                    'date' => $log->date ? $log->date->format('d M Y H:i') : ($log->created_at ? $log->created_at->format('d M Y H:i') : ''),
+                    'ip' => $log->ip ?? '',
                 ])
         );
     }

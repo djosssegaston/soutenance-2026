@@ -72,7 +72,7 @@ class InstitutionProjectController extends Controller
                 'description' => $project->description,
                 'secteur' => $project->secteur,
                 'ville' => $project->localisation,
-                'porteur' => $project->owner ? $project->owner->name : 'N/A',
+                'porteur' => $project->owner?->name ?? '',
                 'budget_total' => (float) $project->montant_demande,
                 'montant_finance' => (float) $project->montant_finance,
                 'progression' => $project->montant_demande > 0 ? round(($project->montant_finance / $project->montant_demande) * 100) : 0,

@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\Api;
 
 use App\Enums\FundingStatus;
+use App\Enums\ProjectStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Funding;
 use App\Models\Institution;
 use App\Models\Project;
+use App\Models\Transaction;
 use App\Services\EcheanceService;
+use App\Services\FedaPayService;
 use App\Services\FinancingWorkflowService;
 use App\Services\FundingManagementService;
 use Illuminate\Http\Request;
@@ -20,14 +23,18 @@ class InstitutionFundingController extends Controller
 
     protected EcheanceService $echeanceService;
 
+    protected FedaPayService $fedaPayService;
+
     public function __construct(
         FundingManagementService $fundingService,
         FinancingWorkflowService $workflow,
         EcheanceService $echeanceService,
+        FedaPayService $fedaPayService,
     ) {
         $this->fundingService = $fundingService;
         $this->workflow = $workflow;
         $this->echeanceService = $echeanceService;
+        $this->fedaPayService = $fedaPayService;
     }
 
     private function getInstitution(Request $request): ?Institution
@@ -120,13 +127,51 @@ class InstitutionFundingController extends Controller
             'conditions' => 'nullable|string',
             'frais' => 'nullable|string',
             'commentaires' => 'nullable|string',
+            'confirm_overfunding' => 'nullable|in:0,1',
         ]);
 
-        if ($this->fundingService->checkOverfunding($data['project_id'], $data['montant_propose'])) {
-            return response()->json(['message' => 'Risque de surfinancement détecté pour ce projet.'], 422);
-        }
-
         $project = Project::findOrFail($data['project_id']);
+
+        $overfundingDetected = $this->fundingService->checkOverfunding(
+            $project->id,
+            (float) $data['montant_propose']
+        );
+
+        if ($overfundingDetected) {
+            $confirmOverfunding = $data['confirm_overfunding'] ?? null;
+
+            if ($confirmOverfunding === null) {
+                // Première soumission : retourner un avertissement
+                $currentTotal = (float) $project->financements()
+                    ->whereIn('statut', [
+                        FundingStatus::PROPOSED->value,
+                        FundingStatus::AWAITING_BORROWER_PLAN->value,
+                        FundingStatus::AWAITING_IMF_VALIDATION->value,
+                        FundingStatus::APPROVED->value,
+                        FundingStatus::DISBURSED->value,
+                        FundingStatus::ACTIVE->value,
+                    ])
+                    ->sum('montant_propose');
+
+                return response()->json([
+                    'overfunding_warning' => true,
+                    'message' => 'Le montant total des financements dépasserait le montant demandé pour ce projet.',
+                    'existing_total' => $currentTotal,
+                    'proposed_amount' => (float) $data['montant_propose'],
+                    'max_allowed' => (float) $project->montant_demande,
+                ], 409);
+            }
+
+            if ($confirmOverfunding === '0') {
+                // L'IMF refuse le surfinancement → projet reprend "En cours d'analyse"
+                $project->update(['statut' => ProjectStatus::UNDER_INSTITUTION_REVIEW->value]);
+
+                return response()->json([
+                    'message' => 'Proposition de financement annulée. Le projet reprend le statut "En cours d\'analyse".',
+                ]);
+            }
+            // confirm_overfunding === '1' → continuer (surcharge acceptée)
+        }
 
         if (! $project->peutEtreFinance()) {
             $statusLabel = $project->statusEnum()->label();
@@ -158,15 +203,52 @@ class InstitutionFundingController extends Controller
         $funding = Funding::where('institution_id', $institution->id)->findOrFail($id);
 
         try {
-            $funding = $this->workflow->imfApprouverPlan($request->user(), $funding);
+            $bypassActive = $this->fedaPayService->isBypassActive();
+
+            $funding = $this->workflow->imfApprouverPlan(
+                $request->user(),
+                $funding,
+                skipDisbursement: $bypassActive
+            );
+
+            if ($bypassActive) {
+                // Créer une transaction de type disbursement pour le paiement IMF
+                $callbackUrl = url('/frontend/dashboard02/institution/financement.php').'?payment_status=pending';
+                $transaction = Transaction::create([
+                    'project_id' => $funding->project_id,
+                    'user_id' => $request->user()->id,
+                    'institution_id' => $institution->id,
+                    'type' => 'disbursement',
+                    'amount' => (float) $funding->montant_propose,
+                    'currency' => 'XOF',
+                    'status' => 'pending',
+                    'metadata' => [
+                        'financement_id' => $funding->id,
+                        'project_title' => $funding->project->titre,
+                        'institution_name' => $institution->nom,
+                        'initiated_at' => now()->toIso8601String(),
+                        'sandbox_bypass' => true,
+                    ],
+                ]);
+
+                $paymentUrl = $this->fedaPayService->bypassPaymentUrl($transaction, $callbackUrl);
+
+                return response()->json([
+                    'message' => 'Plan approuvé. Veuillez procéder au paiement pour finaliser le décaissement.',
+                    'funding' => $funding,
+                    'payment_url' => $paymentUrl,
+                    'transaction_id' => $transaction->id,
+                    'amount' => (float) $funding->montant_propose,
+                ]);
+            }
+
+            return response()->json([
+                'message' => 'Plan approuvé, financement décaissé et échéancier généré.',
+                'funding' => $funding->load(['echeances']),
+            ]);
         } catch (\RuntimeException $e) {
             return response()->json(['message' => $e->getMessage()], 422);
         }
-
-        return response()->json([
-            'message' => 'Plan approuvé, financement décaissé et échéancier généré.',
-            'funding' => $funding->load(['echeances']),
-        ]);
     }
 
     public function rejectPlan(Request $request, $id)
@@ -245,6 +327,36 @@ class InstitutionFundingController extends Controller
         }
 
         $funding = Funding::where('institution_id', $institution->id)->findOrFail($id);
+
+        // Si bypass actif et funding approuvé, initier un paiement bypass
+        if ($this->fedaPayService->isBypassActive() && $funding->statut === FundingStatus::APPROVED->value) {
+            $callbackUrl = url('/frontend/dashboard02/institution/financement.php').'?payment_status=pending';
+            $transaction = Transaction::create([
+                'project_id' => $funding->project_id,
+                'user_id' => $request->user()->id,
+                'institution_id' => $institution->id,
+                'type' => 'disbursement',
+                'amount' => (float) $funding->montant_propose,
+                'currency' => 'XOF',
+                'status' => 'pending',
+                'metadata' => [
+                    'financement_id' => $funding->id,
+                    'project_title' => $funding->project->titre,
+                    'institution_name' => $institution->nom,
+                    'initiated_at' => now()->toIso8601String(),
+                    'sandbox_bypass' => true,
+                ],
+            ]);
+
+            $paymentUrl = $this->fedaPayService->bypassPaymentUrl($transaction, $callbackUrl);
+
+            return response()->json([
+                'message' => 'Veuillez procéder au paiement pour finaliser le décaissement.',
+                'payment_url' => $paymentUrl,
+                'transaction_id' => $transaction->id,
+                'amount' => (float) $funding->montant_propose,
+            ]);
+        }
 
         if ($funding->statut !== FundingStatus::APPROVED->value) {
             return response()->json(['message' => 'Le financement doit être approuvé avant décaissement.'], 422);

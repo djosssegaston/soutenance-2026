@@ -18,54 +18,41 @@ class EcheanceService
     {
         $capital = (float) ($funding->montant_valide ?: $funding->montant_propose);
         $tauxAnnuel = (float) $funding->taux_interet;
-        $dureeMois = (int) ($funding->duree ?: 1);
         $montantMensuel = (float) ($funding->montant_mensuel ?: 0);
         $jourRemboursement = (int) ($funding->jour_remboursement ?: 1);
         $dateDecaissement = $funding->date_decaissement
             ? Carbon::parse($funding->date_decaissement)
             : now();
 
-        $tauxMensuel = ($tauxAnnuel / 100) / 12;
-        $interetsTotal = $capital * $tauxMensuel * $dureeMois;
-        $montantTotalARembourser = $capital + $interetsTotal;
-
         if ($montantMensuel <= 0) {
-            $montantMensuel = $dureeMois > 0
-                ? round($montantTotalARembourser / $dureeMois, 2)
-                : $montantTotalARembourser;
+            throw new \InvalidArgumentException('Le montant mensuel doit être supérieur à 0.');
         }
 
-        $nombreEcheances = (int) ceil($montantTotalARembourser / $montantMensuel);
-        if ($nombreEcheances <= 0) {
-            $nombreEcheances = $dureeMois;
-        }
-        // Cap at duree max and adjust last installment
-        if ($nombreEcheances > $dureeMois) {
-            $nombreEcheances = $dureeMois;
-        }
+        // Nombre d'échéances = capital / montant mensuel (part_ capital fixe)
+        $nombreEcheances = (int) ceil($capital / $montantMensuel);
+
+        // Taux d'intérêt par échéance = taux annuel / nombre d'échéances
+        $tauxParEcheance = ($tauxAnnuel / 100) / $nombreEcheances;
 
         $capitalRestant = $capital;
         $echeances = [];
 
         DB::beginTransaction();
         try {
-            // Remove old echeances and corresponding repayments before regenerating
             $funding->echeances()->delete();
             Repayment::where('financement_id', $funding->id)->delete();
 
             for ($i = 1; $i <= $nombreEcheances; $i++) {
                 $dateEcheance = $this->calculerDateEcheance($dateDecaissement, $i, $jourRemboursement);
 
-                $interetsEcheance = round($capitalRestant * $tauxMensuel, 2);
+                // Intérêts sur le capital restant au taux de la période
+                $interetsEcheance = round($capitalRestant * $tauxParEcheance, 2);
 
-                // Last installment: take all remaining capital
+                // Dernière échéance : tout le capital restant
                 if ($i === $nombreEcheances) {
                     $capitalEcheance = round($capitalRestant, 2);
                 } else {
-                    $capitalEcheance = round(max(0, $montantMensuel - $interetsEcheance), 2);
-                    if ($capitalEcheance > $capitalRestant) {
-                        $capitalEcheance = $capitalRestant;
-                    }
+                    $capitalEcheance = round(min($montantMensuel, $capitalRestant), 2);
                 }
 
                 $montantEcheance = round($capitalEcheance + $interetsEcheance, 2);
@@ -94,7 +81,6 @@ class EcheanceService
 
                 $echeances[] = $echeance;
 
-                // Also create a Repayment record so it appears on institution/admin dashboards
                 $repaymentStatus = match ($statut) {
                     'paid' => 'paye',
                     'overdue' => 'en_retard',
@@ -135,7 +121,8 @@ class EcheanceService
             Log::info('Échéancier généré', [
                 'financement_id' => $funding->id,
                 'nombre_echeances' => count($echeances),
-                'total' => $montantTotalARembourser,
+                'capital' => $capital,
+                'taux_par_echeance' => $tauxParEcheance,
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -219,14 +206,24 @@ class EcheanceService
             default => 'en_attente',
         };
 
-        Repayment::where('financement_id', $echeance->financement_id)
-            ->where('date_echeance', $echeance->date_echeance)
-            ->update([
+        Repayment::updateOrCreate(
+            [
+                'financement_id' => $echeance->financement_id,
+                'date_echeance' => $echeance->date_echeance,
+            ],
+            [
+                'project_id' => $echeance->project_id,
+                'institution_id' => $echeance->institution_id,
+                'montant_total' => $montantTotal,
                 'montant_rembourse' => $nouveauPaye,
                 'montant_restant' => round(max(0, $montantTotal - $nouveauPaye), 2),
                 'statut' => $repaymentStatus,
                 'penalites' => $echeance->penalites ?? 0,
-            ]);
+                'niveau_risque' => $repaymentStatus === 'en_retard' ? 'eleve' : 'faible',
+                'methode_paiement' => $methode,
+                'transaction_reference' => $reference,
+            ]
+        );
 
         $funding = $echeance->funding;
         $this->verifierCompletionFinancement($funding);

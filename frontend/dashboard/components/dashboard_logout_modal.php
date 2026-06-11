@@ -1,7 +1,7 @@
 <?php require_once __DIR__ . '/../../includes/path_helpers.php'; ?>
 <?php
 $logoutUserName = isset($dashboard_user_name) ? $dashboard_user_name : 'Utilisateur';
-$logoutUserId = isset($dashboard_user_id) ? $dashboard_user_id : 'N/A';
+$logoutUserId = $dashboard_user_id ?? '';
 $logoutUserRole = isset($dashboard_user_role) ? $dashboard_user_role : 'Utilisateur';
 ?>
 <div class="modal fade dashboard-logout-modal" id="dashboardLogoutModal" tabindex="-1" aria-labelledby="dashboardLogoutModalLabel" aria-hidden="true">

@@ -275,10 +275,10 @@ function renderRecentProjects(projects) {
                 <h6 class="mb-0 fw-semibold fs-13">${p.titre}</h6>
                 <small class="text-muted fs-11">REF: ${p.id}</small>
             </td>
-            <td><span class="fs-13">${p.owner || p.owner_name || 'N/A'}</span></td>
+            <td><span class="fs-13">${p.owner || p.owner_name || ''}</span></td>
             <td><span class="fw-bold">${new Intl.NumberFormat('fr-FR').format(p.montant || p.montant_demande || 0)} FCFA</span></td>
             <td><span class="badge bg-${(p.risk === 'critique' || p.risk === 'critique') ? 'danger' : 'warning'}-transparent text-${(p.risk === 'critique' || p.risk === 'critique') ? 'danger' : 'warning'}">${(p.risk || 'modere').toUpperCase()}</span></td>
-            <td><span class="badge bg-${p.statut_color || 'primary'}-transparent text-${p.statut_color || 'primary'}">${p.statut_label || p.statut || 'N/A'}</span></td>
+            <td><span class="badge bg-${p.statut_color || 'primary'}-transparent text-${p.statut_color || 'primary'}">${p.statut_label || p.statut || ''}</span></td>
             <td>
                 <div class="btn-list">
                     <button class="btn btn-sm btn-icon btn-primary-light rounded-circle btn-view-project" title="Voir" data-id="${p.id}"><i class="fe fe-eye"></i></button>
@@ -332,18 +332,20 @@ async function openProjectDetail(id) {
         document.getElementById('modal-detail-title').textContent = p.titre || 'Détail Projet';
         document.getElementById('md-ref').textContent = '#' + p.id;
         document.getElementById('md-description').innerHTML = p.description || 'Aucune description';
-        document.getElementById('md-owner').textContent = p.owner?.name || 'N/A';
+        document.getElementById('md-owner').textContent = p.owner?.name || '';
         document.getElementById('md-email').textContent = p.owner?.email || '';
-        document.getElementById('md-secteur').textContent = p.secteur || 'N/A';
+        document.getElementById('md-secteur').textContent = p.secteur || '';
         document.getElementById('md-montant').textContent = new Intl.NumberFormat('fr-FR').format(p.montant_demande || 0) + ' FCFA';
-        var isFinanced = (parseFloat(p.montant_finance) > 0) || (p.financements && p.financements.length > 0);
-        var label = isFinanced ? 'Projet d\u00e9j\u00e0 financ\u00e9' : getStatusLabel(p.statut_label || p.statut || 'N/A');
-        var color = isFinanced ? 'success' : getStatusBadge(p.statut_color || p.statut || 'secondary');
+        var aFundingDecaisse = p.financements && p.financements.some(function(f) { return ['disbursed', 'active'].includes(f.statut); });
+        var aFundingPropose = p.financements && p.financements.some(function(f) { return ['proposed', 'awaiting_borrower_plan', 'awaiting_imf_validation'].includes(f.statut); });
+        var isFinanced = (parseFloat(p.montant_finance) > 0) || aFundingDecaisse;
+        var label = isFinanced ? 'Projet d\u00e9j\u00e0 financ\u00e9' : (aFundingPropose ? 'Financement propos\u00e9' : getStatusLabel(p.statut_label || p.statut || ''));
+        var color = isFinanced ? 'success' : (aFundingPropose ? 'info' : getStatusBadge(p.statut_color || p.statut || 'secondary'));
         var statutEl = document.getElementById('md-statut');
         statutEl.textContent = label;
         statutEl.className = 'badge fs-13 px-3 py-2 bg-' + color;
-        document.getElementById('md-created').textContent = p.created_at ? new Date(p.created_at).toLocaleDateString('fr-FR') : 'N/A';
-        document.getElementById('md-updated').textContent = p.updated_at ? new Date(p.updated_at).toLocaleDateString('fr-FR') : 'N/A';
+        document.getElementById('md-created').textContent = p.created_at ? new Date(p.created_at).toLocaleDateString('fr-FR') : '';
+        document.getElementById('md-updated').textContent = p.updated_at ? new Date(p.updated_at).toLocaleDateString('fr-FR') : '';
 
         const validateBtn = document.getElementById('md-validate-btn');
         validateBtn.dataset.id = id;

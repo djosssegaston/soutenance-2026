@@ -6,6 +6,8 @@ use App\Models\Project;
 use App\Models\Repayment;
 use App\Models\Transaction;
 use App\Models\User;
+use FedaPay\FedaPay;
+use FedaPay\Transaction as FedaPayTransaction;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -62,7 +64,7 @@ class RepaymentService
     /**
      * Initier un paiement de remboursement via FedaPay
      */
-    public function initiateRepaymentPayment(Repayment $repayment, User $user, array $customerData = []): array
+    public function initiateRepaymentPayment(Repayment $repayment, User $user, array $customerData = [], ?string $callbackUrl = null): array
     {
         // Vérifier que le remboursement appartient au porteur
         if ($repayment->project->user_id !== $user->id) {
@@ -74,14 +76,59 @@ class RepaymentService
             throw new \RuntimeException('Ce remboursement est déjà payé.');
         }
 
-        $fedapayService = new FedaPayService;
+        FedaPay::setApiKey(config('services.fedapay.secret_key'));
+        FedaPay::setEnvironment(config('services.fedapay.environment', 'sandbox'));
 
         $customerData = array_merge([
             'firstname' => $user->prenom ?? explode(' ', $user->name)[0],
             'lastname' => $user->nom ?? explode(' ', $user->name)[1] ?? 'Client',
             'email' => $user->email,
-            'phone' => $user->telephone ?? '22900000000',
+            'phone' => $user->telephone ?? '22997000001',
         ], $customerData);
+
+        $montant = $repayment->montant_restant ?: $repayment->montant_total;
+        $isSandbox = config('services.fedapay.environment') === 'sandbox';
+
+        // Bypass FedaPay en sandbox
+        if ($isSandbox && config('services.fedapay.sandbox_bypass') === true) {
+            $transaction = Transaction::create([
+                'project_id' => $repayment->project_id,
+                'user_id' => $user->id,
+                'institution_id' => $repayment->institution_id,
+                'type' => 'repayment',
+                'amount' => $montant,
+                'currency' => 'XOF',
+                'status' => 'pending',
+                'metadata' => [
+                    'repayment_id' => $repayment->id,
+                    'initiated_at' => now()->toIso8601String(),
+                    'sandbox_bypass' => true,
+                ],
+            ]);
+
+            $callbackUrl = $callbackUrl ?: route('payment.callback', ['transaction_id' => $transaction->id]);
+
+            Log::info('FedaPay bypass: repayment payment initiated', [
+                'transaction_id' => $transaction->id,
+                'amount' => $montant,
+            ]);
+
+            return [
+                'payment_url' => route('payment.bypass.confirm', [
+                    'transaction' => $transaction->id,
+                    'callback' => $callbackUrl,
+                ]),
+                'transaction_id' => $transaction->id,
+                'token' => 'bypass',
+            ];
+        }
+
+        if ($isSandbox) {
+            $customerData['phone'] = '66000001';
+            $customerData['email'] = 'sandbox-'.time().'@alogoto.com';
+        }
+
+        $phoneNumber = self::normalizePhone($customerData['phone'] ?? '22997000001');
 
         // Créer une transaction de type 'repayment'
         $transaction = Transaction::create([
@@ -89,7 +136,7 @@ class RepaymentService
             'user_id' => $user->id,
             'institution_id' => $repayment->institution_id,
             'type' => 'repayment',
-            'amount' => $repayment->montant_restant ?: $repayment->montant_total,
+            'amount' => $montant,
             'currency' => 'XOF',
             'status' => 'pending',
             'metadata' => [
@@ -99,25 +146,53 @@ class RepaymentService
         ]);
 
         try {
-            $result = $fedapayService->initiatePayment($repayment->project, $customerData);
+            // Générer l'URL de callback si non fournie
+            $callbackUrl = $callbackUrl ?: route('payment.callback', ['transaction_id' => $transaction->id]);
+
+            // Créer la transaction FedaPay avec le bon montant (pas le montant_demande du projet)
+            $fedapayData = [
+                'amount' => (int) round($montant),
+                'currency' => ['iso' => 'XOF'],
+                'description' => 'Remboursement projet: '.$repayment->project->titre,
+                'customer' => [
+                    'firstname' => $customerData['firstname'] ?? 'Client',
+                    'lastname' => $customerData['lastname'] ?? 'ALOGOTO',
+                    'email' => $customerData['email'] ?? 'client@alogoto.com',
+                    'phone_number' => [
+                        'number' => self::normalizePhone($customerData['phone'] ?? '22997000001'),
+                        'country' => 'bj',
+                    ],
+                ],
+                'callback_url' => $callbackUrl,
+                'metadata' => [
+                    'transaction_id' => $transaction->id,
+                    'repayment_id' => $repayment->id,
+                    'type' => 'repayment',
+                ],
+            ];
+
+            $fedapayTransaction = FedaPayTransaction::create($fedapayData);
+
+            $token = $fedapayTransaction->generateToken(['callback_url' => $callbackUrl]);
 
             $transaction->update([
-                'fedapay_transaction_id' => $result['transaction_id'],
+                'fedapay_transaction_id' => $fedapayTransaction->id,
                 'metadata' => array_merge($transaction->metadata ?? [], [
-                    'fedapay_token' => $result['token'],
+                    'fedapay_token' => $token->token,
                 ]),
             ]);
 
             Log::info('Repayment payment initiated', [
                 'repayment_id' => $repayment->id,
                 'transaction_id' => $transaction->id,
-                'amount' => $repayment->montant_restant ?: $repayment->montant_total,
+                'fedapay_id' => $fedapayTransaction->id,
+                'amount' => $montant,
             ]);
 
             return [
-                'payment_url' => $result['payment_url'],
+                'payment_url' => $token->url,
                 'transaction_id' => $transaction->id,
-                'token' => $result['token'],
+                'token' => $token->token,
             ];
 
         } catch (\Exception $e) {
@@ -225,5 +300,14 @@ class RepaymentService
         $dailyRate = config('services.fedapay.penalty_daily_rate', 0.001);
 
         return round((float) $repayment->montant_total * $dailyRate * $daysLate, 2);
+    }
+
+    private static function normalizePhone(?string $phone): string
+    {
+        if ($phone === null) {
+            return '22997000001';
+        }
+
+        return preg_replace('/[^0-9]/', '', $phone);
     }
 }

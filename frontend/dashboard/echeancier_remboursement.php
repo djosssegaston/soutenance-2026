@@ -88,7 +88,7 @@ $(document).ready(function() {
             const confirmation = echeance.statut === 'paid' ? 'Paiement confirmé' : 'En attente';
 
             const row = `<tr>
-              <td>${echeance.date_echeance || 'N/A'}</td>
+              <td>${echeance.date_echeance || ''}</td>
               <td>${parseFloat(echeance.montant_total || 0).toLocaleString('fr-FR')} FCFA</td>
               <td><span class="status-badge ${st.class}">${st.label}</span></td>
               <td>${confirmation}</td>

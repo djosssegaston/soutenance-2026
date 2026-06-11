@@ -27,7 +27,7 @@ class FundingReceived implements ShouldBroadcast
         return [
             'type' => 'funding',
             'title' => 'Financement reçu',
-            'message' => number_format($this->funding->montant).' FCFA pour '.($this->funding->project?->titre ?? 'N/A'),
+            'message' => number_format($this->funding->montant).' FCFA pour '.($this->funding->project?->titre ?? ''),
             'funding_id' => $this->funding->id,
             'project_id' => $this->funding->project_id,
             'montant' => $this->funding->montant,

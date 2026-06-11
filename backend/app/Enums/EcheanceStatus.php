@@ -9,6 +9,8 @@ enum EcheanceStatus: string
     case PAID = 'paid';
     case OVERDUE = 'overdue';
     case PARTIAL = 'partial';
+    case FAILED = 'failed';
+    case CANCELLED = 'cancelled';
 
     public function label(): string
     {
@@ -18,6 +20,8 @@ enum EcheanceStatus: string
             self::PAID => 'Payée',
             self::OVERDUE => 'En retard',
             self::PARTIAL => 'Partielle',
+            self::FAILED => 'Échec',
+            self::CANCELLED => 'Annulé',
         };
     }
 
@@ -29,6 +33,8 @@ enum EcheanceStatus: string
             self::PAID => 'success',
             self::OVERDUE => 'danger',
             self::PARTIAL => 'warning',
+            self::FAILED => 'danger',
+            self::CANCELLED => 'danger',
         };
     }
 
@@ -40,5 +46,10 @@ enum EcheanceStatus: string
     public function isEnRetard(): bool
     {
         return $this === self::OVERDUE;
+    }
+
+    public function isTerminal(): bool
+    {
+        return in_array($this, [self::PAID, self::FAILED, self::CANCELLED]);
     }
 }

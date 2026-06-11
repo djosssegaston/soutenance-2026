@@ -226,6 +226,44 @@
     </div>
 </div>
 
+<!-- MODAL PAIEMENT DÉCAISSEMENT BYPASS -->
+<div class="modal fade" id="paymentDisbursementModal" tabindex="-1" aria-labelledby="paymentDisbursementModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header text-center d-block border-0 pb-0" style="position:relative;">
+                <h5 class="modal-title fs-4 fw-bold" id="paymentDisbursementModalLabel">Paiement Décaissement</h5>
+                <button type="button" class="btn-close position-absolute top-0 end-0 mt-3 me-3" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Étape 1 : confirmation initiale -->
+                <div id="payment-disb-step-init">
+                    <p>Montant à payer : <strong id="payment-disb-amount"></strong> FCFA</p>
+                    <div id="payment-disb-error" class="alert alert-danger" style="display: none;"></div>
+                </div>
+                <!-- Étape 2 : préloader -->
+                <div id="payment-disb-step-preloader" style="display:none;">
+                    <div class="text-center py-4">
+                        <div class="d-inline-block" style="width:60px;height:60px;background: url('../../asset/images/fade-stagger-squares%20(2).svg') center/contain no-repeat;"></div>
+                        <p class="mt-3 text-muted fs-14">Préparation du paiement...</p>
+                    </div>
+                </div>
+                <!-- Étape 3 : formulaire bypass -->
+                <div id="payment-disb-step-bypass" style="display:none;">
+                    <div id="bypass-disb-form-container"></div>
+                </div>
+                <!-- Étape 4 : statut du paiement -->
+                <div id="payment-disb-step-status" style="display:none;">
+                    <div class="text-center py-4" id="payment-disb-status-content"></div>
+                </div>
+            </div>
+            <div class="modal-footer" id="payment-disb-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="paymentDisbBtnCancel">Annuler</button>
+                <button type="button" class="btn btn-primary" id="confirm-disbursement-payment">Confirmer et Payer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="js/financement.js"></script>
 
 <?php require_once __DIR__ . '/footer.php'; ?>

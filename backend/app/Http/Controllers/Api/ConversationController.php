@@ -32,11 +32,11 @@ class ConversationController extends Controller
                 'id' => $conv->id,
                 'project' => [
                     'id' => $conv->project?->id,
-                    'titre' => $conv->project?->titre ?? 'N/A',
+                    'titre' => $conv->project?->titre ?? '',
                 ],
                 'institution' => [
                     'id' => $conv->institution?->id,
-                    'nom' => $conv->type === 'admin_support' ? 'Administration' : ($conv->institution?->nom ?? 'N/A'),
+                    'nom' => $conv->type === 'admin_support' ? 'Administration' : ($conv->institution?->nom ?? ''),
                     'logo' => $conv->type === 'admin_support' ? null : ($conv->institution?->logo ?? null),
                 ],
                 'last_message' => $latestMessage ? [

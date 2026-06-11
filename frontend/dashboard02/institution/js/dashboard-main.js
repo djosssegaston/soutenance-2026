@@ -123,7 +123,7 @@ function renderRecentProjects(projects) {
                         </div>
                     </div>
                 </td>
-                <td><span class="fs-13 text-dark">${project.porteur ? project.porteur.name : 'N/A'}</span></td>
+                <td><span class="fs-13 text-dark">${project.porteur ? project.porteur.name : ''}</span></td>
                 <td><span class="fw-bold text-dark fs-13">${new Intl.NumberFormat('fr-FR').format(project.montant_demande)} FCFA</span></td>
                 <td><span class="badge badge-soft-${riskColor} rounded-pill px-3">${project.niveau_risque || 'Faible'}</span></td>
                 <td><span class="badge badge-soft-${statusBadge.color} rounded-pill px-3">${statusBadge.label}</span></td>

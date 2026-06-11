@@ -61,12 +61,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const actionBadges = {'validate':'bg-success-transparent text-success','reject':'bg-danger-transparent text-danger','suspend':'bg-warning-transparent text-warning','login':'bg-primary-transparent text-primary','update':'bg-info-transparent text-info'};
         items.forEach(l => {
             const tr = document.createElement('tr');
-            const dt = l.created_at ? new Date(l.created_at).toLocaleString('fr-FR') : 'N/A';
+            const dt = l.created_at ? new Date(l.created_at).toLocaleString('fr-FR') : '';
             tr.innerHTML = `
                 <td class="fs-12">${dt}</td>
                 <td><span class="fw-semibold">${l.user_name || 'Système'}</span><br><small class="text-muted">${l.user_role || ''}</small></td>
-                <td><span class="badge ${actionBadges[l.action] || 'bg-light text-dark'}">${l.action || 'N/A'}</span></td>
-                <td>${l.target || 'N/A'}</td>
+                <td><span class="badge ${actionBadges[l.action] || 'bg-light text-dark'}">${l.action || ''}</span></td>
+                <td>${l.target || ''}</td>
                 <td><span class="badge ${levelBadges[l.level] || 'bg-light'}">${l.level || 'info'}</span></td>
                 <td class="fs-12 text-muted">${l.ip_address || '—'}</td>
                 <td><button class="btn btn-sm btn-outline-primary" title="Détails"><i class="fe fe-eye"></i></button></td>`;

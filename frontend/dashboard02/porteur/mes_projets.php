@@ -16,7 +16,8 @@ $totalSoumis = $projects->filter(function($p) {
 })->count();
 
 $totalFinances = $projects->filter(function($p) {
-    return in_array($p->statut, ['funded', 'active', 'completed']) || $p->financements->isNotEmpty();
+    $aFundingDecaisse = $p->financements->contains(fn($f) => in_array($f->statut, ['disbursed', 'active']));
+    return in_array($p->statut, ['funded', 'active', 'completed']) || $aFundingDecaisse;
 })->count();
 
 $totalRejetes = $projects->filter(function($p) {
@@ -29,19 +30,21 @@ $totalBrouillons = $projects->filter(function($p) {
 
 $projectsJson = $projects->map(function ($p) {
     $statusEnum = $p->statusEnum();
+    $aFundingDecaisse = $p->financements->contains(fn($f) => in_array($f->statut, ['disbursed', 'active']));
+    $aFundingPropose = $p->financements->contains(fn($f) => in_array($f->statut, ['proposed', 'awaiting_borrower_plan', 'awaiting_imf_validation']));
     return [
         'id' => $p->id,
         'encrypted_id' => encryptId($p->id),
         'titre' => $p->titre,
-        'secteur' => $p->secteur ?? 'N/A',
+        'secteur' => $p->secteur ?? '',
         'montant_demande' => (float) $p->montant_demande,
         'montant_finance' => (float) ($p->montant_finance ?? 0),
         'statut' => $p->statut,
-        'statut_label' => ($statusEnum->isFinanced() || $p->financements->isNotEmpty()) ? 'Projet déjà financé' : $statusEnum->label(),
+        'statut_label' => $statusEnum->isFinanced() || $aFundingDecaisse ? 'Projet déjà financé' : ($aFundingPropose ? 'Financement proposé' : $statusEnum->label()),
         'statut_color' => $statusEnum->color(),
         'description' => $p->description ?? '',
-        'created_at' => $p->created_at ? $p->created_at->format('d M Y') : 'N/A',
-        'updated_at' => $p->updated_at ? $p->updated_at->format('d M Y') : 'N/A',
+        'created_at' => $p->created_at ? $p->created_at->format('d M Y') : '',
+        'updated_at' => $p->updated_at ? $p->updated_at->format('d M Y') : '',
         'institution_nom' => $p->financements->first()?->institution?->nom ?? '',
         'progression' => $p->montant_demande > 0 ? (int) round((($p->montant_finance ?? 0) / $p->montant_demande) * 100) : 0,
         'can_edit' => $statusEnum->canOwnerModify() || $statusEnum === \App\Enums\ProjectStatus::UNDER_ADMIN_REVIEW,
@@ -217,7 +220,9 @@ $projectsJson = $projects->map(function ($p) {
                                                     foreach ($projects as $project):
                                                         $index++;
                                                         $statusEnum = $project->statusEnum();
-                                                        $statusLabel = ($statusEnum->isFinanced() || $project->financements->isNotEmpty()) ? 'Projet déjà financé' : $statusEnum->label();
+                                                        $aFundingDecaisse = $project->financements->contains(fn($f) => in_array($f->statut, ['disbursed', 'active']));
+$aFundingPropose = $project->financements->contains(fn($f) => in_array($f->statut, ['proposed', 'awaiting_borrower_plan', 'awaiting_imf_validation']));
+$statusLabel = $statusEnum->isFinanced() || $aFundingDecaisse ? 'Projet déjà financé' : ($aFundingPropose ? 'Financement proposé' : $statusEnum->label());
                                                         $statusColor = $statusEnum->color();
                                                         $funded = (int) $project->montant_finance;
                                                         $progress = $project->montant_demande > 0 ? (int) round(($funded / $project->montant_demande) * 100) : 0;
@@ -238,7 +243,7 @@ $projectsJson = $projects->map(function ($p) {
                                                                 </div>
                                                                 <div class="d-flex flex-column">
                                                                     <span class="fw-medium lh-1"><?php echo htmlspecialchars($project->titre, ENT_QUOTES, 'UTF-8'); ?></span>
-                                                                    <small class="text-muted"><?php echo $project->created_at ? $project->created_at->format('d M Y') : 'N/A'; ?></small>
+                                                                    <small class="text-muted"><?php echo $project->created_at ? $project->created_at->format('d M Y') : ''; ?></small>
                                                                 </div>
                                                             </div>
                                                         </td>
@@ -247,7 +252,7 @@ $projectsJson = $projects->map(function ($p) {
                                                                 <span class="badge bg-info-transparent rounded-pill text-info p-2 me-3">
                                                                     <i class="fe fe-tag"></i>
                                                                 </span>
-                                                                <?php echo htmlspecialchars($project->secteur ?? 'N/A', ENT_QUOTES, 'UTF-8'); ?>
+                                                                <?php echo htmlspecialchars($project->secteur ?? '', ENT_QUOTES, 'UTF-8'); ?>
                                                             </div>
                                                         </td>
                                                         <td>

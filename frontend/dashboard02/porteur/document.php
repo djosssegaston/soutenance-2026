@@ -9,6 +9,33 @@ $totalDocs = $documents->count();
 $validatedDocs = $documents->where('statut_validation', 'valide')->count();
 $pendingDocs = $documents->where('statut_validation', 'en_attente')->count();
 $rejectedDocs = $documents->where('statut_validation', 'rejete')->count();
+
+// Grouper les documents par projet
+$projects = $documents->groupBy(function ($doc) {
+    return $doc->project_id;
+})->map(function ($docs, $projectId) {
+    $first = $docs->first();
+    return [
+        'id' => $projectId,
+        'titre' => $first?->project?->titre ?? '',
+        'docs_count' => $docs->count(),
+        'validated_count' => $docs->where('statut_validation', 'valide')->count(),
+        'pending_count' => $docs->where('statut_validation', 'en_attente')->count(),
+        'rejected_count' => $docs->where('statut_validation', 'rejete')->count(),
+        'documents' => $docs->map(function ($doc) {
+            return [
+                'id' => $doc->id,
+                'fichier' => $doc->fichier,
+                'type' => $doc->type,
+                'statut_validation' => $doc->statut_validation,
+                'uploaded_at' => $doc->uploaded_at?->toIso8601String(),
+                'created_at' => $doc->created_at?->toIso8601String(),
+                'raison_rejet' => $doc->raison_rejet,
+                'project_titre' => $doc->project?->titre ?? '',
+            ];
+        })->values(),
+    ];
+})->values();
 ?>
 
 <!-- Styles spécifiques à la page documents -->
@@ -137,15 +164,9 @@ $rejectedDocs = $documents->where('statut_validation', 'rejete')->count();
                                     <div class="position-relative">
                                         <i class="bi bi-search position-absolute" style="left:10px; top:50%; transform:translateY(-50%); z-index:10;"></i>
                                         <input type="text" class="form-control ps-5" id="searchDocs" 
-                                               placeholder="Rechercher..." style="width:250px;"
-                                               onkeyup="filterDocuments()">
+                                        placeholder="Rechercher un projet..." style="width:250px;"
+                                        onkeyup="filterProjects()">
                                     </div>
-                                    <select class="form-select w-auto" id="filterStatus" onchange="filterByStatus()">
-                                        <option value="all">Tous les statuts</option>
-                                        <option value="valide">Validés</option>
-                                        <option value="en_attente">En attente</option>
-                                        <option value="rejete">Rejetés</option>
-                                    </select>
                                     <button type="button" class="btn btn-outline-info" onclick="location.reload()">
                                         <i class="bi bi-arrow-clockwise me-1"></i>Actualiser
                                     </button>
@@ -159,12 +180,12 @@ $rejectedDocs = $documents->where('statut_validation', 'rejete')->count();
                 </div>
             </div>
 
-            <!-- TABLEAU DES DOCUMENTS -->
+            <!-- PROJETS AVEC DOCUMENTS -->
             <div class="row">
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header justify-content-between">
-                            <h4 class="card-title">Liste des documents</h4>
+                            <h4 class="card-title"><i class="bi bi-folder me-2"></i>Mes Projets</h4>
                         </div>
                         <div class="card-body">
                             <?php if ($documents->isEmpty()): ?>
@@ -175,113 +196,42 @@ $rejectedDocs = $documents->where('statut_validation', 'rejete')->count();
                                 </div>
                             <?php else: ?>
                                 <div class="table-responsive">
-                                    <table class="table table-hover table-striped" id="documentsTable">
+                                    <table class="table table-hover table-striped" id="projectsTable">
                                         <thead>
                                             <tr>
-                                                <th>Fichier</th>
-                                                <th>Type</th>
                                                 <th>Projet</th>
-                                                <th>Statut</th>
-                                                <th>Date</th>
+                                                <th class="text-center">Total Docs</th>
+                                                <th class="text-center">Validés</th>
+                                                <th class="text-center">En attente</th>
+                                                <th class="text-center">Rejetés</th>
                                                 <th>Actions</th>
                                             </tr>
                                         </thead>
-                                        <tbody id="documentsBody">
-                                            <?php foreach ($documents as $index => $doc): ?>
-                                                <?php
-                                                $statusClass = match($doc->statut_validation) {
-                                                    'valide' => 'bg-success-transparent text-success',
-                                                    'en_attente' => 'bg-warning-transparent text-warning',
-                                                    'rejete' => 'bg-danger-transparent text-danger',
-                                                    default => 'bg-secondary-transparent text-secondary',
-                                                };
-                                                $statusLabel = match($doc->statut_validation) {
-                                                    'valide' => 'Validé',
-                                                    'en_attente' => 'En attente',
-                                                    'rejete' => 'Rejeté',
-                                                    default => ucfirst($doc->statut_validation),
-                                                };
-                                                $daysElapsed = $doc->uploaded_at 
-                                                    ? now()->diffInDays($doc->uploaded_at) 
-                                                    : ($doc->created_at ? now()->diffInDays($doc->created_at) : null);
-                                                ?>
-                                                <tr data-status="<?php echo $doc->statut_validation; ?>"
-                                                    data-name="<?php echo strtolower(htmlspecialchars(basename($doc->fichier), ENT_QUOTES, 'UTF-8')); ?>"
-                                                    data-type="<?php echo strtolower($doc->type); ?>"
-                                                    data-project="<?php echo strtolower(htmlspecialchars($doc->project->titre ?? '', ENT_QUOTES, 'UTF-8')); ?>">
-                                                    <td>
-                                                        <div class="d-flex align-items-center">
-                                                            <i class="bi bi-file-earmark-text text-primary me-2"></i>
-                                                            <div>
-                                                                <strong><?php echo htmlspecialchars(basename($doc->fichier), ENT_QUOTES, 'UTF-8'); ?></strong>
-                                                                <?php if ($doc->uploaded_at): ?>
-                                                                    <br><small class="text-muted"><?php echo $doc->uploaded_at->diffForHumans(); ?></small>
-                                                                <?php endif; ?>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                    <td>
-                                                        <span class="badge bg-info-transparent text-info"><?php echo htmlspecialchars($doc->type, ENT_QUOTES, 'UTF-8'); ?></span>
-                                                    </td>
-                                                    <td><?php echo htmlspecialchars($doc->project->titre ?? 'N/A', ENT_QUOTES, 'UTF-8'); ?></td>
-                                                    <td>
-                                                        <span class="badge <?php echo $statusClass; ?>">
-                                                            <?php echo $statusLabel; ?>
-                                                        </span>
-                                                        <?php if ($doc->statut_validation === 'en_attente' && $daysElapsed !== null): ?>
-                                                            <br><span class="days-badge <?php echo $daysElapsed > 7 ? 'days-danger' : 'days-warning'; ?>">
-                                                                <?php echo $daysElapsed; ?> jour(s)
-                                                            </span>
-                                                        <?php elseif ($doc->statut_validation === 'rejete'): ?>
-                                                            <br><span class="days-badge days-danger">
-                                                                Rejeté
-                                                            </span>
-                                                            <?php if ($doc->raison_rejet): ?>
-                                                                <br><small class="text-danger" title="<?php echo htmlspecialchars($doc->raison_rejet, ENT_QUOTES, 'UTF-8'); ?>">
-                                                                    <?php echo htmlspecialchars(substr($doc->raison_rejet, 0, 30), ENT_QUOTES, 'UTF-8') . (strlen($doc->raison_rejet) > 30 ? '...' : ''); ?>
-                                                                </small>
-                                                            <?php endif; ?>
-                                                        <?php endif; ?>
-                                                    </td>
-                                                    <td>
-                                                        <?php 
-                                                        if ($doc->uploaded_at) {
-                                                            echo $doc->uploaded_at->format('d/m/Y H:i');
-                                                        } elseif ($doc->created_at) {
-                                                            echo $doc->created_at->format('d/m/Y H:i');
-                                                        } else {
-                                                            echo 'N/A';
-                                                        }
-                                                        ?>
-                                                    </td>
-                                                    <td>
-                                                        <div class="btn-group btn-group-sm" role="group">
-                                                            <a href="/documents/secure/project/<?php echo $doc->id; ?>/view" 
-                                                               class="btn btn-outline-info" title="Voir">
-                                                                <i class="bi bi-eye"></i>
-                                                            </a>
-                                                            <a href="/documents/secure/project/<?php echo $doc->id; ?>/download" 
-                                                               class="btn btn-outline-primary" title="Télécharger">
-                                                                <i class="bi bi-download"></i>
-                                                            </a>
-                                                            <button type="button" class="btn btn-outline-warning" 
-                                                                    title="Remplacer"
-                                                                    onclick="showReplaceModal(<?php echo $doc->id; ?>, '<?php echo str_replace("'", "\\'", htmlspecialchars($doc->type, ENT_QUOTES, 'UTF-8')); ?>')">
-                                                                <i class="bi bi-arrow-repeat"></i>
-                                                            </button>
-                                                            <button type="button" class="btn btn-outline-danger" 
-                                                                    title="Supprimer"
-                                                                    onclick="confirmDelete(<?php echo $doc->id; ?>, '<?php echo str_replace("'", "\\'", htmlspecialchars(basename($doc->fichier), ENT_QUOTES, 'UTF-8')); ?>')">
-                                                                <i class="bi bi-trash"></i>
-                                                            </button>
-                                                        </div>
-                                                    </td>
-                                                </tr>
+                                        <tbody id="projectsBody">
+                                            <?php foreach ($projects as $project): ?>
+                                            <tr data-titre="<?php echo strtolower(htmlspecialchars($project['titre'], ENT_QUOTES, 'UTF-8')); ?>">
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <i class="bi bi-folder2-open text-primary me-2 fs-5"></i>
+                                                        <span class="fw-medium"><?php echo htmlspecialchars($project['titre'], ENT_QUOTES, 'UTF-8'); ?></span>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center"><span class="badge bg-secondary"><?php echo $project['docs_count']; ?></span></td>
+                                                <td class="text-center"><span class="badge bg-success"><?php echo $project['validated_count']; ?></span></td>
+                                                <td class="text-center"><span class="badge bg-warning"><?php echo $project['pending_count']; ?></span></td>
+                                                <td class="text-center"><?php echo $project['rejected_count'] > 0 ? '<span class="badge bg-danger">' . $project['rejected_count'] . '</span>' : '<span class="text-muted">0</span>'; ?></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary consulter-btn"
+                                                            data-id="<?php echo $project['id']; ?>"
+                                                            data-titre="<?php echo htmlspecialchars($project['titre'], ENT_QUOTES, 'UTF-8'); ?>">
+                                                        <i class="bi bi-eye me-1"></i> Consulter
+                                                    </button>
+                                                </td>
+                                            </tr>
                                             <?php endforeach; ?>
                                         </tbody>
                                     </table>
                                 </div>
-                                <div class="d-flex justify-content-center mt-3" id="documentsPagination"></div>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -399,6 +349,45 @@ $rejectedDocs = $documents->where('statut_validation', 'rejete')->count();
     </div>
 </div>
 
+<!-- Modal Documents Projet -->
+<div class="modal fade" id="projetDocsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title"><i class="bi bi-folder me-2"></i>Documents du Projet</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h6 class="fw-bold" id="modal-projet-titre"></h6>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped mb-0">
+                        <thead>
+                            <tr>
+                                <th>Fichier</th>
+                                <th>Type</th>
+                                <th>Statut</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="modal-docs-body"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Données projets JSON pour JS -->
+<script id="projects-data" type="application/json"><?php echo json_encode($projects); ?></script>
+
 <!-- Toast Notification -->
 <div class="toast-notification" id="toastNotification">
     <div class="p-3">
@@ -414,85 +403,78 @@ $rejectedDocs = $documents->where('statut_validation', 'rejete')->count();
 </div>
 
 <script>
-const PAGINATION_ROWS = 10;
+const projectsData = JSON.parse(document.getElementById('projects-data').textContent);
 
-function updatePagination(tableBodyId, paginationId) {
-    const tbody = document.getElementById(tableBodyId);
-    const nav = document.getElementById(paginationId);
-    if (!tbody || !nav) return;
-
-    const rows = Array.from(tbody.children).filter(row => {
-        if (row.dataset && row.dataset.filtered === 'true') return false;
-        if (row.querySelector('td[colspan]')) return false;
-        return true;
-    });
-
-    const totalPages = Math.max(1, Math.ceil(rows.length / PAGINATION_ROWS));
-    let currentPage = parseInt(nav.dataset.currentPage || '1', 10);
-    if (currentPage > totalPages) currentPage = totalPages;
-    nav.dataset.currentPage = currentPage;
-
-    Array.from(tbody.children).forEach(row => {
-        if (row.dataset && row.dataset.filtered === 'true') {
-            row.style.display = 'none';
-        } else if (!row.querySelector('td[colspan]')) {
-            const idx = rows.indexOf(row);
-            if (idx !== -1) {
-                row.style.display = (idx >= (currentPage - 1) * PAGINATION_ROWS && idx < currentPage * PAGINATION_ROWS) ? '' : 'none';
-            }
-        }
-    });
-
-    if (totalPages <= 1) { nav.innerHTML = ''; return; }
-
-    let html = '<nav aria-label="Pagination"><ul class="pagination pagination-sm justify-content-center mb-0">';
-    html += `<li class="page-item ${currentPage <= 1 ? 'disabled' : ''}"><a class="page-link" href="#" onclick="return paginationGo('${tableBodyId}','${paginationId}',${currentPage - 1})"><i class="bi bi-chevron-left"></i></a></li>`;
-    for (let i = 1; i <= totalPages; i++) {
-        html += `<li class="page-item ${i === currentPage ? 'active' : ''}"><a class="page-link" href="#" onclick="return paginationGo('${tableBodyId}','${paginationId}',${i})">${i}</a></li>`;
-    }
-    html += `<li class="page-item ${currentPage >= totalPages ? 'disabled' : ''}"><a class="page-link" href="#" onclick="return paginationGo('${tableBodyId}','${paginationId}',${currentPage + 1})"><i class="bi bi-chevron-right"></i></a></li>`;
-    html += '</ul></nav>';
-    nav.innerHTML = html;
-}
-
-function paginationGo(tableBodyId, paginationId, page) {
-    const nav = document.getElementById(paginationId);
-    if (nav) nav.dataset.currentPage = page;
-    updatePagination(tableBodyId, paginationId);
-    return false;
-}
-
-function resetPagination(tableBodyId, paginationId) {
-    const nav = document.getElementById(paginationId);
-    if (nav) nav.dataset.currentPage = 1;
-    updatePagination(tableBodyId, paginationId);
-}
-
-// Filtrage par statut
-function filterByStatus() {
-    const val = document.getElementById('filterStatus').value;
-    const rows = document.querySelectorAll('#documentsTable tbody tr');
-    rows.forEach(row => {
-        const match = val === 'all' || row.dataset.status === val;
-        row.dataset.filtered = match ? 'false' : 'true';
-        row.style.display = match ? '' : 'none';
-    });
-    resetPagination('documentsBody', 'documentsPagination');
-}
-
-// Recherche
-function filterDocuments() {
+function filterProjects() {
     const val = document.getElementById('searchDocs').value.toLowerCase();
-    const rows = document.querySelectorAll('#documentsTable tbody tr');
+    const rows = document.querySelectorAll('#projectsBody tr[data-titre]');
     rows.forEach(row => {
-        const name = row.dataset.name;
-        const type = row.dataset.type;
-        const project = row.dataset.project;
-        const match = name.includes(val) || type.includes(val) || project.includes(val);
-        row.dataset.filtered = match ? 'false' : 'true';
-        row.style.display = match ? '' : 'none';
+        const titre = row.dataset.titre;
+        row.style.display = titre.includes(val) ? '' : 'none';
     });
-    resetPagination('documentsBody', 'documentsPagination');
+}
+
+function openProjetDocs(projectId, titre) {
+    document.getElementById('modal-projet-titre').textContent = titre;
+
+    const project = projectsData.find(p => String(p.id) === String(projectId));
+    const docs = project ? project.documents : [];
+
+    const tbody = document.getElementById('modal-docs-body');
+    tbody.innerHTML = '';
+
+    if (docs.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">Aucun document pour ce projet.</td></tr>';
+    } else {
+        docs.forEach(doc => {
+            const statusBadges = {
+                'valide': '<span class="badge bg-success-transparent text-success">Validé</span>',
+                'en_attente': '<span class="badge bg-warning-transparent text-warning">En attente</span>',
+                'rejete': '<span class="badge bg-danger-transparent text-danger">Rejeté</span>',
+            };
+            let statusHtml = statusBadges[doc.statut_validation] || '<span class="badge bg-secondary">' + doc.statut_validation + '</span>';
+
+            const uploadedAt = doc.uploaded_at || doc.created_at;
+            if (doc.statut_validation === 'en_attente' && uploadedAt) {
+                const days = Math.floor((Date.now() - new Date(uploadedAt).getTime()) / (1000 * 60 * 60 * 24));
+                statusHtml += '<br><span class="days-badge ' + (days > 7 ? 'days-danger' : 'days-warning') + '">' + days + ' jour(s)</span>';
+            } else if (doc.statut_validation === 'rejete') {
+                statusHtml += '<br><span class="days-badge days-danger">Rejeté</span>';
+                if (doc.raison_rejet) {
+                    statusHtml += '<br><small class="text-danger" title="' + doc.raison_rejet + '">' + (doc.raison_rejet.length > 30 ? doc.raison_rejet.substring(0, 30) + '...' : doc.raison_rejet) + '</small>';
+                }
+            }
+
+            const dateStr = uploadedAt ? new Date(uploadedAt).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-file-earmark-text text-primary me-2"></i>
+                        <div>
+                            <strong>${doc.fichier.split('/').pop()}</strong>
+                            ${uploadedAt ? '<br><small class="text-muted">' + new Date(uploadedAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) + '</small>' : ''}
+                        </div>
+                    </div>
+                </td>
+                <td><span class="badge bg-info-transparent text-info">${doc.type}</span></td>
+                <td>${statusHtml}</td>
+                <td>${dateStr}</td>
+                <td>
+                    <div class="btn-group btn-group-sm" role="group">
+                        <a href="/documents/secure/project/${doc.id}/view" class="btn btn-outline-info" title="Voir"><i class="bi bi-eye"></i></a>
+                        <a href="/documents/secure/project/${doc.id}/download" class="btn btn-outline-primary" title="Télécharger"><i class="bi bi-download"></i></a>
+                        <button type="button" class="btn btn-outline-warning" title="Remplacer" onclick="showReplaceModal(${doc.id}, '${doc.type.replace(/'/g, "\\'")}')"><i class="bi bi-arrow-repeat"></i></button>
+                        <button type="button" class="btn btn-outline-danger" title="Supprimer" onclick="confirmDelete(${doc.id}, '${doc.fichier.split('/').pop().replace(/'/g, "\\'")}')"><i class="bi bi-trash"></i></button>
+                    </div>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('projetDocsModal')).show();
 }
 
 // Modal remplacement
@@ -530,7 +512,11 @@ showToast('success', 'Succès', '<?php echo str_replace("'", "\\'", session('suc
 showToast('error', 'Erreur', '<?php echo str_replace("'", "\\'", session('error')); ?>');
 <?php endif; ?>
 document.addEventListener('DOMContentLoaded', function() {
-    updatePagination('documentsBody', 'documentsPagination');
+    document.querySelectorAll('.consulter-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            openProjetDocs(this.dataset.id, this.dataset.titre);
+        });
+    });
 });
 </script>
 

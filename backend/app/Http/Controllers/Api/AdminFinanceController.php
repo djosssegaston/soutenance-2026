@@ -117,9 +117,9 @@ class AdminFinanceController extends Controller
 
         $data = $repayments->map(fn ($r) => [
             'id' => $r->id,
-            'project_title' => $r->project?->titre ?? 'N/A',
-            'porteur_name' => $r->project?->owner?->name ?? 'N/A',
-            'institution_name' => $r->project?->financements->first()?->institution?->nom ?? 'N/A',
+            'project_title' => $r->project?->titre ?? '',
+            'porteur_name' => $r->project?->owner?->name ?? '',
+            'institution_name' => $r->project?->financements->first()?->institution?->nom ?? '',
             'montant_total' => (float) $r->montant_total,
             'montant_paye' => (float) $r->montant_rembourse,
             'montant_restant' => (float) ($r->montant_restant ?? $r->montant_total - $r->montant_rembourse),
@@ -172,8 +172,8 @@ class AdminFinanceController extends Controller
         $data = $fundings->map(fn ($f) => [
             'id' => $f->id,
             'reference' => 'FIN-'.str_pad((string) $f->id, 5, '0', STR_PAD_LEFT),
-            'project_title' => $f->project?->titre ?? 'N/A',
-            'institution_name' => $f->institution?->nom ?? 'N/A',
+            'project_title' => $f->project?->titre ?? '',
+            'institution_name' => $f->institution?->nom ?? '',
             'montant' => (float) ($f->montant_valide ?? $f->montant_propose ?? $f->montant ?? 0),
             'type' => $f->type ?? 'loan',
             'statut' => $f->statut,

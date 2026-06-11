@@ -18,6 +18,7 @@ class FinancingWorkflowService
     public function __construct(
         protected ProjectWorkflowService $workflow,
         protected EcheanceService $echeanceService,
+        protected FedaPayService $fedaPayService,
     ) {}
 
     public function imfFaireProposition(User $user, Project $project, array $data): Funding
@@ -152,7 +153,7 @@ class FinancingWorkflowService
         return $funding;
     }
 
-    public function imfApprouverPlan(User $user, Funding $funding): Funding
+    public function imfApprouverPlan(User $user, Funding $funding, bool $skipDisbursement = false): Funding
     {
         $institution = $user->institution;
         if (! $institution || $funding->institution_id !== $institution->id) {
@@ -163,13 +164,87 @@ class FinancingWorkflowService
             throw new RuntimeException('Ce plan n\'est pas en attente de validation IMF.');
         }
 
-        DB::transaction(function () use ($funding, $user) {
+        DB::transaction(function () use ($funding, $user, $skipDisbursement) {
             $funding->update([
                 'statut' => FundingStatus::APPROVED->value,
                 'montant_valide' => $funding->montant_propose,
-                'montant_decaisse' => $funding->montant_propose,
                 'date_validation' => now(),
                 'date_approbation_imf' => now(),
+            ]);
+
+            if (! $skipDisbursement) {
+                $funding->update([
+                    'montant_decaisse' => $funding->montant_propose,
+                    'date_decaissement' => now(),
+                ]);
+
+                $project = $funding->project;
+                $project->update([
+                    'montant_finance' => (float) $project->montant_finance + (float) $funding->montant_propose,
+                ]);
+
+                $this->workflow->markAsFunded($project, $user->id);
+            }
+
+            $this->logAction($funding->id, 'approbation_imf', $user->name,
+                'IMF approuve le plan et valide le financement'
+            );
+        });
+
+        $funding = $funding->fresh();
+
+        if ($skipDisbursement) {
+            // Paiement IMF requis avant décaissement
+            $this->notifierPorteur(
+                $funding->project->user_id,
+                'Plan de remboursement approuvé',
+                "L'institution {$funding->institution->nom} a approuvé votre plan de remboursement pour le projet \"{$funding->project->titre}\". ".
+                'Le décaissement sera effectué après validation du paiement.',
+                'plan_approuve'
+            );
+
+            return $funding;
+        }
+
+        $echeances = $this->echeanceService->genererEcheancier($funding);
+
+        if (! empty($echeances)) {
+            $funding->update(['statut' => FundingStatus::DISBURSED->value]);
+
+            $project = $funding->project;
+            $this->workflow->activate($project, $user->id);
+
+            // Initier le décaissement via FedaPay Payout
+            try {
+                $this->fedaPayService->initierDecaissement($funding->fresh());
+            } catch (\Exception $e) {
+                Log::warning('FedaPay disbursement initiation failed (non bloquant)', [
+                    'financement_id' => $funding->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        $this->notifierPorteur(
+            $funding->project->user_id,
+            'Plan de remboursement approuvé',
+            "L'institution {$funding->institution->nom} a approuvé votre plan de remboursement pour le projet \"{$funding->project->titre}\". ".
+            'Le financement de '.number_format((float) $funding->montant_propose, 0, ',', ' ').' FCFA est décaissé.',
+            'plan_approuve'
+        );
+
+        return $funding->fresh();
+    }
+
+    public function finaliserDecaissement(Funding $funding, User $user): Funding
+    {
+        if ($funding->statut !== FundingStatus::APPROVED->value) {
+            throw new RuntimeException('Le financement doit être approuvé avant décaissement.');
+        }
+
+        DB::transaction(function () use ($funding, $user) {
+            $funding->update([
+                'montant_decaisse' => $funding->montant_propose,
                 'date_decaissement' => now(),
             ]);
 
@@ -180,8 +255,8 @@ class FinancingWorkflowService
 
             $this->workflow->markAsFunded($project, $user->id);
 
-            $this->logAction($funding->id, 'approbation_imf', $user->name,
-                'IMF approuve le plan et valide le financement'
+            $this->logAction($funding->id, 'decaissement_imf', $user->name,
+                'Paiement IMF confirmé, décaissement effectué'
             );
         });
 
@@ -194,14 +269,23 @@ class FinancingWorkflowService
 
             $project = $funding->project;
             $this->workflow->activate($project, $user->id);
+
+            try {
+                $this->fedaPayService->initierDecaissement($funding->fresh());
+            } catch (\Exception $e) {
+                Log::warning('FedaPay disbursement initiation failed (non bloquant)', [
+                    'financement_id' => $funding->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
         }
 
         $this->notifierPorteur(
             $funding->project->user_id,
-            'Plan de remboursement approuvé',
-            "L'institution {$funding->institution->nom} a approuvé votre plan de remboursement pour le projet \"{$funding->project->titre}\". ".
-            'Le financement de '.number_format((float) $funding->montant_propose, 0, ',', ' ').' FCFA est décaissé.',
-            'plan_approuve'
+            'Financement décaissé',
+            'Le financement de '.number_format((float) $funding->montant_propose, 0, ',', ' ').
+            " FCFA pour le projet \"{$funding->project->titre}\" a été décaissé. Les remboursements commencent.",
+            'financement_decaissement'
         );
 
         return $funding->fresh();

@@ -202,18 +202,24 @@ class AdminDashboardController extends Controller
             ->take(10)
             ->get()
             ->map(function ($p) {
-                $isFinanced = ($p->montant_finance > 0) || $p->financements->isNotEmpty();
+                $aFundingDecaisse = $p->financements->contains(fn ($f) => in_array($f->statut, ['disbursed', 'active']));
+                $aFundingPropose = $p->financements->contains(fn ($f) => in_array($f->statut, ['proposed', 'awaiting_borrower_plan', 'awaiting_imf_validation']));
+                $isFinanced = ($p->montant_finance > 0) || $aFundingDecaisse;
                 $statutLabel = $isFinanced
                     ? 'Projet déjà financé'
-                    : $this->getStatusLabel($p->statut ?? 'draft');
+                    : ($aFundingPropose
+                        ? 'Financement proposé'
+                        : $this->getStatusLabel($p->statut ?? 'draft'));
                 $statutColor = $isFinanced
                     ? 'success'
-                    : $this->getStatusColor($p->statut ?? 'draft');
+                    : ($aFundingPropose
+                        ? 'info'
+                        : $this->getStatusColor($p->statut ?? 'draft'));
 
                 return [
                     'id' => $p->id,
                     'titre' => $p->titre,
-                    'owner' => optional($p->owner)->name ?? 'N/A',
+                    'owner' => $p->owner?->name ?? '',
                     'montant' => (float) $p->montant_demande,
                     'funded' => (float) $p->montant_finance,
                     'statut' => $p->statut,

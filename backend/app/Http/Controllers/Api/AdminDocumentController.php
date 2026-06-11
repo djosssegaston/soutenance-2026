@@ -36,8 +36,8 @@ class AdminDocumentController extends Controller
         $data = $documents->map(fn ($d) => [
             'id' => $d->id,
             'project_id' => $d->project_id,
-            'project_title' => $d->project?->titre ?? 'N/A',
-            'porteur_name' => $d->project?->owner?->name ?? 'N/A',
+            'project_title' => $d->project?->titre ?? '',
+            'porteur_name' => $d->project?->owner?->name ?? '',
             'type' => $d->type,
             'fichier' => $d->fichier,
             'statut_validation' => $d->statut_validation ?? 'en_attente',

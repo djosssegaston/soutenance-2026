@@ -176,9 +176,9 @@ class DashboardAnalyticsService
             ->map(fn ($r) => [
                 'id' => $r->id,
                 'project_id' => $r->project_id,
-                'project_name' => $r->project?->titre ?? 'N/A',
+                'project_name' => $r->project?->titre ?? '',
                 'amount' => (float) $r->montant_restant,
-                'due_date' => $r->date_echeance?->format('d/m/Y') ?? 'N/A',
+                'due_date' => $r->date_echeance?->format('d/m/Y') ?? '',
             ]);
 
         $highRiskProjects = InstitutionAnalysis::where('institution_id', $institution->id)
@@ -189,7 +189,7 @@ class DashboardAnalyticsService
             ->map(fn ($a) => [
                 'id' => $a->id,
                 'project_id' => $a->project_id,
-                'project_name' => $a->project?->titre ?? 'N/A',
+                'project_name' => $a->project?->titre ?? '',
                 'risk_score' => $a->risk_score,
             ]);
 

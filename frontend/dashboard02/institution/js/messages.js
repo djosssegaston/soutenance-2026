@@ -89,14 +89,14 @@ function renderConversations() {
             </div>
             <div class="conv-info">
                 <div class="conv-top">
-                    <span class="conv-name">${escapeHtml(conv.porteur_name || 'N/A')}</span>
+                    <span class="conv-name">${escapeHtml(conv.porteur_name || '')}</span>
                     <span class="conv-time">${escapeHtml(conv.last_message_at || '')}</span>
                 </div>
                 <div class="conv-bottom">
                     <span class="conv-preview">${escapeHtml(conv.last_message || 'Nouvelle discussion')}</span>
                     ${unreadBadge}
                 </div>
-                <span class="conv-role">Projet: ${escapeHtml(conv.project_title || 'N/A')}</span>
+                <span class="conv-role">Projet: ${escapeHtml(conv.project_title || '')}</span>
             </div>
         `;
         list.appendChild(li);

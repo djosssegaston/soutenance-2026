@@ -207,8 +207,8 @@ class ProfileWebController extends Controller
                     'action' => $action['label'],
                     'icon' => $action['icon'],
                     'color' => $action['color'],
-                    'ip' => $log->ip ?? 'N/A',
-                    'date' => $log->date ? $log->date->format('d M Y H:i') : ($log->created_at ? $log->created_at->format('d M Y H:i') : 'N/A'),
+                    'ip' => $log->ip ?? '',
+                    'date' => $log->date ? $log->date->format('d M Y H:i') : ($log->created_at ? $log->created_at->format('d M Y H:i') : ''),
                 ];
             });
 

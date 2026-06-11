@@ -232,6 +232,8 @@ Route::prefix('v1')->group(function () {
 
         // Repayment receipts and simulation
         Route::prefix('repayments')->group(function () {
+            Route::get('receipt/by-echeance/{echeance}', [\App\Http\Controllers\Api\RepaymentReceiptController::class, 'getReceiptByEcheance']);
+            Route::get('receipt/pdf/{echeance}', [\App\Http\Controllers\Api\RepaymentReceiptController::class, 'downloadReceiptPdf']);
             Route::get('receipt/{repayment}', [\App\Http\Controllers\Api\RepaymentReceiptController::class, 'generateReceipt']);
             Route::get('late/porteur', [\App\Http\Controllers\Api\RepaymentReceiptController::class, 'porteurLateRepayments']);
             Route::get('late/institution', [\App\Http\Controllers\Api\RepaymentReceiptController::class, 'institutionLateRepayments'])->middleware('role:institution');
@@ -285,6 +287,8 @@ Route::prefix('v1')->group(function () {
         // Admin Remboursements
         Route::prefix('admin/remboursements')->middleware(['role:admin', 'audit'])->group(function () {
             Route::get('/', [\App\Http\Controllers\Api\AdminRepaymentController::class, 'index']);
+            Route::get('projects', [\App\Http\Controllers\Api\AdminRepaymentController::class, 'projects']);
+            Route::get('project/{id}', [\App\Http\Controllers\Api\AdminRepaymentController::class, 'projectRepayments']);
             Route::get('table', [\App\Http\Controllers\Api\AdminFinanceController::class, 'repaymentTable']);
         });
 

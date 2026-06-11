@@ -124,10 +124,10 @@ function renderInterviews(interviews) {
                 </td>
                 <td>
                     <span class="badge bg-light text-dark">${item.type_entretien.toUpperCase()}</span>
-                    <div class="small text-truncate" style="max-width: 150px;">${item.lieu || 'N/A'}</div>
+                    <div class="small text-truncate" style="max-width: 150px;">${item.lieu || ''}</div>
                 </td>
                 <td>
-                    <div class="small">${item.analyste ? item.analyste.name : 'N/A'}</div>
+                    <div class="small">${item.analyste ? item.analyste.name : ''}</div>
                 </td>
                 <td>${statusBadge}</td>
                 <td>
@@ -219,7 +219,7 @@ async function viewInterviewDetails(id) {
                         <tr><td class="fw-bold">Projet:</td><td>${item.project.titre}</td></tr>
                         <tr><td class="fw-bold">Porteur:</td><td>${item.porteur.name}</td></tr>
                         <tr><td class="fw-bold">Date & Heure:</td><td>${new Date(item.date_entretien).toLocaleDateString()} à ${item.heure_entretien.substring(0, 5)}</td></tr>
-                        <tr><td class="fw-bold">Lieu / Lien:</td><td>${item.lieu || 'N/A'}</td></tr>
+                        <tr><td class="fw-bold">Lieu / Lien:</td><td>${item.lieu || ''}</td></tr>
                     </table>
                     
                     <h6 class="fw-bold mt-4">Description / Consignes</h6>

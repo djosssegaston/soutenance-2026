@@ -4,6 +4,9 @@
 
 const API_BASE = '/api/v1';
 let currentPage = 1;
+let currentDisbursementId = null;
+let currentDisbursementAmount = 0;
+let currentDisbursementTransactionId = null;
 
 document.addEventListener('DOMContentLoaded', function() {
     // Initial Load
@@ -52,6 +55,89 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }, 100);
     }
+
+    // ---- Payment Modal (Bypass Décaissement) ----
+    const paymentModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('paymentDisbursementModal'));
+    const paymentModalEl = document.getElementById('paymentDisbursementModal');
+
+    document.getElementById('confirm-disbursement-payment').addEventListener('click', function() {
+        if (!currentDisbursementTransactionId) return;
+
+        document.getElementById('payment-disb-step-init').style.display = 'none';
+        document.getElementById('payment-disb-step-preloader').style.display = 'block';
+        document.getElementById('paymentDisbBtnCancel').style.display = 'none';
+        document.getElementById('confirm-disbursement-payment').style.display = 'none';
+
+        setTimeout(function() {
+            document.getElementById('payment-disb-step-preloader').style.display = 'none';
+            document.getElementById('payment-disb-step-bypass').style.display = 'block';
+            document.getElementById('bypass-disb-form-container').innerHTML = buildBypassForm(currentDisbursementTransactionId, currentDisbursementAmount);
+            document.getElementById('paymentDisbBtnCancel').style.display = 'inline-block';
+        }, 2500);
+    });
+
+    paymentModalEl.addEventListener('submit', function(e) {
+        const form = e.target.closest('#bypass-disb-form-container form');
+        if (!form) return;
+        e.preventDefault();
+
+        const formData = new FormData(form);
+
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            },
+            credentials: 'same-origin'
+        })
+        .then(r => r.json())
+        .then(data => {
+            const isSuccess = data.success;
+            const message = data.message;
+            const redirectUrl = data.redirect_url;
+
+            const icon = isSuccess ? 'bi-check-circle-fill' : 'bi-x-circle-fill';
+            const color = isSuccess ? '#1a7d36' : '#dc3545';
+            const bg = isSuccess ? '#e8f5e9' : '#fbe9e7';
+            const border = isSuccess ? '#a5d6a7' : '#ffab91';
+
+            document.getElementById('payment-disb-step-bypass').style.display = 'none';
+            document.getElementById('payment-disb-footer').style.display = 'none';
+
+            const statusContent = document.getElementById('payment-disb-status-content');
+            statusContent.innerHTML = `
+                <div style="font-size:56px;color:${color};margin-bottom:12px;">
+                    <i class="bi ${icon}"></i>
+                </div>
+                <div style="font-size:18px;font-weight:600;color:${color};padding:12px 20px;
+                            background:${bg};border:2px solid ${border};border-radius:12px;
+                            display:inline-block;max-width:100%;">
+                    ${message}
+                </div>
+            `;
+            document.getElementById('payment-disb-step-status').style.display = 'block';
+            document.getElementById('paymentDisbursementModalLabel').textContent = isSuccess ? 'Paiement réussi' : 'Paiement échoué';
+
+            setTimeout(function() {
+                window.location.href = redirectUrl;
+            }, 1500);
+        })
+        .catch(function() {
+            document.getElementById('payment-disb-step-status').style.display = 'none';
+            document.getElementById('payment-disb-step-bypass').style.display = 'block';
+            document.getElementById('payment-disb-footer').style.display = 'flex';
+        });
+    });
+
+    paymentModalEl.addEventListener('hidden.bs.modal', function () {
+        document.getElementById('payment-disb-step-bypass').style.display = 'none';
+        document.getElementById('payment-disb-step-status').style.display = 'none';
+        document.getElementById('payment-disb-footer').style.display = 'flex';
+        document.getElementById('bypass-disb-form-container').innerHTML = '';
+        document.getElementById('paymentDisbursementModalLabel').textContent = 'Paiement Décaissement';
+    });
 });
 
 /**
@@ -187,16 +273,66 @@ async function handleProposeFunding(e) {
             body: JSON.stringify(data)
         });
 
+        const result = await response.json();
+
         if (response.ok) {
             ALOGOTO.success('Proposition envoyée avec succès.');
             bootstrap.Modal.getInstance(document.getElementById('modal-propose-funding')).hide();
             e.target.reset();
             fetchFundings();
             fetchStats();
-        } else {
-            const err = await response.json();
-            ALOGOTO.error(err.message || 'Erreur lors de l\'envoi.');
+            return;
         }
+
+        // Surfinancement détecté → demander confirmation
+        if (result.overfunding_warning) {
+            const existing = formatMoney(result.existing_total);
+            const proposed = formatMoney(result.proposed_amount);
+            const maxAllowed = formatMoney(result.max_allowed);
+
+            const { isConfirmed } = await ALOGOTO.confirm(
+                'Surfinancement détecté',
+                `Le montant total des financements (${existing} + ${proposed} = ${formatMoney(result.existing_total + result.proposed_amount)}) dépasserait le montant demandé de ${maxAllowed}.<br><br><strong>Voulez-vous vraiment proposer ce montant ?</strong>`,
+                'Oui, proposer',
+                'Non, annuler'
+            );
+
+            data.confirm_overfunding = isConfirmed ? '1' : '0';
+
+            const secondResponse = await fetch(`${API_BASE}/institution/financements`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify(data)
+            });
+
+            const secondResult = await secondResponse.json();
+
+            if (isConfirmed) {
+                if (secondResponse.ok) {
+                    ALOGOTO.success('Proposition envoyée avec succès.');
+                    bootstrap.Modal.getInstance(document.getElementById('modal-propose-funding')).hide();
+                    e.target.reset();
+                    fetchFundings();
+                    fetchStats();
+                } else {
+                    ALOGOTO.error(secondResult.message || 'Erreur lors de l\'envoi.');
+                }
+            } else {
+                ALOGOTO.info(secondResult.message || 'Proposition annulée.');
+                bootstrap.Modal.getInstance(document.getElementById('modal-propose-funding')).hide();
+                e.target.reset();
+                fetchFundings();
+                fetchStats();
+            }
+            return;
+        }
+
+        ALOGOTO.error(result.message || 'Erreur lors de l\'envoi.');
     } catch (error) {
         console.error('Proposal error:', error);
     }
@@ -387,12 +523,17 @@ async function handleApprovePlan(id) {
             }
         });
 
+        const result = await response.json();
+
         if (response.ok) {
+            if (result.payment_url) {
+                showBypassModal(result.transaction_id, result.amount || 0, id);
+                return;
+            }
             ALOGOTO.success('Plan approuvé, décaissement effectué.');
             fetchFundings();
             fetchStats();
         } else {
-            const result = await response.json().catch(() => ({}));
             ALOGOTO.error(result.message || 'Erreur lors de l\'approbation.');
         }
     } catch (error) {
@@ -510,17 +651,189 @@ async function handleDisbursement(id) {
             }
         });
 
+        const result = await response.json();
+
         if (response.ok) {
+            if (result.payment_url) {
+                showBypassModal(result.transaction_id, result.amount || 0, id);
+                return;
+            }
             ALOGOTO.success('Décaissement validé avec succès.');
             fetchFundings();
             fetchStats();
         } else {
-            const result = await response.json().catch(() => ({}));
             ALOGOTO.error(result.message || 'Erreur lors du décaissement.');
         }
     } catch (error) {
         ALOGOTO.error('Erreur de connexion.');
     }
+}
+
+function showBypassModal(transactionId, amount, fundingId) {
+    currentDisbursementTransactionId = transactionId;
+    currentDisbursementAmount = amount;
+    currentDisbursementId = fundingId;
+
+    document.getElementById('payment-disb-amount').textContent = new Intl.NumberFormat('fr-FR').format(amount);
+    document.getElementById('payment-disb-error').style.display = 'none';
+    document.getElementById('payment-disb-step-init').style.display = 'block';
+    document.getElementById('payment-disb-step-preloader').style.display = 'none';
+    document.getElementById('payment-disb-step-bypass').style.display = 'none';
+    document.getElementById('paymentDisbBtnCancel').style.display = 'inline-block';
+    document.getElementById('confirm-disbursement-payment').style.display = 'inline-block';
+    document.getElementById('confirm-disbursement-payment').disabled = false;
+
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('paymentDisbursementModal')).show();
+}
+
+function buildBypassForm(transactionId, amount) {
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
+    const formatted = new Intl.NumberFormat('fr-FR').format(amount || 0);
+    return `
+        <div class="bypass-checkout">
+            <style>
+                .bypass-checkout .bypass-amount {
+                    background: #fff8f0;
+                    border: 2px solid #fde4c8;
+                    border-radius: 12px;
+                    padding: 16px 18px;
+                    text-align: center;
+                    margin-bottom: 20px;
+                }
+                .bypass-checkout .bypass-amount .ba-label {
+                    font-size: 12px;
+                    color: #6b7a8f;
+                    text-transform: uppercase;
+                    letter-spacing: 1px;
+                    font-weight: 600;
+                }
+                .bypass-checkout .bypass-amount .ba-value {
+                    font-size: 24px;
+                    font-weight: 700;
+                    color: #d35400;
+                }
+                .bypass-checkout .bypass-amount .ba-value .ba-currency {
+                    font-size: 14px;
+                    color: #6b7a8f;
+                    font-weight: 500;
+                }
+                .bypass-checkout .form-group {
+                    margin-bottom: 16px;
+                }
+                .bypass-checkout .form-group label {
+                    display: block;
+                    font-size: 13px;
+                    font-weight: 600;
+                    color: #3d4a5c;
+                    margin-bottom: 5px;
+                }
+                .bypass-checkout .form-group .input-wrapper {
+                    position: relative;
+                }
+                .bypass-checkout .form-group .input-wrapper .prefix {
+                    position: absolute;
+                    left: 12px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    color: #6b7a8f;
+                    font-size: 13px;
+                    font-weight: 500;
+                    pointer-events: none;
+                }
+                .bypass-checkout .form-group input {
+                    width: 100%;
+                    padding: 10px 12px 10px 46px;
+                    border: 2px solid #e0e5ec;
+                    border-radius: 10px;
+                    font-size: 15px;
+                    color: #2d3748;
+                    outline: none;
+                    transition: border-color 0.2s;
+                    background: #fff;
+                }
+                .bypass-checkout .form-group input:focus {
+                    border-color: #e67e22;
+                    box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.12);
+                }
+                .bypass-checkout .form-group input.has-error {
+                    border-color: #dc3545;
+                }
+                .bypass-checkout .form-group .hint {
+                    font-size: 11px;
+                    color: #6b7a8f;
+                    margin-top: 4px;
+                }
+                .bypass-checkout .form-group .hint .success-hint { color: #1a7d36; }
+                .bypass-checkout .form-group .hint .fail-hint { color: #dc3545; }
+                .bypass-checkout .bypass-actions {
+                    display: flex;
+                    gap: 10px;
+                    margin-top: 20px;
+                }
+                .bypass-checkout .bypass-actions .btn-submit {
+                    flex: 2;
+                    padding: 12px;
+                    border: none;
+                    border-radius: 10px;
+                    font-size: 15px;
+                    font-weight: 600;
+                    color: #fff;
+                    background: linear-gradient(135deg, #e67e22, #d35400);
+                    cursor: pointer;
+                    transition: transform 0.15s, box-shadow 0.15s;
+                }
+                .bypass-checkout .bypass-actions .btn-submit:hover {
+                    transform: translateY(-1px);
+                    box-shadow: 0 4px 15px rgba(211, 84, 0, 0.3);
+                }
+                .bypass-checkout .bypass-actions .btn-cancel-bypass {
+                    flex: 1;
+                    padding: 12px;
+                    border: 2px solid #e0e5ec;
+                    border-radius: 10px;
+                    font-size: 13px;
+                    font-weight: 500;
+                    color: #6b7a8f;
+                    background: #fff;
+                    cursor: pointer;
+                    transition: border-color 0.2s, color 0.2s;
+                    text-align: center;
+                    text-decoration: none;
+                }
+                .bypass-checkout .bypass-actions .btn-cancel-bypass:hover {
+                    border-color: #dc3545;
+                    color: #dc3545;
+                }
+            </style>
+            <div class="bypass-amount">
+                <div class="ba-label">Montant à décaisser</div>
+                <div class="ba-value">${formatted} <span class="ba-currency">XOF</span></div>
+            </div>
+            <form method="POST" action="/payment/bypass-confirm/${transactionId}">
+                <input type="hidden" name="_token" value="${csrfToken}">
+                <div class="form-group">
+                    <label>Numéro de téléphone <span style="color:#dc3545;">*</span></label>
+                    <div class="input-wrapper">
+                        <span class="prefix">+229</span>
+                        <input type="tel" name="phone" class="bypass-phone-input"
+                               value="0168552584" placeholder="XX XX XX XX"
+                               maxlength="10" required>
+                    </div>
+                    <div class="hint">
+                        <i class="bi bi-info-circle"></i> Vous recevrez une demande de confirmation sur votre mobile
+                    </div>
+                </div>
+                <div class="bypass-actions">
+                    <button type="submit" class="btn-submit">
+                        <i class="bi bi-check-circle"></i> Payer ${formatted} XOF
+                    </button>
+                    <a href="/payment/bypass-cancel/${transactionId}" class="btn-cancel-bypass">
+                        <i class="bi bi-x-circle"></i> Annuler
+                    </a>
+                </div>
+            </form>
+        </div>
+    `;
 }
 
 function renderPagination(data) {

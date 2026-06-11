@@ -169,8 +169,8 @@ class DashboardController extends Controller
                 'id' => $prochaineEcheance->id,
                 'montant' => $prochaineEcheance->montant_total,
                 'date' => $prochaineEcheance->date_echeance?->format('d M Y'),
-                'projet' => $prochaineEcheance->funding?->project?->titre ?? 'N/A',
-                'institution' => $prochaineEcheance->funding?->institution?->nom ?? 'N/A',
+                'projet' => $prochaineEcheance->funding?->project?->titre ?? '',
+                'institution' => $prochaineEcheance->funding?->institution?->nom ?? '',
             ] : null,
         ]);
     }
@@ -205,7 +205,7 @@ class DashboardController extends Controller
             return [
                 'id' => $project->id,
                 'titre' => $project->titre,
-                'secteur' => $project->secteur ?? 'N/A',
+                'secteur' => $project->secteur ?? '',
                 'description' => $project->description ?? '',
                 'montant_demande' => (float) $project->montant_demande,
                 'montant_finance' => $funded,
@@ -217,14 +217,14 @@ class DashboardController extends Controller
                 'statut_can_delete' => $statusEnum->canOwnerModify(),
                 'statut_can_submit' => $statusEnum->canOwnerSubmit(),
                 'date_creation' => $project->created_at ? $project->created_at->format('Y-m-d') : null,
-                'date_creation_formatted' => $project->created_at ? $project->created_at->format('d M Y') : 'N/A',
+                'date_creation_formatted' => $project->created_at ? $project->created_at->format('d M Y') : '',
                 'timestamp' => $project->created_at ? $project->created_at->timestamp : 0,
                 'institution' => $latestFunding && $latestFunding->institution
                     ? $latestFunding->institution->nom
                     : null,
                 'remboursement' => $repaymentStatus,
-                'duree' => $project->duree ?? 'N/A',
-                'localisation' => $project->localisation ?? 'N/A',
+                'duree' => $project->duree ?? '',
+                'localisation' => $project->localisation ?? '',
             ];
         })->values();
 
@@ -405,7 +405,7 @@ class DashboardController extends Controller
                     'id' => $project->id,
                     'code' => $this->projectCode($project->id),
                     'titre' => $project->titre,
-                    'owner_name' => optional($project->owner)->name ?? 'N/A',
+                    'owner_name' => optional($project->owner)->name ?? '',
                     'montant_demande' => (float) $project->montant_demande,
                     'statut' => $status->value,
                     'statut_label' => $status->label(),
@@ -455,7 +455,7 @@ class DashboardController extends Controller
                     'id' => $project->id,
                     'code' => $this->projectCode($project->id),
                     'titre' => $project->titre,
-                    'secteur' => $project->secteur ?? 'N/A',
+                    'secteur' => $project->secteur ?? '',
                     'montant_demande' => (float) $project->montant_demande,
                     'statut' => $project->statusEnum()->value,
                     'statut_label' => $project->statusEnum()->label(),

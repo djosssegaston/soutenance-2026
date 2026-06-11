@@ -185,8 +185,8 @@ class DashboardPagesController extends Controller
                             'action' => $action['label'],
                             'icon' => $action['icon'],
                             'color' => $action['color'],
-                            'ip' => $log->ip ?? 'N/A',
-                            'date' => $log->date ? $log->date->format('d M Y H:i') : ($log->created_at ? $log->created_at->format('d M Y H:i') : 'N/A'),
+                            'ip' => $log->ip ?? '',
+                            'date' => $log->date ? $log->date->format('d M Y H:i') : ($log->created_at ? $log->created_at->format('d M Y H:i') : ''),
                         ];
                     });
 
@@ -239,8 +239,8 @@ class DashboardPagesController extends Controller
                             'action' => $action['label'],
                             'icon' => $action['icon'],
                             'color' => $action['color'],
-                            'ip' => $log->ip ?? 'N/A',
-                            'date' => $log->date ? $log->date->format('d M Y H:i') : ($log->created_at ? $log->created_at->format('d M Y H:i') : 'N/A'),
+                            'ip' => $log->ip ?? '',
+                            'date' => $log->date ? $log->date->format('d M Y H:i') : ($log->created_at ? $log->created_at->format('d M Y H:i') : ''),
                         ];
                     });
 
@@ -431,7 +431,7 @@ class DashboardPagesController extends Controller
                 $chartSectors = $sectorCounts->keys()->map(fn ($s) => $s ?: 'Non spécifié')->values()->all();
                 $chartSecteurData = $sectorCounts->values()->all();
                 $topSector = $sectorCounts->isNotEmpty()
-                    ? ($sectorCounts->keys()->first() ?: 'N/A')
+                    ? ($sectorCounts->keys()->first() ?: '')
                     : 'Aucun';
                 $totalActivityPct = $sectorCounts->isNotEmpty() && $projects->count() > 0
                     ? round(($sectorCounts->max() / $projects->count()) * 100)
@@ -703,7 +703,7 @@ class DashboardPagesController extends Controller
             'securite_admin.php' => 'admin.security',
             'parametres.php' => 'admin.settings',
             'mes_projets.php' => 'porteur.projects',
-            'remboursements.php' => 'porteur.repayments',
+            'remboursement.php' => 'porteur.repayments',
             'notifications.php' => 'porteur.notifications',
             'messages.php' => 'porteur.messages',
             'profil.php' => 'porteur.profile',

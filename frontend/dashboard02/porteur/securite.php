@@ -185,9 +185,9 @@ $activeSection = $_GET['section'] ?? 'password';
                                                 <tr data-session-id="<?php echo htmlspecialchars($session['id'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
                                                     <td><i class="bi bi-<?php echo $session['device'] === 'Mobile' ? 'phone' : ($session['device'] === 'Tablette' ? 'tablet' : 'laptop'); ?> me-2"></i><?php echo htmlspecialchars($session['device'] ?? 'Inconnu', ENT_QUOTES, 'UTF-8'); ?></td>
                                                     <td><?php echo htmlspecialchars($session['browser'] ?? 'Inconnu', ENT_QUOTES, 'UTF-8'); ?> (<?php echo htmlspecialchars($session['platform'] ?? '?', ENT_QUOTES, 'UTF-8'); ?>)</td>
-                                                    <td><?php echo htmlspecialchars($session['ip_address'] ?? 'N/A', ENT_QUOTES, 'UTF-8'); ?></td>
+                                                    <td><?php echo htmlspecialchars($session['ip_address'] ?? '', ENT_QUOTES, 'UTF-8'); ?></td>
                                                     <td>
-                                                        <?php echo htmlspecialchars($session['last_activity_ago'] ?? 'N/A', ENT_QUOTES, 'UTF-8'); ?>
+                                                        <?php echo htmlspecialchars($session['last_activity_ago'] ?? '', ENT_QUOTES, 'UTF-8'); ?>
                                                         <?php if ($session['is_current'] ?? false): ?><span class="badge bg-success-transparent text-success ms-2">Actuelle</span><?php endif; ?>
                                                     </td>
                                                     <td>
@@ -327,9 +327,9 @@ $activeSection = $_GET['section'] ?? 'password';
                                             <tbody id="auditLogsBody">
                                             <?php foreach ($auditLogs as $log): ?>
                                                 <tr>
-                                                    <td><i class="bi <?php echo htmlspecialchars($log['icon'] ?? 'bi-clock', ENT_QUOTES, 'UTF-8'); ?> text-<?php echo htmlspecialchars($log['color'] ?? 'secondary', ENT_QUOTES, 'UTF-8'); ?> me-2"></i><?php echo htmlspecialchars($log['action'] ?? 'N/A', ENT_QUOTES, 'UTF-8'); ?></td>
-                                                    <td><?php echo htmlspecialchars($log['ip'] ?? 'N/A', ENT_QUOTES, 'UTF-8'); ?></td>
-                                                    <td><?php echo htmlspecialchars($log['date'] ?? 'N/A', ENT_QUOTES, 'UTF-8'); ?></td>
+                                                    <td><i class="bi <?php echo htmlspecialchars($log['icon'] ?? 'bi-clock', ENT_QUOTES, 'UTF-8'); ?> text-<?php echo htmlspecialchars($log['color'] ?? 'secondary', ENT_QUOTES, 'UTF-8'); ?> me-2"></i><?php echo htmlspecialchars($log['action'] ?? '', ENT_QUOTES, 'UTF-8'); ?></td>
+                                                    <td><?php echo htmlspecialchars($log['ip'] ?? '', ENT_QUOTES, 'UTF-8'); ?></td>
+                                                    <td><?php echo htmlspecialchars($log['date'] ?? '', ENT_QUOTES, 'UTF-8'); ?></td>
                                                 </tr>
                                             <?php endforeach; ?>
                                             <?php if (empty($auditLogs)): ?><tr><td colspan="3" class="text-center py-4 text-muted">Aucun événement enregistré</td></tr><?php endif; ?>

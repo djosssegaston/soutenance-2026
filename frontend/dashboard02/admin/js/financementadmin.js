@@ -187,11 +187,11 @@ document.addEventListener('DOMContentLoaded', function() {
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td><span class="fw-semibold">FIN-${String(f.id).padStart(5,'0')}</span></td>
-                <td><h6 class="mb-0 fw-semibold">${f.project_title || 'N/A'}</h6></td>
-                <td>${f.institution_name || 'N/A'}</td>
+                <td><h6 class="mb-0 fw-semibold">${f.project_title || ''}</h6></td>
+                <td>${f.institution_name || ''}</td>
                 <td class="fw-bold text-success">${formatMoney(f.montant)} FCFA</td>
-                <td><span class="badge ${getTypeBadge(f.type)}">${f.type || 'N/A'}</span></td>
-                <td><span class="badge ${getStatusBadge(f.statut)}">${f.statut || 'N/A'}</span></td>
+                <td><span class="badge ${getTypeBadge(f.type)}">${f.type || ''}</span></td>
+                <td><span class="badge ${getStatusBadge(f.statut)}">${f.statut || ''}</span></td>
                 <td class="fs-12">${formatDate(f.created_at)}</td>
                 <td>
                     <div class="btn-list">
@@ -204,7 +204,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function formatMoney(a) { return new Intl.NumberFormat('fr-FR').format(a || 0); }
-    function formatDate(d) { if (!d) return 'N/A'; return new Date(d).toLocaleDateString('fr-FR', {day:'2-digit',month:'2-digit',year:'numeric'}); }
+    function formatDate(d) { if (!d) return ''; return new Date(d).toLocaleDateString('fr-FR', {day:'2-digit',month:'2-digit',year:'numeric'}); }
     function getTypeBadge(t) { return {'investment':'bg-primary-transparent text-primary','loan':'bg-warning-transparent text-warning','grant':'bg-success-transparent text-success'}[t] || 'bg-light text-dark'; }
     function getStatusBadge(s) { return {'pending':'bg-warning-transparent text-warning','disbursed':'bg-success-transparent text-success','completed':'bg-primary-transparent text-primary','failed':'bg-danger-transparent text-danger'}[s] || 'bg-light text-dark'; }
 

@@ -200,11 +200,15 @@ class PorteurFinancingController extends Controller
             return response()->json(['message' => 'Montant invalide.'], 422);
         }
 
+        if (empty($user->telephone)) {
+            return response()->json(['message' => 'Veuillez renseigner votre numéro de téléphone dans votre profil avant d\'effectuer un paiement.'], 422);
+        }
+
         $customerData = [
             'firstname' => $user->prenom ?? explode(' ', $user->name)[0],
             'lastname' => $user->nom ?? explode(' ', $user->name)[1] ?? 'Client',
             'email' => $user->email,
-            'phone' => $user->telephone ?? '22900000000',
+            'phone' => $user->telephone,
         ];
 
         try {
@@ -219,6 +223,7 @@ class PorteurFinancingController extends Controller
                 'payment_url' => $result['payment_url'],
                 'transaction_id' => $result['transaction_id'],
                 'token' => $result['token'],
+                'amount' => $montant,
             ]);
         } catch (\Exception $e) {
             return response()->json([

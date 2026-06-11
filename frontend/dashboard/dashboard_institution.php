@@ -296,7 +296,7 @@ HTML;
       tbody.innerHTML = response.projects.map(project => {
         const riskHtml = project.risk_score !== null && project.risk_score !== undefined
           ? `<span class="badge ${project.risk_score < 30 ? 'bg-success' : project.risk_score < 60 ? 'bg-warning' : 'bg-danger'}">${project.risk_score}/100</span>`
-          : '<span class="text-muted">N/A</span>';
+          : '';
         
         const statutColors = {
           'admin_validated': 'bg-success',

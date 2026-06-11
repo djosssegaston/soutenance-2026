@@ -34,8 +34,8 @@ class AdminEcheanceController extends Controller
 
         $data = $echeances->map(fn ($e) => [
             'id' => $e->id,
-            'project_title' => $e->project?->titre ?? 'N/A',
-            'porteur_name' => $e->project?->owner?->name ?? 'N/A',
+            'project_title' => $e->project?->titre ?? '',
+            'porteur_name' => $e->project?->owner?->name ?? '',
             'montant' => $e->montant_total,
             'date_echeance' => $e->date_echeance,
             'statut' => $e->statut,
@@ -69,7 +69,7 @@ class AdminEcheanceController extends Controller
             return [
                 'id' => $p->id,
                 'titre' => $p->titre,
-                'porteur_name' => $p->owner?->name ?? 'N/A',
+                'porteur_name' => $p->owner?->name ?? '',
                 'echeances_count' => $echeances->count(),
                 'total_due' => $echeances->sum('montant_total'),
                 'total_paid' => $echeances->sum('montant_paye'),
@@ -102,7 +102,7 @@ class AdminEcheanceController extends Controller
             'project' => [
                 'id' => $project->id,
                 'titre' => $project->titre,
-                'porteur_name' => $project->owner?->name ?? 'N/A',
+                'porteur_name' => $project->owner?->name ?? '',
             ],
             'data' => $echeances->map(fn ($e) => [
                 'id' => $e->id,
@@ -111,7 +111,7 @@ class AdminEcheanceController extends Controller
                 'montant_restant' => $e->montant_restant,
                 'date_echeance' => $e->date_echeance,
                 'statut' => $e->statut,
-                'institution_nom' => $e->institution?->nom ?? 'N/A',
+                'institution_nom' => $e->institution?->nom ?? '',
             ]),
         ]);
     }

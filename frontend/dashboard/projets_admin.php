@@ -21,7 +21,7 @@ $projects = \App\Models\Project::with('owner')->get()->map(function ($project) {
     return [
         'id' => 'PRJ-' . str_pad($project->id, 3, '0', STR_PAD_LEFT),
         'name' => $project->titre,
-        'carrier' => $project->owner->name ?? 'N/A',
+        'carrier' => $project->owner->name ?? '',
         'sector' => $project->secteur,
         'amount' => $project->montant_demande,
         'status_label' => $status['label'],

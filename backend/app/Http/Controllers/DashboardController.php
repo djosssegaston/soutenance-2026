@@ -110,7 +110,7 @@ class DashboardController extends Controller
             return [
                 'code' => $this->projectCode($project->id),
                 'title' => (string) $project->titre,
-                'owner' => optional($project->owner)->name ?? 'N/A',
+                'owner' => $project->owner?->name ?? '',
                 'amount' => $this->formatMoneyCompact($project->montant_demande),
                 'status_label' => $statusMeta['label'],
                 'status_class' => $statusMeta['class'],
@@ -238,7 +238,7 @@ class DashboardController extends Controller
             return [
                 'code' => $this->projectCode($project->id),
                 'title' => (string) $project->titre,
-                'sector' => $project->secteur ?? 'N/A',
+                'sector' => $project->secteur ?? '',
                 'amount' => $this->formatMoneyCompact($project->montant_demande),
                 'status_label' => $currentStatus->label(),
                 'status_class' => 'status-'.$currentStatus->color().' '.$currentStatus->color(),
@@ -338,7 +338,7 @@ class DashboardController extends Controller
             return [
                 'code' => $this->projectCode($project->id),
                 'title' => (string) $project->titre,
-                'sector' => $project->secteur ?? 'N/A',
+                'sector' => $project->secteur ?? '',
                 'amount' => $this->formatMoneyCompact($project->montant_demande),
                 'risk_label' => $riskMeta['label'],
                 'risk_class' => $riskMeta['class'],

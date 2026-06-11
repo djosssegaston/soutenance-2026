@@ -3,31 +3,18 @@
  */
 
 const API_BASE = '/api/v1';
-let currentPage = 1;
+let allRepayments = [];
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Initial Load
     fetchStats();
     fetchRepayments();
 
-    // Event Listeners
-    document.getElementById('search-btn').addEventListener('click', () => {
-        currentPage = 1;
-        fetchRepayments();
-    });
-
-    document.getElementById('reset-filters').addEventListener('click', () => {
-        document.getElementById('filter-status').value = '';
-        document.getElementById('filter-risk').value = '';
-        $('.select2').val(null).trigger('change');
-        currentPage = 1;
-        fetchRepayments();
+    document.getElementById('search-btn').addEventListener('click', filterProjects);
+    document.getElementById('search-input').addEventListener('keyup', function(e) {
+        if (e.key === 'Enter') filterProjects();
     });
 });
 
-/**
- * Récupère les stats
- */
 async function fetchStats() {
     try {
         const response = await fetch(`${API_BASE}/institution/remboursements/statistiques`, {
@@ -45,96 +32,169 @@ async function fetchStats() {
     }
 }
 
-/**
- * Récupère la liste des remboursements
- */
-async function fetchRepayments(page = 1) {
-    currentPage = page;
-    const loader = document.getElementById('repayments-loader');
-    const container = document.getElementById('repayments-list');
-    
+async function fetchRepayments() {
+    const loader = document.getElementById('projects-loader');
+    const container = document.getElementById('projects-list');
+    const empty = document.getElementById('projects-empty');
+
     if (loader) loader.style.display = 'block';
     if (container) container.innerHTML = '';
-
-    const statut = document.getElementById('filter-status').value;
-    const risque = document.getElementById('filter-risk').value;
+    if (empty) empty.style.display = 'none';
 
     try {
-        const response = await fetch(`${API_BASE}/institution/remboursements?page=${page}&statut=${statut}&risque=${risque}`, {
+        const response = await fetch(`${API_BASE}/institution/remboursements?per_page=500`, {
             headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
         });
         const data = await response.json();
-
-        renderRepayments(data.data);
-        renderPagination(data);
+        allRepayments = data.data || [];
+        renderProjects();
     } catch (error) {
         console.error('Error fetching repayments:', error);
-        container.innerHTML = '<tr><td colspan="7" class="text-center text-danger">Erreur de chargement.</td></tr>';
+        if (container) container.innerHTML = '<tr><td colspan="6" class="text-center text-danger">Erreur de chargement.</td></tr>';
     } finally {
         if (loader) loader.style.display = 'none';
     }
 }
 
-/**
- * Affiche les lignes de remboursements
- */
-function renderRepayments(repayments) {
-    const container = document.getElementById('repayments-list');
+function groupByProject(repayments) {
+    const map = {};
+    repayments.forEach(r => {
+        if (!r.project) return;
+        const pid = r.project.id;
+        if (!map[pid]) {
+            map[pid] = {
+                project_id: pid,
+                titre: r.project.titre,
+                owner: r.project.owner,
+                repayments: [],
+                total_due: 0,
+                total_paid: 0,
+                total_remaining: 0,
+                count: 0,
+            };
+        }
+        map[pid].repayments.push(r);
+        map[pid].total_due += parseFloat(r.montant_total || 0);
+        map[pid].total_paid += parseFloat(r.montant_rembourse || 0);
+        map[pid].total_remaining += parseFloat(r.montant_restant || 0);
+        map[pid].count++;
+    });
+    return Object.values(map);
+}
+
+function renderProjects() {
+    const container = document.getElementById('projects-list');
+    const empty = document.getElementById('projects-empty');
+    if (!container) return;
     container.innerHTML = '';
 
-    if (repayments.length === 0) {
-        container.innerHTML = '<tr><td colspan="7" class="text-center py-5 text-muted">Aucun remboursement trouvé.</td></tr>';
+    const paid = allRepayments.filter(r => r.statut === 'paye');
+
+    if (paid.length === 0) {
+        if (empty) empty.style.display = 'block';
         return;
     }
 
-    repayments.forEach(item => {
-        const riskBadge = getRiskBadge(item.niveau_risque);
-        const statusBadge = getStatusBadge(item.statut);
-        
-        const row = `
-            <tr>
-                <td>
-                    <div class="fw-semibold">${item.project.titre}</div>
-                    <div class="small text-muted">${item.project.owner.name}</div>
-                </td>
-                <td><span class="fw-bold">${formatMoney(item.montant_total)}</span></td>
-                <td><span class="text-danger">${formatMoney(item.montant_restant)}</span></td>
-                <td>${new Date(item.date_echeance).toLocaleDateString()}</td>
-                <td>${riskBadge}</td>
-                <td>${statusBadge}</td>
-                <td>
-                    <button class="btn btn-sm btn-primary" onclick="event.stopPropagation();viewRepaymentDetails(${item.id})">
-                        <i class="fe fe-eye"></i> Suivi
-                    </button>
-                </td>
-            </tr>
-        `;
-        container.innerHTML += row;
+    if (empty) empty.style.display = 'none';
+    const projects = groupByProject(paid);
+
+    projects.forEach(p => {
+        container.innerHTML += renderProjectRow(p);
     });
 }
 
-/**
- * Pagination
- */
-function renderPagination(data) {
-    const container = document.getElementById('pagination-container');
-    if (!container || !data.links) return;
-
-    let html = '<ul class="pagination pagination-rounded">';
-    data.links.forEach(link => {
-        if (link.url) {
-            const pageNum = link.url.split('page=')[1];
-            html += `<li class="page-item ${link.active ? 'active' : ''}"><a class="page-link" href="javascript:void(0)" onclick="fetchRepayments(${pageNum})">${link.label}</a></li>`;
-        }
-    });
-    html += '</ul>';
-    container.innerHTML = html;
+function renderProjectRow(p) {
+    return `
+        <tr role="button" style="cursor:pointer" onclick="openProjetPaiements(${p.project_id})">
+            <td class="ps-4">
+                <div class="fw-semibold">${escHtml(p.titre)}</div>
+                <div class="small text-muted">${escHtml(p.owner?.name || '')}</div>
+            </td>
+            <td><span class="fw-bold">${formatMoney(p.total_due)}</span></td>
+            <td><span class="text-success">${formatMoney(p.total_paid)}</span></td>
+            <td><span class="text-danger">${formatMoney(p.total_remaining)}</span></td>
+            <td>${p.count}</td>
+            <td class="pe-4">
+                <button class="btn btn-sm btn-primary" onclick="event.stopPropagation();openProjetPaiements(${p.project_id})">
+                    <i class="fe fe-eye"></i> Consulter
+                </button>
+            </td>
+        </tr>
+    `;
 }
 
-/**
- * Détails du remboursement
- */
+function filterProjects() {
+    const q = document.getElementById('search-input').value.toLowerCase().trim();
+    const container = document.getElementById('projects-list');
+    const empty = document.getElementById('projects-empty');
+    if (!container) return;
+    container.innerHTML = '';
+
+    const paid = allRepayments.filter(r => r.statut === 'paye');
+    let projects = groupByProject(paid);
+
+    if (q) {
+        projects = projects.filter(p =>
+            p.titre.toLowerCase().includes(q) ||
+            (p.owner?.name || '').toLowerCase().includes(q)
+        );
+    }
+
+    if (projects.length === 0) {
+        if (empty) empty.style.display = 'block';
+        return;
+    }
+
+    if (empty) empty.style.display = 'none';
+
+    projects.forEach(p => {
+        container.innerHTML += renderProjectRow(p);
+    });
+}
+
+function openProjetPaiements(projectId) {
+    const paid = allRepayments.filter(r => r.statut === 'paye' && r.project && r.project.id === projectId);
+    const project = paid[0]?.project || allRepayments.find(r => r.project && r.project.id === projectId)?.project;
+
+    if (!project) return;
+
+    document.getElementById('modal-projet-title').textContent = escHtml(project.titre);
+
+    const list = document.getElementById('projet-paiements-list');
+    const empty = document.getElementById('projet-paiements-empty');
+    list.innerHTML = '';
+
+    if (paid.length === 0) {
+        empty.style.display = 'block';
+    } else {
+        empty.style.display = 'none';
+        paid.forEach(r => {
+            const tr = `
+                <tr>
+                    <td>${formatMoney(r.montant_total)}</td>
+                    <td class="text-success">${formatMoney(r.montant_rembourse)}</td>
+                    <td class="text-danger">${formatMoney(r.montant_restant)}</td>
+                    <td>${new Date(r.date_echeance).toLocaleDateString()}</td>
+                    <td class="risk-col">${getRiskBadge(r.niveau_risque)}</td>
+                    <td class="statut-col">${getStatusBadge(r.statut)}</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" onclick="event.stopPropagation();viewRepaymentDetails(${r.id})">
+                            <i class="fe fe-eye"></i> Suivi
+                        </button>
+                    </td>
+                </tr>
+            `;
+            list.innerHTML += tr;
+        });
+    }
+
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('projetPaiementsModal')).show();
+}
+
 async function viewRepaymentDetails(id) {
+    const projetModal = bootstrap.Modal.getInstance(document.getElementById('projetPaiementsModal'));
+    if (projetModal) projetModal.hide();
+
     try {
         const response = await fetch(`${API_BASE}/institution/remboursements/${id}`, {
             headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
@@ -147,7 +207,7 @@ async function viewRepaymentDetails(id) {
                 <div class="col-md-6">
                     <h6 class="fw-bold mb-3">Résumé Échéance</h6>
                     <table class="table table-sm">
-                        <tr><td>Projet:</td><td class="fw-bold">${item.project.titre}</td></tr>
+                        <tr><td>Projet:</td><td class="fw-bold">${escHtml(item.project.titre)}</td></tr>
                         <tr><td>Montant Dû:</td><td class="fw-bold">${formatMoney(item.montant_total)}</td></tr>
                         <tr><td>Déjà Remboursé:</td><td class="text-success">${formatMoney(item.montant_rembourse)}</td></tr>
                         <tr><td>Reste à Payer:</td><td class="text-danger fw-bold">${formatMoney(item.montant_restant)}</td></tr>
@@ -167,14 +227,14 @@ async function viewRepaymentDetails(id) {
                     ` : ''}
                 </div>
             </div>
-            
+
             <h6 class="fw-bold mt-4">Historique des Événements</h6>
             <ul class="list-group list-group-flush border rounded">
                 ${item.events && item.events.length > 0 ? item.events.map(e => `
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <div>
-                            <strong>${e.type_evenement.toUpperCase()}</strong> - ${e.details}
-                            <div class="fs-11 text-muted">Par: ${e.auteur}</div>
+                            <strong>${escHtml(e.type).toUpperCase()}</strong> - ${escHtml(e.description)}
+                            <div class="fs-11 text-muted">Par: ${escHtml(e.user_name)}</div>
                         </div>
                         <span class="small text-muted">${new Date(e.created_at).toLocaleString()}</span>
                     </li>
@@ -182,7 +242,6 @@ async function viewRepaymentDetails(id) {
             </ul>
         `;
 
-        // Actions
         document.getElementById('btn-validate-repayment').onclick = () => validateRepayment(id);
         document.getElementById('btn-open-dispute').onclick = async () => {
             const modalEl = document.getElementById('modal-repayment-details');
@@ -232,7 +291,7 @@ async function validateRepayment(id) {
         });
         if (response.ok) {
             ALOGOTO.success('Remboursement validé.');
-            fetchRepayments(currentPage);
+            fetchRepayments();
             fetchStats();
         } else {
             const result = await response.json().catch(() => ({}));
@@ -257,7 +316,7 @@ async function openDispute(id, motif) {
         });
         if (response.ok) {
             ALOGOTO.success('Litige ouvert.');
-            fetchRepayments(currentPage);
+            fetchRepayments();
         } else {
             const result = await response.json().catch(() => ({}));
             ALOGOTO.error(result.message || 'Erreur lors de l\'ouverture du litige.');
@@ -267,7 +326,13 @@ async function openDispute(id, motif) {
     }
 }
 
-// Helpers
+function escHtml(str) {
+    if (!str) return '';
+    const d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+}
+
 function formatMoney(amount) {
     return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'XOF', minimumFractionDigits: 0 }).format(amount);
 }

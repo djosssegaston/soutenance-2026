@@ -158,7 +158,7 @@ $activeTab = $_GET['tab'] ?? 'all';
                                             data-type="<?php echo $notification->type; ?>"
                                             data-title="<?php echo htmlspecialchars($notification->title ?? 'Sans titre', ENT_QUOTES, 'UTF-8'); ?>"
                                             data-content="<?php echo htmlspecialchars($notification->content, ENT_QUOTES, 'UTF-8'); ?>"
-                                            data-date="<?php echo $notification->created_at ? $notification->created_at->format('d M Y H:i') : 'N/A'; ?>"
+                                            data-date="<?php echo $notification->created_at ? $notification->created_at->format('d M Y H:i') : ''; ?>"
                                             data-status="<?php echo $isArchived ? 'archived' : ($isUnread ? 'unread' : 'read'); ?>"
                                             class="<?php echo $isUnread && !$isArchived ? 'fw-bold' : ''; ?>">
                                             <td><?php echo $index; ?></td>
@@ -185,7 +185,7 @@ $activeTab = $_GET['tab'] ?? 'all';
                                                 <?php endif; ?>
                                             </td>
                                             <td>
-                                                <small class="text-muted"><?php echo $notification->created_at ? $notification->created_at->format('d M Y H:i') : 'N/A'; ?></small>
+                                                <small class="text-muted"><?php echo $notification->created_at ? $notification->created_at->format('d M Y H:i') : ''; ?></small>
                                             </td>
                                             <td>
                                                 <div class="g-1 d-flex gap-1 flex-nowrap">

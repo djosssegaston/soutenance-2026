@@ -407,8 +407,7 @@ async function analyzeProject(id) {
         const data = await response.json();
 
         if (response.ok) {
-            ALOGOTO.success('Analyse lancée avec succès. Le projet est maintenant dans votre pipeline d\'analyse.');
-            fetchProjects(currentPage);
+            window.location.href = 'projets_analyses.php';
         } else {
             ALOGOTO.error(data.message || 'Erreur lors du lancement de l\'analyse.');
         }

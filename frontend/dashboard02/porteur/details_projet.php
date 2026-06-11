@@ -48,7 +48,7 @@ $financements = $project->financements ?? collect();
                             <div class="row mb-4">
                                 <div class="col-md-6">
                                     <h6 class="fw-bold">Secteur</h6>
-                                    <p><?php echo htmlspecialchars($project->secteur ?? 'N/A', ENT_QUOTES, 'UTF-8'); ?></p>
+                                    <p><?php echo htmlspecialchars($project->secteur ?? '', ENT_QUOTES, 'UTF-8'); ?></p>
                                 </div>
                                 <div class="col-md-6">
                                     <h6 class="fw-bold">Montant demandé</h6>
@@ -64,7 +64,7 @@ $financements = $project->financements ?? collect();
                                 </div>
                                 <div class="col-md-6">
                                     <h6 class="fw-bold">Date de soumission</h6>
-                                    <p><?php echo $project->created_at ? $project->created_at->format('d M Y') : 'N/A'; ?></p>
+                                    <p><?php echo $project->created_at ? $project->created_at->format('d M Y') : ''; ?></p>
                                 </div>
                             </div>
                             <?php endif; ?>
@@ -92,7 +92,7 @@ $financements = $project->financements ?? collect();
                                     <tbody>
                                         <?php foreach ($financements as $f): ?>
                                         <tr id="funding-row-<?php echo $f->id; ?>">
-                                            <td><?php echo htmlspecialchars($f->institution->nom ?? 'N/A', ENT_QUOTES, 'UTF-8'); ?></td>
+                                            <td><?php echo htmlspecialchars($f->institution->nom ?? '', ENT_QUOTES, 'UTF-8'); ?></td>
                                             <td><?php echo number_format($f->montant_propose, 0, ',', ' '); ?> FCFA</td>
                                             <td><?php echo $f->taux_interet; ?>%</td>
                                             <td><?php echo $f->duree; ?> mois</td>
@@ -178,8 +178,8 @@ $financements = $project->financements ?? collect();
                             <div class="table-responsive">
                                 <table class="table table-sm">
                                     <tr><td>Statut</td><td><span class="badge bg-<?php echo $statusColor; ?>"><?php echo $statusLabel; ?></span></td></tr>
-                                    <tr><td>Secteur</td><td><?php echo htmlspecialchars($project->secteur ?? 'N/A', ENT_QUOTES, 'UTF-8'); ?></td></tr>
-                                    <tr><td>Créé le</td><td><?php echo $project->created_at ? $project->created_at->format('d/m/Y') : 'N/A'; ?></td></tr>
+                                    <tr><td>Secteur</td><td><?php echo htmlspecialchars($project->secteur ?? '', ENT_QUOTES, 'UTF-8'); ?></td></tr>
+                                    <tr><td>Créé le</td><td><?php echo $project->created_at ? $project->created_at->format('d/m/Y') : ''; ?></td></tr>
                                     <?php if ($project->date_soumission): ?>
                                     <tr><td>Soumis le</td><td><?php echo $project->date_soumission->format('d/m/Y'); ?></td></tr>
                                     <?php endif; ?>
@@ -199,7 +199,7 @@ $financements = $project->financements ?? collect();
                             <?php foreach ($analyses as $analysis): ?>
                             <div class="mb-3 p-3 border rounded">
                                 <div class="fw-bold"><?php echo htmlspecialchars($analysis->institution->nom ?? 'Institution', ENT_QUOTES, 'UTF-8'); ?></div>
-                                <div class="small text-muted">Note: <?php echo $analysis->note_risque ?? 'N/A'; ?> / 100</div>
+                                <div class="small text-muted">Note: <?php echo $analysis->note_risque ?? ''; ?> / 100</div>
                                 <div class="small"><?php echo htmlspecialchars(substr($analysis->commentaires ?? '', 0, 200), ENT_QUOTES, 'UTF-8'); ?></div>
                                 <span class="badge bg-<?php echo ($analysis->decision ?? '') === 'favorable' ? 'success' : (($analysis->decision ?? '') === 'defavorable' ? 'danger' : 'secondary'); ?> mt-1">
                                     <?php echo ucfirst($analysis->decision ?? 'En attente'); ?>

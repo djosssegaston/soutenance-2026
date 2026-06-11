@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const json = await res.json();
             if (!json.success) throw new Error('Erreur API');
             const items = json.data || [];
-            document.getElementById('modal-institution-name').textContent = items.length > 0 ? (items[0].institution_nom || 'N/A') : 'N/A';
+            document.getElementById('modal-institution-name').textContent = items.length > 0 ? (items[0].institution_nom || '') : '';
             renderModalEcheances(items);
         } catch (e) {
             document.getElementById('modal-echeances-body').innerHTML =

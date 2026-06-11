@@ -95,11 +95,11 @@ class ExportController extends Controller
         $rows = $projects->map(fn ($p) => [
             $p->id,
             $p->titre,
-            $p->owner?->name ?? 'N/A',
+            $p->owner?->name ?? '',
             number_format((float) $p->montant_demande, 0, ',', ' ').' FCFA',
-            $p->secteur ?? 'N/A',
+            $p->secteur ?? '',
             $p->statut ?? 'draft',
-            $p->created_at?->format('d/m/Y') ?? 'N/A',
+            $p->created_at?->format('d/m/Y') ?? '',
         ])->toArray();
 
         return compact('columns', 'rows');
@@ -124,11 +124,11 @@ class ExportController extends Controller
             $u->id,
             $u->name,
             $u->email,
-            $u->telephone ?? 'N/A',
+            $u->telephone ?? '',
             $u->role,
             $u->statut ?? 'actif',
-            $u->ville ?? 'N/A',
-            $u->created_at?->format('d/m/Y') ?? 'N/A',
+            $u->ville ?? '',
+            $u->created_at?->format('d/m/Y') ?? '',
         ])->toArray();
 
         return compact('columns', 'rows');
@@ -148,13 +148,13 @@ class ExportController extends Controller
 
         $rows = $repayments->map(fn ($r) => [
             $r->id,
-            $r->project?->titre ?? 'N/A',
-            $r->project?->owner?->name ?? 'N/A',
+            $r->project?->titre ?? '',
+            $r->project?->owner?->name ?? '',
             number_format((float) $r->montant_total, 0, ',', ' ').' FCFA',
             number_format((float) ($r->montant_rembourse ?? 0), 0, ',', ' ').' FCFA',
-            $r->statut ?? 'N/A',
-            $r->date_echeance?->format('d/m/Y') ?? 'N/A',
-            $r->date_paiement?->format('d/m/Y') ?? 'N/A',
+            $r->statut ?? '',
+            $r->date_echeance?->format('d/m/Y') ?? '',
+            $r->date_paiement?->format('d/m/Y') ?? '',
         ])->toArray();
 
         return compact('columns', 'rows');
@@ -174,12 +174,12 @@ class ExportController extends Controller
 
         $rows = $fundings->map(fn ($f) => [
             $f->id,
-            $f->project?->titre ?? 'N/A',
-            $f->institution?->nom ?? 'N/A',
+            $f->project?->titre ?? '',
+            $f->institution?->nom ?? '',
             number_format((float) ($f->montant_valide ?? $f->montant ?? 0), 0, ',', ' ').' FCFA',
             $f->type ?? 'loan',
-            $f->statut ?? 'N/A',
-            $f->created_at?->format('d/m/Y') ?? 'N/A',
+            $f->statut ?? '',
+            $f->created_at?->format('d/m/Y') ?? '',
         ])->toArray();
 
         return compact('columns', 'rows');
@@ -199,12 +199,12 @@ class ExportController extends Controller
 
         $rows = $echeances->map(fn ($e) => [
             $e->id,
-            $e->project?->titre ?? 'N/A',
-            $e->project?->owner?->name ?? 'N/A',
+            $e->project?->titre ?? '',
+            $e->project?->owner?->name ?? '',
             number_format((float) $e->montant_total, 0, ',', ' ').' FCFA',
-            $e->statut ?? 'N/A',
-            $e->date_echeance?->format('d/m/Y') ?? 'N/A',
-            $e->date_paiement?->format('d/m/Y') ?? 'N/A',
+            $e->statut ?? '',
+            $e->date_echeance?->format('d/m/Y') ?? '',
+            $e->date_paiement?->format('d/m/Y') ?? '',
         ])->toArray();
 
         return compact('columns', 'rows');

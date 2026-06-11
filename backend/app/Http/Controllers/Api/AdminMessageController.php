@@ -117,7 +117,7 @@ class AdminMessageController extends Controller
 
             return [
                 'id' => $c->id,
-                'name' => $c->porteur?->name ?? ($c->institution?->nom ?? 'N/A'),
+                'name' => $c->porteur?->name ?? ($c->institution?->nom ?? ''),
                 'avatar' => $c->porteur?->avatar_url ?? $c->institution?->logo ?? null,
                 'last_message' => $lm ? substr($lm->message, 0, 80) : '',
                 'last_at' => $lm?->created_at?->diffForHumans() ?? '',

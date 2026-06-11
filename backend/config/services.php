@@ -40,6 +40,8 @@ return [
         'public_key' => env('FEDAPAY_PUBLIC_KEY'),
         'environment' => env('FEDAPAY_ENV', 'sandbox'),
         'webhook_secret' => env('FEDAPAY_WEBHOOK_SECRET'),
+        'penalty_daily_rate' => env('PENALTY_DAILY_RATE', 0.001),
+        'sandbox_bypass' => env('FEDAPAY_SANDBOX_BYPASS', env('APP_ENV') === 'local'),
     ],
 
     'google' => [

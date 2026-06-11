@@ -700,7 +700,7 @@ function loadHistory() {
         }
         var html = '';
         data.forEach(function(log) {
-            html += '<tr><td><i class="bi ' + (log.icon || 'bi-clock') + ' text-' + (log.color || 'secondary') + ' me-2"></i>' + (log.action || '') + '</td><td>' + (log.ip || 'N/A') + '</td><td>' + (log.date || 'N/A') + '</td></tr>';
+            html += '<tr><td><i class="bi ' + (log.icon || 'bi-clock') + ' text-' + (log.color || 'secondary') + ' me-2"></i>' + (log.action || '') + '</td><td>' + (log.ip || '') + '</td><td>' + (log.date || '') + '</td></tr>';
         });
         tbody.innerHTML = html;
         updatePagination('historyBody', 'historyPagination');

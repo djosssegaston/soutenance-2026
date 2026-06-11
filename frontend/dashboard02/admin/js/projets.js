@@ -146,7 +146,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 </td>
                 <td>
-                    <div class="fw-semibold">${p.owner ? p.owner.name : 'N/A'}</div>
+                    <div class="fw-semibold">${p.owner ? p.owner.name : ''}</div>
                     <div class="fs-12 text-muted">${p.localisation || 'Secteur non défini'}</div>
                 </td>
                 <td>
@@ -340,10 +340,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- HELPERS ---
     function renderStatusCell(p) {
         const financedStatuses = ['funded', 'active', 'completed'];
-        const hasFunding = (p.financements && p.financements.length > 0) || (p.montant_finance && p.montant_finance > 0);
-        const isFinanced = financedStatuses.includes(p.statut) || hasFunding;
-        const label = isFinanced ? 'Projet déjà financé' : getStatusLabel(p.statut);
-        const badge = isFinanced ? 'bg-success' : getStatusBadge(p.statut);
+        const disbursedStatuses = ['disbursed', 'active'];
+        const proposedStatuses = ['proposed', 'awaiting_borrower_plan', 'awaiting_imf_validation'];
+        const hasDisbursedFunding = p.financements && p.financements.some(f => disbursedStatuses.includes(f.statut));
+        const hasProposedFunding = p.financements && p.financements.some(f => proposedStatuses.includes(f.statut));
+        const isFinanced = financedStatuses.includes(p.statut) || hasDisbursedFunding;
+        const label = isFinanced ? 'Projet déjà financé' : (hasProposedFunding ? 'Financement proposé' : getStatusLabel(p.statut));
+        const badge = isFinanced ? 'bg-success' : (hasProposedFunding ? 'bg-info' : getStatusBadge(p.statut));
         return `<span class="badge ${badge}">${label}</span>`;
     }
 
@@ -352,7 +355,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function formatDate(dateString) {
-        if (!dateString) return 'N/A';
+        if (!dateString) return '';
         const d = new Date(dateString);
         return d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
     }

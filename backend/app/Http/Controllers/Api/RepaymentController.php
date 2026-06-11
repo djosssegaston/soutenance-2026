@@ -168,6 +168,10 @@ class RepaymentController extends Controller
             return response()->json(['message' => 'Ce remboursement est déjà payé'], 400);
         }
 
+        if (empty($user->telephone)) {
+            return response()->json(['message' => 'Veuillez renseigner votre numéro de téléphone dans votre profil avant d\'effectuer un paiement.'], 422);
+        }
+
         try {
             $result = $this->repaymentService->initiateRepaymentPayment($repayment, $user);
 

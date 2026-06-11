@@ -137,13 +137,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="d-flex align-items-center">
                         <span class="avatar avatar-md brround me-3" style="background-image: url('${resolveAvatarUrl(u.avatar)}')"></span>
                         <div>
-                            <h6 class="mb-0 fw-semibold">${u.name || 'N/A'}</h6>
+                            <h6 class="mb-0 fw-semibold">${u.name || ''}</h6>
                             <span class="fs-12 text-muted">ID: ${u.id}</span>
                         </div>
                     </div>
                 </td>
                 <td>
-                    <div class="fw-semibold">${u.email || 'N/A'}</div>
+                    <div class="fw-semibold">${u.email || ''}</div>
                     <div class="fs-12 text-muted">${u.phone || '—'}</div>
                 </td>
                 <td><span class="badge ${getRoleBadge(u.role)}">${formatRole(u.role)}</span></td>
@@ -345,19 +345,19 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function formatDate(dateString) {
-        if (!dateString) return 'N/A';
+        if (!dateString) return '';
         const d = new Date(dateString);
         return d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
     }
 
     function formatRole(role) {
         const map = { 'porteur': 'Porteur', 'institution': 'Institution', 'admin': 'Administrateur' };
-        return map[role] || role || 'N/A';
+        return map[role] || role || '';
     }
 
     function formatStatus(status) {
         const map = { 'active': 'Actif', 'suspended': 'Suspendu', 'pending': 'En attente' };
-        return map[status] || status || 'N/A';
+        return map[status] || status || '';
     }
 
     function getRoleBadge(role) {

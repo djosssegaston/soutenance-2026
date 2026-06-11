@@ -28,7 +28,7 @@ class RepaymentRecorded implements ShouldBroadcast
         return [
             'type' => 'repayment',
             'title' => 'Remboursement '.($this->repayment->statut === 'paye' ? 'reçu' : 'en attente'),
-            'message' => 'Projet: '.($this->repayment->project?->titre ?? 'N/A'),
+            'message' => 'Projet: '.($this->repayment->project?->titre ?? ''),
             'repayment_id' => $this->repayment->id,
             'montant' => $this->repayment->montant_total,
             'statut' => $this->repayment->statut,

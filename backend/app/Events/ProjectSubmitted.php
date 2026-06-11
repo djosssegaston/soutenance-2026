@@ -27,7 +27,7 @@ class ProjectSubmitted implements ShouldBroadcast
         return [
             'type' => 'project_submitted',
             'title' => 'Nouveau projet soumis',
-            'message' => $this->project->titre.' par '.($this->project->owner?->name ?? 'N/A'),
+            'message' => $this->project->titre.' par '.($this->project->owner?->name ?? ''),
             'project_id' => $this->project->id,
             'montant' => $this->project->montant_demande,
         ];

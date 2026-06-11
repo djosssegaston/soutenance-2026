@@ -61,7 +61,7 @@ class MonitoringService
 
             return ($size[0]->size ?? 0).' MB';
         } catch (\Exception $e) {
-            return 'N/A';
+            return '—';
         }
     }
 }

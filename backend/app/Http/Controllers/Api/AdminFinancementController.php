@@ -29,8 +29,8 @@ class AdminFinancementController extends Controller
 
         $data = $financements->map(fn ($f) => [
             'id' => $f->id,
-            'project_title' => $f->project?->titre ?? 'N/A',
-            'institution_name' => $f->institution?->nom ?? 'N/A',
+            'project_title' => $f->project?->titre ?? '',
+            'institution_name' => $f->institution?->nom ?? '',
             'montant' => $f->montant_valide ?? $f->montant_propose ?? $f->montant_demande,
             'type' => $f->type ?? 'loan',
             'statut' => $f->statut,
@@ -56,12 +56,12 @@ class AdminFinancementController extends Controller
             'data' => [
                 'id' => $funding->id,
                 'reference' => 'FIN-'.str_pad((string) $funding->id, 5, '0', STR_PAD_LEFT),
-                'project_title' => $funding->project?->titre ?? 'N/A',
+                'project_title' => $funding->project?->titre ?? '',
                 'project_description' => $funding->project?->description ?? '',
-                'project_secteur' => $funding->project?->secteur ?? 'N/A',
-                'porteur_name' => $funding->porteur?->name ?? $funding->project?->owner?->name ?? 'N/A',
+                'project_secteur' => $funding->project?->secteur ?? '',
+                'porteur_name' => $funding->porteur?->name ?? $funding->project?->owner?->name ?? '',
                 'porteur_email' => $funding->porteur?->email ?? $funding->project?->owner?->email ?? '',
-                'institution_name' => $funding->institution?->nom ?? 'N/A',
+                'institution_name' => $funding->institution?->nom ?? '',
                 'montant_demande' => (float) ($funding->montant_demande ?? 0),
                 'montant_propose' => (float) ($funding->montant_propose ?? 0),
                 'montant_valide' => (float) ($funding->montant_valide ?? 0),

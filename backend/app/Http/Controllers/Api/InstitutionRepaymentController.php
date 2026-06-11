@@ -42,7 +42,7 @@ class InstitutionRepaymentController extends Controller
             $query->where('niveau_risque', $request->risque);
         }
 
-        $repayments = $query->latest()->paginate(10);
+        $repayments = $query->latest()->paginate($request->integer('per_page', 10));
 
         // Mise à jour dynamique du risque et pénalités lors de la consultation
         $repayments->getCollection()->transform(function ($r) {
@@ -107,7 +107,7 @@ class InstitutionRepaymentController extends Controller
         return response()->json([
             'id' => $repayment->id,
             'project' => [
-                'titre' => $repayment->project?->titre ?? 'N/A',
+                'titre' => $repayment->project?->titre ?? '',
             ],
             'montant_total' => $repayment->montant_total,
             'montant_rembourse' => $repayment->montant_rembourse,
@@ -205,7 +205,7 @@ class InstitutionRepaymentController extends Controller
             return [
                 'id' => $p->id,
                 'titre' => $p->titre,
-                'porteur_name' => $p->owner?->name ?? 'N/A',
+                'porteur_name' => $p->owner?->name ?? '',
                 'echeances_count' => $echeances->count(),
                 'total_due' => $echeances->sum('montant_total'),
                 'total_paid' => $echeances->sum('montant_paye'),
@@ -249,7 +249,7 @@ class InstitutionRepaymentController extends Controller
             'project' => [
                 'id' => $project->id,
                 'titre' => $project->titre,
-                'porteur_name' => $project->owner?->name ?? 'N/A',
+                'porteur_name' => $project->owner?->name ?? '',
             ],
             'data' => $echeances->map(fn ($e) => [
                 'id' => $e->id,
@@ -258,7 +258,7 @@ class InstitutionRepaymentController extends Controller
                 'montant_restant' => $e->montant_restant,
                 'date_echeance' => $e->date_echeance,
                 'statut' => $e->statut,
-                'institution_nom' => $e->institution?->nom ?? 'N/A',
+                'institution_nom' => $e->institution?->nom ?? '',
             ]),
         ]);
     }
