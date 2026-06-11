@@ -157,7 +157,7 @@ class PaymentController extends Controller
         if ($status === 'failed') {
             $returnUrl = $transaction
                 ? match ($transaction->type) {
-                    'echeance_repayment' => '/frontend/dashboard02/porteur/echeances.php',
+                    'echeance_repayment' => '/frontend/dashboard02/porteur/echances.php',
                     'repayment' => '/frontend/dashboard02/porteur/remboursements.php',
                     default => '/frontend/dashboard02/porteur',
                 }

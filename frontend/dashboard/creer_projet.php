@@ -160,6 +160,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $projectId = isset($_POST['project_id']) ? (int) $_POST['project_id'] : null;
 
+    $project = null;
+
     if ($error_message === '' && $projectId) {
         $project = \App\Models\Project::where('id', $projectId)->where('user_id', $user->id)->first();
         if (!$project) {
@@ -177,12 +179,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'statut' => $statut,
                 'statut_soumission' => $statut_soumission,
             ]);
-
-            header("Location: mes_projets.php");
-            exit;
         }
-    } else {
-        \App\Models\Project::create([
+    } elseif ($error_message === '') {
+        $project = \App\Models\Project::create([
             'user_id' => $user->id,
             'titre' => $formValues['name'],
             'description' => $formValues['description'],
@@ -193,6 +192,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'statut' => $statut,
             'statut_soumission' => $statut_soumission,
         ]);
+    }
+
+    if ($project && $error_message === '') {
+        // Sauvegarder l'image du projet
+        if (!empty($_FILES['projectImage']['tmp_name'])) {
+            $imageDir = 'projects/' . $project->id;
+            \Illuminate\Support\Facades\Storage::disk('public')->makeDirectory($imageDir);
+            $imagePath = $_FILES['projectImage']['tmp_name'];
+            $imageName = 'image_' . time() . '.' . pathinfo($_FILES['projectImage']['name'], PATHINFO_EXTENSION);
+            \Illuminate\Support\Facades\Storage::disk('public')->putFileAs($imageDir, new \Illuminate\Http\File($imagePath), $imageName);
+        }
+
+        // Sauvegarder les documents
+        if (!empty($_FILES['projectDocs']['name']) && is_array($_FILES['projectDocs']['name'])) {
+            $docsDir = 'projects/' . $project->id;
+            \Illuminate\Support\Facades\Storage::disk('public')->makeDirectory($docsDir);
+            foreach ($_FILES['projectDocs']['tmp_name'] as $i => $tmpName) {
+                if (!empty($tmpName) && !empty($_FILES['projectDocs']['name'][$i])) {
+                    $docName = 'doc_' . time() . '_' . $i . '.' . pathinfo($_FILES['projectDocs']['name'][$i], PATHINFO_EXTENSION);
+                    \Illuminate\Support\Facades\Storage::disk('public')->putFileAs($docsDir, new \Illuminate\Http\File($tmpName), $docName);
+                    \App\Models\ProjectDocument::create([
+                        'project_id' => $project->id,
+                        'type' => pathinfo($_FILES['projectDocs']['name'][$i], PATHINFO_EXTENSION),
+                        'fichier' => $docName,
+                        'statut_validation' => 'en_attente',
+                        'uploaded_at' => now(),
+                    ]);
+                }
+            }
+        }
 
         header("Location: mes_projets.php");
         exit;

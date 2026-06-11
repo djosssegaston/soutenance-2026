@@ -170,9 +170,9 @@ Route::prefix('v1')->group(function () {
 
         // Routes remboursements porteur
         Route::get('porteur/remboursements', [RepaymentController::class, 'index']);
+        Route::get('porteur/remboursements/historique', [RepaymentController::class, 'history']);
         Route::get('porteur/remboursements/{repayment}', [RepaymentController::class, 'show']);
         Route::post('porteur/remboursements/{repayment}/payer', [RepaymentController::class, 'initiatePayment']);
-        Route::get('porteur/remboursements/historique', [RepaymentController::class, 'history']);
 
         // Routes porteur financement workflow
         Route::prefix('porteur/financements')->group(function () {
