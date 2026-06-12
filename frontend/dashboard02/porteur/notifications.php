@@ -348,9 +348,12 @@ function execAction(url, method, cb) {
     });
 }
 
+function stripHtml(str) {
+    return String(str || '').replace(/<[^>]*>/g, '');
+}
 function showConfirm(title, message, btnClass, btnText, callback) {
     document.getElementById('confirmModalTitle').innerHTML = title;
-    document.getElementById('confirmModalMessage').textContent = message;
+    document.getElementById('confirmModalMessage').textContent = stripHtml(message);
     var btn = document.getElementById('confirmModalBtn');
     btn.className = 'btn ' + btnClass;
     btn.textContent = btnText;
@@ -399,8 +402,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     '</span>' +
                     '<span class="badge bg-' + statusColor + '-transparent text-' + statusColor + ' p-2 px-3 mb-2 d-inline-block ms-2">' + statusLabel + '</span>' +
                 '</div>' +
-                '<h5 class="fw-bold mb-2">' + title + '</h5>' +
-                '<p class="text-muted mb-3">' + content + '</p>' +
+                '<h5 class="fw-bold mb-2">' + title.replace(/<[^>]*>/g, '') + '</h5>' +
+                '<p class="text-muted mb-3">' + content.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '').replace(/on\w+\s*=\s*"[^"]*"/gi, '').replace(/on\w+\s*=\s*'[^']*'/gi, '') + '</p>' +
                 '<small class="text-muted">Reçue le : ' + date + '</small>';
 
             viewModalInstance.show();

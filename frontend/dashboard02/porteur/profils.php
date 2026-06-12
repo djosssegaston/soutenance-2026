@@ -391,8 +391,11 @@ const csrfToken = '<?php echo $csrf_token ?? ""; ?>';
 var confirmModal = null;
 var confirmCallback = null;
 
+function stripHtml(str) {
+    return String(str || '').replace(/<[^>]*>/g, '');
+}
 function showAlert(el, msg, type) {
-    el.textContent = msg;
+    el.textContent = stripHtml(msg);
     el.className = 'alert alert-' + type;
     el.classList.remove('d-none');
 }
@@ -403,7 +406,7 @@ function hideAlert(el) {
 
 function showConfirm(title, message, btnClass, btnText, callback) {
     document.getElementById('confirmModalTitle').innerHTML = title;
-    document.getElementById('confirmModalMessage').textContent = message;
+    document.getElementById('confirmModalMessage').textContent = stripHtml(message);
     var btn = document.getElementById('confirmModalBtn');
     btn.className = 'btn ' + btnClass;
     btn.textContent = btnText;
@@ -700,7 +703,7 @@ function loadHistory() {
         }
         var html = '';
         data.forEach(function(log) {
-            html += '<tr><td><i class="bi ' + (log.icon || 'bi-clock') + ' text-' + (log.color || 'secondary') + ' me-2"></i>' + (log.action || '') + '</td><td>' + (log.ip || '') + '</td><td>' + (log.date || '') + '</td></tr>';
+            html += '<tr><td><i class="bi ' + (log.icon || 'bi-clock') + ' text-' + (log.color || 'secondary') + ' me-2"></i>' + escHtml(log.action || '') + '</td><td>' + escHtml(log.ip || '') + '</td><td>' + escHtml(log.date || '') + '</td></tr>';
         });
         tbody.innerHTML = html;
         updatePagination('historyBody', 'historyPagination');

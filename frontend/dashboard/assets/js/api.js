@@ -249,13 +249,20 @@ const ALOGOTO_API = (function() {
         },
 
         /**
+         * Escape HTML special chars
+         */
+        _stripHtml(str) {
+            return String(str || '').replace(/<[^>]*>/g, '');
+        },
+
+        /**
          * Display success notification
          */
         showSuccess(message, duration = 3000) {
             const notification = document.createElement('div');
             notification.className = 'alert alert-success alert-dismissible fade show';
             notification.innerHTML = `
-                <i class="bi bi-check-circle"></i> ${message}
+                <i class="bi bi-check-circle"></i> ${this._stripHtml(message)}
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             `;
             notification.style.position = 'fixed';
@@ -278,7 +285,7 @@ const ALOGOTO_API = (function() {
             const notification = document.createElement('div');
             notification.className = 'alert alert-danger alert-dismissible fade show';
             notification.innerHTML = `
-                <i class="bi bi-exclamation-triangle"></i> ${message}
+                <i class="bi bi-exclamation-triangle"></i> ${this._stripHtml(message)}
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             `;
             notification.style.position = 'fixed';

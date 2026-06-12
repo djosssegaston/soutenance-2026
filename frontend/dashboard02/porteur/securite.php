@@ -384,9 +384,12 @@ function execAction(url, method, body, cb) {
     .catch(function() { showError('Erreur de connexion'); });
 }
 
+function stripHtml(str) {
+    return String(str || '').replace(/<[^>]*>/g, '');
+}
 function showConfirm(title, message, btnClass, btnText, callback) {
     document.getElementById('confirmModalTitle').innerHTML = title;
-    document.getElementById('confirmModalMessage').textContent = message;
+    document.getElementById('confirmModalMessage').textContent = stripHtml(message);
     var btn = document.getElementById('confirmModalBtn');
     btn.className = 'btn ' + btnClass;
     btn.textContent = btnText;
@@ -396,13 +399,13 @@ function showConfirm(title, message, btnClass, btnText, callback) {
 
 function showError(msg) {
     var el = document.getElementById('passwordError');
-    if (el) { el.textContent = msg; el.classList.remove('d-none'); setTimeout(function(){el.classList.add('d-none');},5000); }
-    else { ModalHelper.alert('<i class="bi bi-exclamation-circle me-2 text-danger"></i> Erreur', msg); }
+    if (el) { el.textContent = stripHtml(msg); el.classList.remove('d-none'); setTimeout(function(){el.classList.add('d-none');},5000); }
+    else { ModalHelper.alert('<i class="bi bi-exclamation-circle me-2 text-danger"></i> Erreur', stripHtml(msg)); }
 }
 
 function showSuccess(msg) {
     var el = document.getElementById('passwordSuccess');
-    if (el) { el.textContent = msg; el.classList.remove('d-none'); setTimeout(function(){el.classList.add('d-none');},5000); }
+    if (el) { el.textContent = stripHtml(msg); el.classList.remove('d-none'); setTimeout(function(){el.classList.add('d-none');},5000); }
 }
 
 function loadPasswordHistory() {
@@ -417,7 +420,7 @@ function loadPasswordHistory() {
         if (data.length === 0) { el.innerHTML = '<p class="text-muted small">Aucun changement enregistré</p>'; return; }
         var html = '<ul class="list-unstyled mb-0">';
         data.forEach(function(log) {
-            html += '<li class="mb-2"><i class="bi bi-arrow-right-circle text-info me-2"></i>' + log.date + ' <small class="text-muted">(' + log.ip + ')</small></li>';
+            html += '<li class="mb-2"><i class="bi bi-arrow-right-circle text-info me-2"></i>' + escHtml(log.date) + ' <small class="text-muted">(' + escHtml(log.ip) + ')</small></li>';
         });
         html += '</ul>';
         el.innerHTML = html;

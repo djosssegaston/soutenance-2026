@@ -397,13 +397,17 @@ window.DocumentViewer = {
         }
     });
 
+    function stripHtml(str) {
+        return String(str || '').replace(/<[^>]*>/g, '');
+    }
+
     window.ModalHelper = {
         confirm: function(title, message, confirmText, cancelText, confirmBtnClass) {
             return new Promise(function(resolve) {
                 mode = 'confirm';
                 resetUI(confirmBtnClass || 'btn-primary');
                 titleEl.innerHTML = title || 'Confirmation';
-                msgEl.textContent = message || '';
+                msgEl.textContent = stripHtml(message || '');
                 confirmBtn.textContent = confirmText || 'Confirmer';
                 cancelBtn.textContent = cancelText || 'Annuler';
                 confirmBtn.style.display = '';
@@ -419,7 +423,7 @@ window.DocumentViewer = {
                 mode = 'alert';
                 resetUI('btn-primary');
                 titleEl.innerHTML = title || 'Information';
-                msgEl.textContent = message || '';
+                msgEl.textContent = stripHtml(message || '');
                 confirmBtn.textContent = buttonText || 'OK';
                 confirmBtn.style.display = '';
                 cancelBtn.style.display = 'none';
@@ -435,7 +439,7 @@ window.DocumentViewer = {
                 mode = 'error';
                 resetUI('btn-danger');
                 titleEl.innerHTML = '<i class="bi bi-x-octagon me-2 text-danger"></i>' + (title || 'Erreur');
-                msgEl.textContent = message || 'Une erreur est survenue.';
+                msgEl.textContent = stripHtml(message || 'Une erreur est survenue.');
                 confirmBtn.textContent = 'OK';
                 confirmBtn.style.display = '';
                 cancelBtn.style.display = 'none';
@@ -451,7 +455,7 @@ window.DocumentViewer = {
                 mode = 'success';
                 resetUI('btn-success');
                 titleEl.innerHTML = '<i class="bi bi-check-circle me-2 text-success"></i>' + (title || 'Succès');
-                msgEl.textContent = message || 'Opération réussie.';
+                msgEl.textContent = stripHtml(message || 'Opération réussie.');
                 confirmBtn.textContent = 'OK';
                 confirmBtn.style.display = '';
                 cancelBtn.style.display = 'none';

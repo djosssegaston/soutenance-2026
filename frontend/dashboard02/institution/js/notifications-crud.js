@@ -63,6 +63,8 @@ function renderNotifications(notifs) {
 
     notifs.forEach(n => {
         const typeIcon = getTypeIcon(n.type);
+        const title = (n.title || 'Sans titre').replace(/<[^>]*>/g, '');
+        const content = (n.content || '').replace(/<[^>]*>/g, '');
         const row = `
             <tr class="${n.is_read ? '' : 'fw-bold'}">
                 <td>
@@ -70,8 +72,8 @@ function renderNotifications(notifs) {
                         <i class="${typeIcon} fs-18"></i>
                     </span>
                 </td>
-                <td>${n.title || 'Sans titre'}</td>
-                <td><span class="text-muted">${n.content.substring(0, 50)}...</span></td>
+                <td>${title}</td>
+                <td><span class="text-muted">${content.substring(0, 50)}...</span></td>
                 <td>${getStatusBadge(n)}</td>
                 <td><small>${new Date(n.created_at).toLocaleString()}</small></td>
                 <td>
@@ -99,9 +101,11 @@ async function viewNotif(id) {
         const n = data.notifications.data.find(x => x.id === id);
 
         const modalBody = document.getElementById('viewModalBody');
+        const title = (n.title || 'Notification').replace(/<[^>]*>/g, '');
+        const content = (n.content || 'Aucun contenu').replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '').replace(/on\w+\s*=\s*"[^"]*"/gi, '').replace(/on\w+\s*=\s*'[^']*'/gi, '');
         modalBody.innerHTML = `
-            <h5 class="fw-bold">${n.title}</h5>
-            <p class="text-muted">${n.content}</p>
+            <h5 class="fw-bold">${title}</h5>
+            <p class="text-muted">${content}</p>
             <div class="small text-muted mt-3">Reçue le ${new Date(n.created_at).toLocaleString()}</div>
         `;
         

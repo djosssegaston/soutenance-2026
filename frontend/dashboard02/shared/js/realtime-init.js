@@ -13,6 +13,10 @@
 /*  Fonctions globales (toasts + badge)                                */
 /* ------------------------------------------------------------------ */
 
+function stripHtml(str) {
+    return String(str || '').replace(/<[^>]*>/g, '');
+}
+
 function showRealtimeAlert(type, title, message) {
     try {
         var container = document.getElementById('realtime-toast-container');
@@ -39,10 +43,10 @@ function showRealtimeAlert(type, title, message) {
             '<div id="' + id + '" class="toast show border-0 ' + (colors[type] || 'border-info') + ' border-start border-4 shadow-sm mb-2" role="alert">' +
                 '<div class="toast-header bg-white">' +
                     '<i class="' + (icons[type] || 'fe fe-bell') + ' me-2 text-' + type + '"></i>' +
-                    '<strong class="me-auto fs-12">' + title + '</strong>' +
+                    '<strong class="me-auto fs-12">' + stripHtml(title) + '</strong>' +
                     '<button type="button" class="btn-close" data-bs-dismiss="toast"></button>' +
                 '</div>' +
-                '<div class="toast-body fs-11 py-2">' + message + '</div>' +
+                '<div class="toast-body fs-11 py-2">' + stripHtml(message) + '</div>' +
             '</div>';
 
         container.insertAdjacentHTML('afterbegin', html);

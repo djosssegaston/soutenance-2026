@@ -28,35 +28,40 @@ class EcheanceService
             throw new \InvalidArgumentException('Le montant mensuel doit être supérieur à 0.');
         }
 
-        // Nombre d'échéances = capital / montant mensuel (part_ capital fixe)
-        $nombreEcheances = (int) ceil($capital / $montantMensuel);
-
-        // Taux d'intérêt par échéance = taux annuel / nombre d'échéances
-        $tauxParEcheance = ($tauxAnnuel / 100) / $nombreEcheances;
+        // Taux mensuel fixe (taux annuel / 12)
+        $tauxMensuel = ($tauxAnnuel / 100) / 12;
 
         $capitalRestant = $capital;
         $echeances = [];
+        $totalInterets = 0;
 
         DB::beginTransaction();
         try {
             $funding->echeances()->delete();
             Repayment::where('financement_id', $funding->id)->delete();
 
-            for ($i = 1; $i <= $nombreEcheances; $i++) {
+            $i = 1;
+            while (round($capitalRestant, 2) > 0) {
                 $dateEcheance = $this->calculerDateEcheance($dateDecaissement, $i, $jourRemboursement);
 
-                // Intérêts sur le capital restant au taux de la période
-                $interetsEcheance = round($capitalRestant * $tauxParEcheance, 2);
+                // Intérêts sur le capital restant au taux mensuel
+                $interetsEcheance = round($capitalRestant * $tauxMensuel, 2);
 
-                // Dernière échéance : tout le capital restant
-                if ($i === $nombreEcheances) {
+                // Le total (capital + intérêts) ne doit pas dépasser le montant mensuel
+                // Capital = montant mensuel - intérêts
+                $capitalTheorique = round($montantMensuel - $interetsEcheance, 2);
+
+                // Dernière échéance : on prend tout le capital restant
+                if ($capitalTheorique >= $capitalRestant) {
                     $capitalEcheance = round($capitalRestant, 2);
+                    $montantEcheance = round($capitalEcheance + $interetsEcheance, 2);
                 } else {
-                    $capitalEcheance = round(min($montantMensuel, $capitalRestant), 2);
+                    $capitalEcheance = max(0, $capitalTheorique);
+                    $montantEcheance = $montantMensuel;
                 }
 
-                $montantEcheance = round($capitalEcheance + $interetsEcheance, 2);
                 $capitalRestant = round($capitalRestant - $capitalEcheance, 2);
+                $totalInterets += $interetsEcheance;
 
                 $statut = EcheanceStatus::PENDING->value;
                 if ($dateEcheance->isPast() && $dateEcheance->isBefore(now()->subDay())) {
@@ -110,6 +115,8 @@ class EcheanceService
                         'penalites' => 0,
                     ]
                 );
+
+                $i++;
             }
 
             $funding->update([
@@ -122,7 +129,7 @@ class EcheanceService
                 'financement_id' => $funding->id,
                 'nombre_echeances' => count($echeances),
                 'capital' => $capital,
-                'taux_par_echeance' => $tauxParEcheance,
+                'taux_mensuel' => $tauxMensuel,
             ]);
         } catch (\Exception $e) {
             DB::rollBack();

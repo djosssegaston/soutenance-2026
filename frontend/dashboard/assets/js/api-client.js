@@ -83,6 +83,10 @@ async function apiFetch(endpoint, options = {}) {
  * Affiche une notification d'erreur API
  * @param {string} message - Le message d'erreur à afficher
  */
+function stripHtml(str) {
+    return String(str || '').replace(/<[^>]*>/g, '');
+}
+
 function showApiError(message) {
     // Vérifie si un conteneur d'alerte existe déjà
     let alertContainer = document.getElementById('api-alert-container');
@@ -115,7 +119,7 @@ function showApiError(message) {
         animation: slideIn 0.3s ease-out;
     `;
     alert.innerHTML = `
-        <strong><i class="bi bi-exclamation-triangle"></i> Erreur:</strong> ${message}
+        <strong><i class="bi bi-exclamation-triangle"></i> Erreur:</strong> ${stripHtml(message)}
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     `;
 
@@ -161,7 +165,7 @@ function showApiSuccess(message) {
         animation: slideIn 0.3s ease-out;
     `;
     alert.innerHTML = `
-        <strong><i class="bi bi-check-circle"></i> Succès:</strong> ${message}
+        <strong><i class="bi bi-check-circle"></i> Succès:</strong> ${stripHtml(message)}
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     `;
 
